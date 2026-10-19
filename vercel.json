@@ -1,9 +1,18 @@
 {
   "version": 2,
+  "services": {
+    "stream-admin-backend": {
+      "root": ".",
+      "entrypoint": "server.js"
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/api/index.js"
+      "destination": {
+        "type": "service",
+        "service": "stream-admin-backend"
+      }
     }
   ],
   "env": {

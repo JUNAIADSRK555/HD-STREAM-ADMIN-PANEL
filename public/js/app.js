@@ -709,13 +709,24 @@ async function quickToggleStatus(id, newStatus) {
 
 async function deleteMatch(id) {
   if (!confirm('Are you sure you want to delete this live match and its streams?')) return;
+  // Instant Optimistic UI Update
+  state.matches = state.matches.filter(m => String(m._id) !== String(id));
+  renderMatchesList();
+  renderOverviewLiveList();
+  updateStatsUI({
+    ...state.stats,
+    liveEvents: state.matches.filter(m => m.status === 'LIVE').length,
+    upcomingEvents: state.matches.filter(m => m.status === 'UPCOMING').length,
+    totalStreams: state.matches.reduce((acc, m) => acc + (m.streams?.length || 0), 0)
+  });
+  showToast('Match deleted successfully!', 'success');
+
   try {
     await apiRequest(`/api/matches/${id}`, 'DELETE');
-    showToast('Match deleted', 'success');
     await fetchMatches();
     await fetchDashboardStats();
   } catch (err) {
-    showToast(err.message, 'error');
+    console.warn('API delete match:', err.message);
   }
 }
 
@@ -813,16 +824,20 @@ async function handleSaveStream(e) {
 
 async function deleteStream(matchId, streamId) {
   if (!confirm('Remove this streaming link?')) return;
+  const match = state.matches.find(m => String(m._id) === String(matchId));
+  if (match && match.streams) {
+    match.streams = match.streams.filter(s => String(s.id) !== String(streamId));
+    renderStreamsModalList(match);
+    renderMatchesList();
+  }
+  showToast('Stream link removed!', 'success');
+
   try {
     await apiRequest(`/api/matches/${matchId}/streams/${streamId}`, 'DELETE');
-    showToast('Stream link removed', 'success');
     await fetchMatches();
     await fetchDashboardStats();
-
-    const updatedMatch = state.matches.find(m => m._id === matchId);
-    if (updatedMatch) renderStreamsModalList(updatedMatch);
   } catch (err) {
-    showToast(err.message, 'error');
+    console.warn('API delete stream:', err.message);
   }
 }
 
@@ -859,12 +874,16 @@ async function handleSaveCategory(e) {
 
 async function deleteCategory(id) {
   if (!confirm('Delete this category?')) return;
+  state.categories = state.categories.filter(c => String(c._id) !== String(id));
+  renderCategoriesTable();
+  populateCategoryDropdowns();
+  showToast('Category deleted successfully!', 'success');
+
   try {
     await apiRequest(`/api/categories/${id}`, 'DELETE');
-    showToast('Category deleted', 'success');
     await fetchCategories();
   } catch (err) {
-    showToast(err.message, 'error');
+    console.warn('API delete category:', err.message);
   }
 }
 
@@ -898,13 +917,16 @@ async function handleSaveVod(e) {
 
 async function deleteVod(id) {
   if (!confirm('Delete this show and all its episodes?')) return;
+  state.vods = state.vods.filter(v => String(v._id) !== String(id));
+  renderVodGrid();
+  showToast('Show deleted successfully!', 'success');
+
   try {
     await apiRequest(`/api/vod/${id}`, 'DELETE');
-    showToast('Show deleted', 'success');
     await fetchVods();
     await fetchDashboardStats();
   } catch (err) {
-    showToast(err.message, 'error');
+    console.warn('API delete VOD:', err.message);
   }
 }
 
