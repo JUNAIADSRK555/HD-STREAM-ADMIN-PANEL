@@ -24,8 +24,8 @@ const initialMatches = [
     bannerUrl: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=80',
     description: 'High voltage super clash live from Dubai International Stadium.',
     isPinned: true,
-    team1: { name: 'India', shortName: 'IND', flag: '🇮🇳', score: '286/5 (46.2 ov)' },
-    team2: { name: 'Pakistan', shortName: 'PAK', flag: '🇵🇰', score: 'Target: 312' },
+    team1: { name: 'India', shortName: 'IND', flag: '🇮🇳', score: '' },
+    team2: { name: 'Pakistan', shortName: 'PAK', flag: '🇵🇰', score: '' },
     streams: [
       {
         id: 'str_icc_01',
@@ -95,7 +95,7 @@ const initialMatches = [
     bannerUrl: 'https://images.unsplash.com/photo-1531415074868-036b107e775a?auto=format&fit=crop&w=1200&q=80',
     description: 'The historic Ashes battle continues under sunny skies at Lord’s.',
     isPinned: false,
-    team1: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺', score: 'Starts at 3:30 PM' },
+    team1: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺', score: '' },
     team2: { name: 'England', shortName: 'ENG', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', score: '' },
     streams: [
       {
@@ -270,18 +270,46 @@ const Store = {
 
   // --- STREAMS INSIDE A MATCH ---
   async addStreamToMatch(matchId, streamData) {
+    let cleanUrl = streamData.streamUrl ? String(streamData.streamUrl).trim() : '';
+    const headers = {
+      userAgent: streamData.headers?.userAgent || streamData.headers?.['User-Agent'] || '',
+      referer: streamData.headers?.referer || streamData.headers?.['Referer'] || '',
+      origin: streamData.headers?.origin || streamData.headers?.['Origin'] || '',
+      cookie: streamData.headers?.cookie || streamData.headers?.['Cookie'] || ''
+    };
+
+    if (cleanUrl.includes('|')) {
+      const pipeIdx = cleanUrl.indexOf('|');
+      const headerStr = cleanUrl.substring(pipeIdx + 1).trim();
+      cleanUrl = cleanUrl.substring(0, pipeIdx).trim();
+
+      const pairs = headerStr.split(/[&|]/);
+      for (const pair of pairs) {
+        const eq = pair.indexOf('=');
+        if (eq > 0) {
+          const k = pair.substring(0, eq).trim().toLowerCase();
+          const v = pair.substring(eq + 1).trim();
+          if (k && v) {
+            if (k === 'user-agent') headers.userAgent = v;
+            else if (k === 'referer') headers.referer = v;
+            else if (k === 'origin') headers.origin = v;
+            else if (k === 'cookie') headers.cookie = v;
+            else headers[k] = v;
+          }
+        }
+      }
+    }
+
     const streamObj = {
       id: 'str_' + Math.random().toString(36).substr(2, 9),
       title: streamData.title || 'Live Stream Server',
-      streamType: streamData.streamType || 'M3U8',
-      streamUrl: streamData.streamUrl,
+      streamType: streamData.streamType || (cleanUrl.includes('.mpd') ? 'MPD' : 'M3U8'),
+      streamUrl: cleanUrl,
+      jsonChannelUrl: streamData.jsonChannelUrl ? String(streamData.jsonChannelUrl).trim() : '',
+      jsonTokenUrl: streamData.jsonTokenUrl ? String(streamData.jsonTokenUrl).trim() : '',
+      jsonToken: streamData.jsonToken ? String(streamData.jsonToken).trim() : (streamData.token ? String(streamData.token).trim() : ''),
       quality: streamData.quality || 'Auto',
-      headers: {
-        userAgent: streamData.headers?.userAgent || '',
-        referer: streamData.headers?.referer || '',
-        origin: streamData.headers?.origin || '',
-        cookie: streamData.headers?.cookie || ''
-      },
+      headers,
       drm: {
         enabled: Boolean(streamData.drm?.enabled),
         scheme: streamData.drm?.scheme || 'clearkey',

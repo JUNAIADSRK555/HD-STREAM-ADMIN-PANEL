@@ -124,14 +124,15 @@ function formatMatchForMobile(match) {
         headers: {
           'User-Agent': s.headers?.userAgent || 'ExoPlayer-Media3/1.4.0',
           'Referer': s.headers?.referer || '',
-          'Origin': s.headers?.origin || ''
+          'Origin': s.headers?.origin || '',
+          'Cookie': s.headers?.cookie || ''
         },
         drm: {
           enabled: Boolean(s.drm?.enabled),
           scheme: s.drm?.scheme || 'none',
           keyId: s.drm?.keyId || '',
           key: s.drm?.key || '',
-          licenseUrl: s.drm?.enabled ? `/api/feed/clearkey/${match._id}/${s.id}` : null,
+          licenseUrl: s.drm?.licenseUrl || (s.drm?.scheme === 'widevine' ? s.drm?.key : (s.drm?.enabled ? `/api/feed/clearkey/${match._id}/${s.id}` : null)),
           clearKeyLicense
         }
       };
@@ -180,11 +181,15 @@ router.get('/playlist.m3u', async (req, res) => {
 
         m3uContent += `#EXTINF:-1 tvg-id="${stream.id}" tvg-name="${m.title}" tvg-logo="${logo}" group-title="${groupTitle}"${userAgent}${referer},${channelName}\n`;
 
-        // ClearKey DRM tags for Kodi / OTT players
-        if (stream.drm?.enabled && stream.drm.scheme === 'clearkey' && stream.drm.keyId && stream.drm.key) {
+        // DRM tags (Widevine & ClearKey) for Kodi, TiviMate, Sparkle & OTT players
+        if (stream.drm?.enabled && (stream.drm.scheme === 'widevine' || stream.drm.licenseUrl)) {
           m3uContent += `#KODIPROP:inputstream.adaptive.manifest_type=${stream.streamType.toLowerCase()}\n`;
-          m3uContent += `#KODIPROP:inputstream.adaptive.license_type=org.w3.clearkey\n`;
-          m3uContent += `#KODIPROP:inputstream.adaptive.license_key={"keys":[{"kty":"oct","k":"${hexToBase64Url(stream.drm.key)}","kid":"${hexToBase64Url(stream.drm.keyId)}"}]}\n`;
+          m3uContent += `#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha\n`;
+          m3uContent += `#KODIPROP:inputstream.adaptive.license_key=${stream.drm.licenseUrl || stream.drm.key}\n`;
+        } else if (stream.drm?.enabled && stream.drm.scheme === 'clearkey' && stream.drm.keyId && stream.drm.key) {
+          m3uContent += `#KODIPROP:inputstream.adaptive.manifest_type=${stream.streamType.toLowerCase()}\n`;
+          m3uContent += `#KODIPROP:inputstream.adaptive.license_type=clearkey\n`;
+          m3uContent += `#KODIPROP:inputstream.adaptive.license_key=${stream.drm.keyId}:${stream.drm.key}\n`;
         }
 
         m3uContent += `${stream.streamUrl}\n\n`;

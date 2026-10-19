@@ -16,7 +16,56 @@
   <!-- Custom Styles -->
   <link rel="stylesheet" href="/css/dashboard.css">
 </head>
-<body class="text-slate-100 antialiased selection:bg-emerald-500 selection:text-black">
+<body class="text-slate-100 antialiased selection:bg-orange-500 selection:text-black">
+
+  <!-- ADMIN AUTHENTICATION LOCK SCREEN (Password Prompt on Link Open) -->
+  <div id="auth-lock-overlay" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-4 transition-all duration-300">
+    <div class="glass-panel p-8 max-w-md w-full border border-orange-500/30 rounded-3xl shadow-2xl shadow-orange-500/20 text-center relative overflow-hidden">
+      <!-- Glow background decoration -->
+      <div class="absolute -top-16 -right-16 w-36 h-36 bg-orange-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -left-16 w-36 h-36 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="w-16 h-16 rounded-2xl bg-white p-1 flex items-center justify-center mx-auto mb-4 shadow-xl shadow-orange-500/30 overflow-hidden">
+        <img src="/logo.png" alt="HD STREAM" class="w-full h-full object-contain rounded-xl">
+      </div>
+      <h2 class="text-2xl font-black tracking-tight text-white">HD<span class="text-orange-500"> STREAM</span></h2>
+      <p class="text-xs text-slate-400 mt-1 mb-6 font-medium">Administrator Portal Authentication</p>
+
+      <form id="form-auth-login" onsubmit="handleAdminLogin(event)" class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Admin Username</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm"><i class="fa-solid fa-user"></i></span>
+            <input type="text" id="auth-username" required value="admin"
+                   class="w-full bg-slate-900/90 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none transition-all">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">Admin Password</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm"><i class="fa-solid fa-key"></i></span>
+            <input type="password" id="auth-password" required placeholder="Enter password (default: admin123)"
+                   class="w-full bg-slate-900/90 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none transition-all">
+          </div>
+        </div>
+
+        <div id="auth-error-msg" class="hidden text-xs text-rose-400 bg-rose-950/50 border border-rose-500/30 rounded-xl p-3 font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-circle-exclamation text-rose-400"></i>
+          <span id="auth-error-text">Incorrect username or password.</span>
+        </div>
+
+        <button type="submit" id="btn-auth-submit" class="w-full py-3 px-4 rounded-xl font-black text-sm bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-slate-950 shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2 transition-all cursor-pointer">
+          <i class="fa-solid fa-lock-open"></i> Unlock Dashboard
+        </button>
+
+        <div class="pt-2 text-[11px] text-slate-400 text-center flex items-center justify-center gap-2">
+          <i class="fa-solid fa-shield-halved text-orange-400"></i>
+          <span>Protected Area • Default: <strong class="text-white">admin</strong> / <strong class="text-white">admin123</strong></span>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- Mobile Top Bar Toggle -->
   <div class="lg:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800">
@@ -34,8 +83,8 @@
   <!-- Sidebar Navigation -->
   <aside id="sidebar" class="sidebar">
     <div class="p-6 border-b border-slate-800/80 flex items-center gap-3">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-orange-500/30">
-        <i class="fa-solid fa-satellite-dish"></i>
+      <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-lg shadow-orange-500/30 overflow-hidden">
+        <img src="/logo.png" alt="HD STREAM" class="w-full h-full object-contain rounded-lg">
       </div>
       <div>
         <h1 class="font-black text-lg tracking-tight leading-none">HD<span class="text-orange-500"> STREAM</span></h1>
@@ -51,13 +100,13 @@
         <span>Dashboard</span>
       </a>
       <a class="nav-link" data-tab="matches">
-        <i class="fa-solid fa-baseball-bat-ball w-5"></i>
-        <span>Live Events</span>
+        <i class="fa-solid fa-tower-broadcast w-5 text-red-400"></i>
+        <span>Live Matches & Cricket</span>
         <span id="badge-live-count" class="ml-auto text-xs font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30">0</span>
       </a>
       <a class="nav-link" data-tab="categories">
-        <i class="fa-solid fa-folder-tree w-5"></i>
-        <span>Categories</span>
+        <i class="fa-solid fa-tv w-5 text-orange-400"></i>
+        <span>24/7 TV & Categories</span>
       </a>
       <a class="nav-link" data-tab="vod">
         <i class="fa-solid fa-film w-5"></i>
@@ -103,17 +152,35 @@
         <p id="page-desc" class="text-sm text-slate-400 mt-1">Real-time control center for live matches, streaming sources, and DRM keys.</p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2.5">
         <!-- Live Clock -->
-        <div class="hidden sm:flex items-center gap-2 bg-slate-900/80 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono text-slate-300">
-          <i class="fa-regular fa-clock text-emerald-400"></i>
+        <div class="hidden xl:flex items-center gap-2 bg-slate-900/80 border border-slate-800 px-3 py-2 rounded-xl text-xs font-mono text-slate-300">
+          <i class="fa-regular fa-clock text-orange-400"></i>
           <span id="current-clock">--:--:-- UTC</span>
         </div>
 
-        <!-- Quick Action Button -->
-        <button onclick="openNewMatchModal()" class="btn-primary-glow">
+        <!-- Direct Channel / Stream (Manual + Token + JSON Key) -->
+        <button onclick="openDirectChannelModal()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-black text-xs flex items-center gap-2 hover:from-orange-400 hover:to-amber-400 transition-all shadow-lg shadow-orange-500/20">
+          <i class="fa-solid fa-tv"></i>
+          <span>+ Add Channel & DRM Key</span>
+        </button>
+
+        <!-- Bulk Import M3U / JSON -->
+        <button onclick="openImportModal()" class="px-3 py-2 rounded-xl bg-purple-600/30 text-purple-300 border border-purple-500/40 hover:bg-purple-600/50 font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-purple-600/10">
+          <i class="fa-solid fa-file-import"></i>
+          <span>Import M3U / JSON</span>
+        </button>
+
+        <!-- Add Live Event -->
+        <button onclick="openNewMatchModal()" class="btn-primary-glow text-xs py-2 px-3">
           <i class="fa-solid fa-plus"></i>
-          <span>Add Live Event</span>
+          <span>Add Match</span>
+        </button>
+
+        <!-- Logout Button -->
+        <button onclick="handleAdminLogout()" class="px-3 py-2 rounded-xl bg-slate-900 text-rose-400 border border-rose-500/30 hover:bg-rose-950/40 font-bold text-xs flex items-center gap-1.5 transition-all">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>Lock</span>
         </button>
       </div>
     </header>
@@ -241,8 +308,8 @@
         </div>
       </div>
 
-      <!-- Live Matches Container -->
-      <div id="matches-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Live Matches Container (Full Width Cards) -->
+      <div id="matches-grid" class="grid grid-cols-1 gap-6 w-full max-w-4xl mx-auto">
         <!-- Injected via JavaScript -->
       </div>
     </section>
@@ -301,7 +368,7 @@
           <i class="fa-solid fa-code text-emerald-400"></i> Dynamic Feeds & Mobile Integration
         </h3>
         <p class="text-sm text-slate-300">
-          Mobile application uses these live endpoints to fetch events, match scores, streaming URLs, and ClearKey DRM parameters.
+          Mobile application uses these live endpoints to fetch events, channels, streaming URLs, and ClearKey DRM parameters.
         </p>
 
         <div class="space-y-4 pt-4">
@@ -385,6 +452,47 @@
           <p class="text-[11px] text-slate-400">Used in header <code>X-Admin-Key</code> to secure adding/editing/deleting streams and matches.</p>
         </div>
 
+        <!-- Change Admin Credentials Section -->
+        <div class="p-5 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-950 border border-orange-500/30 space-y-4">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold">
+              <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div>
+              <h4 class="text-base font-bold text-white">Change Admin Username & Password</h4>
+              <p class="text-xs text-slate-400">Update username and login password for this Admin Panel</p>
+            </div>
+          </div>
+
+          <form id="form-change-credentials" onsubmit="handleChangeCredentials(event)" class="space-y-3 pt-2">
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Current Password *</label>
+              <input type="password" id="cred-current-pass" required placeholder="Enter current password (default: admin123)"
+                     class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">New Username *</label>
+                <input type="text" id="cred-new-user" required placeholder="e.g. admin or custom user"
+                       class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">New Password *</label>
+                <input type="password" id="cred-new-pass" required placeholder="Min 4 characters"
+                       class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white">
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+              <span id="cred-change-status" class="text-xs font-semibold"></span>
+              <button type="submit" class="btn-primary-glow text-xs">
+                <i class="fa-solid fa-key"></i> Update Username & Password
+              </button>
+            </div>
+          </form>
+        </div>
+
         <!-- App Announcement -->
         <div class="space-y-4">
           <div>
@@ -458,17 +566,15 @@
           </div>
         </div>
 
-        <!-- Teams / Participants -->
+        <!-- Teams / Participants (No Scoreboard) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-slate-900/60 rounded-xl border border-slate-800">
           <div>
-            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Team 1 (Name & Score)</label>
-            <input type="text" id="match-team1-name" placeholder="India (IND)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white mb-1.5">
-            <input type="text" id="match-team1-score" placeholder="Score: 245/3 (38 ov)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-emerald-400 font-mono">
+            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Team 1 / Channel Name</label>
+            <input type="text" id="match-team1-name" placeholder="e.g. Star Sports 1 HD or India" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
           </div>
           <div>
-            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Team 2 (Name & Score)</label>
-            <input type="text" id="match-team2-name" placeholder="Australia (AUS)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white mb-1.5">
-            <input type="text" id="match-team2-score" placeholder="Score: Target 290" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-cyan-400 font-mono">
+            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Team 2 / Event Sub-Name (Optional)</label>
+            <input type="text" id="match-team2-name" placeholder="e.g. Live Broadcast or Pakistan" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
           </div>
         </div>
 
@@ -542,6 +648,7 @@
               <select id="stream-type" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
                 <option value="M3U8">HLS (.m3u8)</option>
                 <option value="MPD">DASH (.mpd)</option>
+                <option value="JSON">Dynamic JSON Feed (.json)</option>
                 <option value="DIRECT">MP4 / Direct URL</option>
                 <option value="EMBED">Web Embed / Iframe</option>
               </select>
@@ -549,20 +656,63 @@
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Stream / Manifest URL *</label>
-            <input type="url" id="stream-url" required placeholder="https://cdn.example.com/live/master.m3u8"
+            <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Stream / Manifest URL (M3U8 / MPD / Piped Headers) *</label>
+            <input type="text" id="stream-url" required placeholder="https://cdn.example.com/live/master.m3u8 or paste with |User-Agent=...&Referer=..."
                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono">
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- JSON Channel & Token Inputs -->
+          <div class="p-3 bg-amber-950/20 rounded-xl border border-amber-500/30 space-y-2">
+            <div class="flex items-center justify-between">
+              <label class="text-[11px] font-bold text-amber-400 uppercase flex items-center gap-1.5">
+                <i class="fa-solid fa-code"></i> JSON Channel URL & Token (Optional)
+              </label>
+              <span class="text-[10px] text-amber-300/80">Dynamic Feed & Auth</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <input type="text" id="stream-json-channel-url" placeholder="JSON Channel URL (e.g. https://.../channel.json)"
+                       class="w-full bg-black/60 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-200 font-mono">
+              </div>
+              <div>
+                <input type="text" id="stream-json-token-url" placeholder="JSON Token URL (e.g. https://.../token.php)"
+                       class="w-full bg-black/60 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-200 font-mono">
+              </div>
+            </div>
             <div>
-              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Custom User-Agent (Anti-Hotlink)</label>
-              <input type="text" id="stream-user-agent" placeholder="HD-STREAM/2.0 or ExoPlayer"
+              <input type="text" id="stream-json-token" placeholder="JSON Bearer Token / Session Key (e.g. eyJhbGci...)"
+                     class="w-full bg-black/60 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-200 font-mono">
+            </div>
+          </div>
+
+          <!-- OTT Headers Presets -->
+          <div class="flex items-center gap-2 pt-1">
+            <span class="text-[10px] uppercase font-bold text-slate-400">OTT Quick Presets:</span>
+            <button type="button" onclick="applyOttPreset('hotstar')" class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 text-[10px] font-bold hover:bg-cyan-900">
+              ⚡ Hotstar
+            </button>
+            <button type="button" onclick="applyOttPreset('jio')" class="px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800 text-[10px] font-bold hover:bg-rose-900">
+              ⚡ JioCinema
+            </button>
+            <button type="button" onclick="applyOttPreset('sony')" class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 text-[10px] font-bold hover:bg-amber-900">
+              ⚡ Sony LIV
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Custom User-Agent</label>
+              <input type="text" id="stream-user-agent" placeholder="HotstarMobile/12.5.0 or ExoPlayer"
                      class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
             </div>
             <div>
               <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Custom HTTP Referer</label>
-              <input type="text" id="stream-referer" placeholder="https://official-broadcast.com/"
+              <input type="text" id="stream-referer" placeholder="https://www.hotstar.com/"
+                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Session Cookie / Token</label>
+              <input type="text" id="stream-cookie" placeholder="hdnts=... or token"
                      class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
             </div>
           </div>
@@ -571,7 +721,7 @@
           <div class="p-3 bg-purple-950/20 rounded-xl border border-purple-500/30 space-y-2">
             <div class="flex items-center justify-between">
               <label class="text-xs font-bold text-purple-300 flex items-center gap-1.5">
-                <i class="fa-solid fa-shield-halved"></i> DRM Protection (ClearKey / Widevine)
+                <i class="fa-solid fa-shield-halved"></i> DRM Security (ClearKey / Widevine)
               </label>
               <div class="flex items-center gap-2">
                 <input type="checkbox" id="stream-drm-enable" onchange="toggleDrmInputs(this.checked)" class="w-4 h-4 rounded accent-purple-500">
@@ -579,16 +729,34 @@
               </div>
             </div>
 
-            <div id="drm-inputs-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1 hidden">
+            <div id="drm-inputs-container" class="space-y-2 pt-1 hidden">
               <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Key 1 (Key ID / KID Hex)</label>
-                <input type="text" id="stream-drm-keyid" placeholder="eb63836f296d4532a4eb52f6d831e674"
-                       class="w-full bg-black/70 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-purple-300 font-mono">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">DRM Scheme</label>
+                <select id="stream-drm-scheme" onchange="handleDrmSchemeChange(this.value)" class="w-full bg-black/70 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-purple-300">
+                  <option value="clearkey">ClearKey DRM (Key ID + Key Hex or kid:key)</option>
+                  <option value="widevine">Widevine Modular (Jio, Hotstar, TataPlay License URL)</option>
+                </select>
               </div>
-              <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Key 2 (Key Hex)</label>
-                <input type="text" id="stream-drm-key" placeholder="a68eed132d1a4e1792617f69208fc440"
-                       class="w-full bg-black/70 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-purple-300 font-mono">
+
+              <!-- ClearKey Inputs -->
+              <div id="clearkey-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Key ID (KID Hex or kid:key)</label>
+                  <input type="text" id="stream-drm-keyid" placeholder="eb63836f296d4532a4eb52f6d831e674"
+                         class="w-full bg-black/70 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-purple-300 font-mono">
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Key (Key Hex)</label>
+                  <input type="text" id="stream-drm-key" placeholder="a68eed132d1a4e1792617f69208fc440"
+                         class="w-full bg-black/70 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-purple-300 font-mono">
+                </div>
+              </div>
+
+              <!-- Widevine License Input -->
+              <div id="widevine-fields" class="hidden">
+                <label class="block text-[10px] font-bold text-cyan-400 uppercase mb-1">Widevine License Server URL</label>
+                <input type="text" id="stream-drm-license-url" placeholder="https://license.example.com/widevine/license"
+                       class="w-full bg-black/70 border border-cyan-500/40 rounded-lg px-3 py-1.5 text-xs text-cyan-300 font-mono">
               </div>
             </div>
           </div>
@@ -596,6 +764,88 @@
           <div class="flex justify-end gap-2 pt-2">
             <button type="submit" class="btn-primary-glow text-xs">
               <i class="fa-solid fa-plus"></i> Add Streaming Server
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Import M3U Playlist & JSON Feed -->
+  <div id="modal-import" class="modal-overlay">
+    <div class="modal-box p-6 max-w-xl">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-file-import"></i>
+          </div>
+          <div>
+            <h4 class="text-base font-bold text-white">Import M3U / JSON Playlist</h4>
+            <p class="text-xs text-slate-400">Bulk import channels, streams & DRM keys with 1-click</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-import')" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="pt-4 space-y-4">
+        <!-- Import Type Tabs -->
+        <div class="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
+          <button id="import-tab-m3u" onclick="switchImportTab('m3u')" class="flex-1 py-1.5 rounded-md font-bold text-xs bg-purple-600 text-white">
+            📑 M3U Playlist (URL or Content)
+          </button>
+          <button id="import-tab-json" onclick="switchImportTab('json')" class="flex-1 py-1.5 rounded-md font-bold text-xs text-slate-400 hover:text-white">
+            📦 JSON Feed / Channel Array
+          </button>
+        </div>
+
+        <!-- M3U Form -->
+        <form id="form-import-m3u" onsubmit="handleImportM3u(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">M3U Playlist URL (Online)</label>
+            <input type="url" id="import-m3u-url" placeholder="https://example.com/live-sports.m3u"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Or Paste Raw M3U Text (#EXTM3U)</label>
+            <textarea id="import-m3u-text" rows="4" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-name=&quot;Star Sports HD&quot; group-title=&quot;Cricket&quot;,Star Sports 1 HD&#10;https://.../live.m3u8"
+                      class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-white font-mono"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Default Category</label>
+            <input type="text" id="import-m3u-category" value="Live Sports"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeModal('modal-import')" class="btn-ghost text-xs">Cancel</button>
+            <button type="submit" id="btn-submit-m3u" class="btn-primary-glow text-xs bg-purple-600 hover:bg-purple-500">
+              <i class="fa-solid fa-bolt"></i> Import M3U Channels
+            </button>
+          </div>
+        </form>
+
+        <!-- JSON Form -->
+        <form id="form-import-json" onsubmit="handleImportJson(event)" class="space-y-3 hidden">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">JSON Feed URL (Online)</label>
+            <input type="url" id="import-json-url" placeholder="https://example.com/api/channels.json"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Or Paste JSON Array</label>
+            <textarea id="import-json-text" rows="4" placeholder="[{ &quot;title&quot;: &quot;Star Sports 1 HD&quot;, &quot;streamUrl&quot;: &quot;https://...&quot;, &quot;category&quot;: &quot;Cricket&quot; }]"
+                      class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-xs text-white font-mono"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Default Category</label>
+            <input type="text" id="import-json-category" value="Live Sports"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white">
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeModal('modal-import')" class="btn-ghost text-xs">Cancel</button>
+            <button type="submit" id="btn-submit-json" class="btn-primary-glow text-xs bg-purple-600 hover:bg-purple-500">
+              <i class="fa-solid fa-bolt"></i> Import JSON Channels
             </button>
           </div>
         </form>
@@ -727,6 +977,206 @@
         <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
           <button type="button" onclick="closeModal('modal-episode')" class="btn-ghost text-xs">Cancel</button>
           <button type="submit" class="btn-primary-glow text-xs">Save Episode</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Direct Channel / Stream (Manual + Token + JSON Key DRM) -->
+  <div id="modal-direct-channel" class="modal-overlay">
+    <div class="modal-box p-6 max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-tv"></i>
+          </div>
+          <div>
+            <h4 class="text-base font-bold text-white">Add Channel / Stream (Manual + Token + JSON Key)</h4>
+            <p class="text-xs text-slate-400">Add live channel with M3U8/MPD URL, Bearer Token, and ClearKey/Widevine DRM</p>
+          </div>
+        </div>
+        <button onclick="closeModal('modal-direct-channel')" class="text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="form-direct-channel" onsubmit="handleDirectChannelSave(event)" class="space-y-4 pt-4">
+        <!-- Channel Title & Category -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Channel / Stream Name *</label>
+            <input type="text" id="direct-channel-title" required placeholder="e.g. Star Sports 1 HD (Hindi) or FanCode Cricket"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-orange-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Category</label>
+            <select id="direct-channel-category" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white">
+              <option value="Live Cricket">🏏 Live Cricket</option>
+              <option value="Football">⚽ Football</option>
+              <option value="Star Sports & OTT">📡 Star Sports & OTT</option>
+              <option value="FC LIVE">⚡ FanCode Live</option>
+              <option value="Sony LIV">🎬 Sony LIV</option>
+              <option value="JioCinema">🍿 JioCinema</option>
+              <option value="Live Sports">🏆 Other Sports</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Stream URL & Format -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Stream / Manifest URL (.m3u8 / .mpd / Piped Token) *</label>
+            <input type="text" id="direct-stream-url" required placeholder="https://cdn.example.com/live/master.m3u8 or paste with |User-Agent=...&Referer=..."
+                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white font-mono focus:border-orange-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Stream Type</label>
+            <select id="direct-stream-type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white">
+              <option value="M3U8">HLS (.m3u8)</option>
+              <option value="MPD">DASH (.mpd)</option>
+              <option value="JSON">Dynamic JSON Feed (.json)</option>
+              <option value="DIRECT">MP4 / Direct Link</option>
+              <option value="EMBED">Web Embed</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quality & Status -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Stream Quality</label>
+            <input type="text" id="direct-stream-quality" value="1080p HD" placeholder="1080p HD / 720p / 4K"
+                   class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Broadcast Status</label>
+            <select id="direct-channel-status" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-emerald-400 font-bold">
+              <option value="LIVE">🔴 LIVE NOW</option>
+              <option value="UPCOMING">⏳ UPCOMING</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- JSON Channel & Token Configuration -->
+        <div class="p-3.5 bg-gradient-to-r from-amber-950/40 via-amber-900/20 to-slate-900 rounded-xl border border-amber-500/40 space-y-3">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-code"></i> JSON Channel URL & Token Configuration
+            </label>
+            <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/40">Dynamic JSON / Cricfy API</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">JSON Channel URL (Feed API)</label>
+              <input type="text" id="direct-json-channel-url" placeholder="https://api.example.com/channel.json or feed URL"
+                     class="w-full bg-black/70 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-200 font-mono focus:border-amber-400 outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">JSON Token URL (Auth Endpoint)</label>
+              <input type="text" id="direct-json-token-url" placeholder="https://auth.example.com/get-token.php"
+                     class="w-full bg-black/70 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-200 font-mono focus:border-amber-400 outline-none">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">JSON Token / Bearer Key / Session Token</label>
+            <input type="text" id="direct-stream-token" placeholder="Paste Token / Cookie or Bearer Token (optional)"
+                   class="w-full bg-black/70 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-300 font-mono focus:border-amber-400 outline-none">
+            <p class="text-[10px] text-slate-400 mt-1">If your stream requires a dynamic JSON feed, token endpoint, or Bearer auth key, enter it here.</p>
+          </div>
+        </div>
+
+        <!-- OTT Quick Presets & Headers -->
+        <div class="p-3.5 bg-slate-900/70 rounded-xl border border-slate-800 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase text-slate-300">Custom Headers & Anti-Hotlink</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] text-slate-400 font-bold">1-Click Presets:</span>
+              <button type="button" onclick="applyDirectPreset('hotstar')" class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 text-[10px] font-bold hover:bg-cyan-900">Hotstar</button>
+              <button type="button" onclick="applyDirectPreset('jio')" class="px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800 text-[10px] font-bold hover:bg-rose-900">JioCinema</button>
+              <button type="button" onclick="applyDirectPreset('sony')" class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 text-[10px] font-bold hover:bg-amber-900">Sony LIV</button>
+              <button type="button" onclick="applyDirectPreset('fancode')" class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold hover:bg-emerald-900">FanCode</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">User-Agent</label>
+              <input type="text" id="direct-header-ua" placeholder="Hotstar/12.5 or ExoPlayer"
+                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">HTTP Referer</label>
+              <input type="text" id="direct-header-ref" placeholder="https://www.sonyliv.com/"
+                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Origin Header</label>
+              <input type="text" id="direct-header-origin" placeholder="https://www.sonyliv.com"
+                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cookie Header</label>
+              <input type="text" id="direct-header-cookie" placeholder="hdnts=... or session"
+                     class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+            </div>
+          </div>
+        </div>
+
+        <!-- DRM Security (JSON Key / ClearKey / Widevine) -->
+        <div class="p-3.5 bg-purple-950/20 rounded-xl border border-purple-500/30 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-purple-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved"></i> DRM Protection (ClearKey KID:KEY or Widevine License)
+            </label>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="direct-drm-enable" onchange="toggleDirectDrm(this.checked)" class="w-4 h-4 rounded accent-purple-500">
+              <span class="text-xs text-purple-200 font-semibold">Enable DRM</span>
+            </div>
+          </div>
+
+          <div id="direct-drm-container" class="space-y-2 pt-1 hidden">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">DRM Scheme</label>
+              <select id="direct-drm-scheme" onchange="handleDirectDrmSchemeChange(this.value)" class="w-full bg-black/70 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-purple-300">
+                <option value="clearkey">ClearKey DRM (Key ID + Key Hex OR kid:key)</option>
+                <option value="widevine">Widevine Modular (License Server URL)</option>
+              </select>
+            </div>
+
+            <!-- ClearKey Fields -->
+            <div id="direct-clearkey-fields" class="space-y-2">
+              <div>
+                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">ClearKey JSON Key / KID:KEY format</label>
+                <input type="text" id="direct-drm-kidkey" placeholder="e.g. eb63836f296d4532a4eb52f6d831e674:a68eed132d1a4e1792617f69208fc440"
+                       class="w-full bg-black/70 border border-purple-500/40 rounded-lg px-3 py-2 text-xs text-purple-300 font-mono">
+                <p class="text-[10px] text-slate-400 mt-0.5">Supports both separate keys or combined <code class="text-purple-300">kid:key</code> format directly.</p>
+              </div>
+            </div>
+
+            <!-- Widevine Fields -->
+            <div id="direct-widevine-fields" class="hidden">
+              <label class="block text-[10px] font-bold text-cyan-400 uppercase mb-1">Widevine License Server URL</label>
+              <input type="url" id="direct-drm-license-url" placeholder="https://license.example.com/widevine/license"
+                     class="w-full bg-black/70 border border-cyan-500/40 rounded-lg px-3 py-2 text-xs text-cyan-300 font-mono">
+            </div>
+          </div>
+        </div>
+
+        <!-- Channel Logo / Banner Image -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Channel Logo / Poster URL (Optional)</label>
+          <input type="url" id="direct-channel-banner" placeholder="https://images.unsplash.com/... or channel logo PNG"
+                 class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white font-mono">
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" onclick="closeModal('modal-direct-channel')" class="btn-ghost text-xs">Cancel</button>
+          <button type="submit" id="btn-save-direct-channel" class="btn-primary-glow text-xs bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-black">
+            <i class="fa-solid fa-bolt"></i> Publish Channel to Feed
+          </button>
         </div>
       </form>
     </div>

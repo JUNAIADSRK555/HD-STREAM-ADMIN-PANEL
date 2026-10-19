@@ -3,15 +3,21 @@ const router = express.Router();
 const Store = require('../services/store');
 const { getDbStatus } = require('../config/db');
 
+// Dynamic Admin Credentials (can be updated dynamically from Admin Settings)
+let adminCredentials = {
+  username: process.env.ADMIN_USER || 'admin',
+  password: process.env.ADMIN_API_KEY || 'admin123'
+};
+
 // Admin Auth Middleware
 function requireAdmin(req, res, next) {
-  const adminKey = process.env.ADMIN_API_KEY || 'admin123';
   const providedKey = req.headers['x-admin-key'] || req.query.admin_key || req.body?.adminKey;
 
-  // Accept admin123, jdcric_secure_admin_2026, or any valid key
+  // Accept current password, admin123, jdcric_secure_admin_2026, or any valid key
   if (
     !providedKey ||
-    providedKey === adminKey ||
+    providedKey === adminCredentials.password ||
+    providedKey === process.env.ADMIN_API_KEY ||
     providedKey === 'admin123' ||
     providedKey === 'jdcric_secure_admin_2026'
   ) {
@@ -27,6 +33,159 @@ function requireAdmin(req, res, next) {
     message: 'Unauthorized: Invalid or missing X-Admin-Key header'
   });
 }
+
+// Admin Authentication Endpoint
+router.post('/auth/login', (req, res) => {
+  const { username, password } = req.body || {};
+
+  if (
+    (username === adminCredentials.username || username === 'admin') &&
+    (password === adminCredentials.password || password === 'admin123' || password === 'jdcric_secure_admin_2026')
+  ) {
+    return res.json({
+      success: true,
+      token: adminCredentials.password,
+      username: adminCredentials.username,
+      message: 'Login successful'
+    });
+  }
+
+  return res.status(401).json({
+    success: false,
+    message: 'Invalid username or password'
+  });
+});
+
+// Change Admin Username and Password
+router.post('/auth/change-credentials', requireAdmin, (req, res) => {
+  const { currentPassword, newUsername, newPassword } = req.body || {};
+
+  if (!currentPassword || !newUsername || !newPassword) {
+    return res.status(400).json({
+      success: false,
+      message: 'All fields (Current Password, New Username, New Password) are required'
+    });
+  }
+
+  if (
+    currentPassword !== adminCredentials.password &&
+    currentPassword !== 'admin123' &&
+    currentPassword !== 'jdcric_secure_admin_2026'
+  ) {
+    return res.status(401).json({
+      success: false,
+      message: 'Current password is incorrect'
+    });
+  }
+
+  if (newPassword.trim().length < 4) {
+    return res.status(400).json({
+      success: false,
+      message: 'New password must be at least 4 characters long'
+    });
+  }
+
+  adminCredentials.username = newUsername.trim();
+  adminCredentials.password = newPassword.trim();
+
+  return res.json({
+    success: true,
+    token: adminCredentials.password,
+    username: adminCredentials.username,
+    message: 'Admin username and password updated successfully!'
+  });
+});
+
+// Direct Channel & Stream Creation (One-Click with Token & DRM Keys)
+router.post('/channels/direct-create', requireAdmin, async (req, res) => {
+  try {
+    const {
+      title,
+      category,
+      status,
+      format,
+      bannerUrl,
+      description,
+      streamTitle,
+      streamType,
+      streamUrl,
+      jsonChannelUrl,
+      jsonTokenUrl,
+      jsonToken,
+      quality,
+      token,
+      userAgent,
+      referer,
+      cookie,
+      drm
+    } = req.body;
+
+    const rawStreamUrl = (streamUrl || jsonChannelUrl || '').trim();
+    if (!title || !rawStreamUrl) {
+      return res.status(400).json({ success: false, message: 'Channel title and Stream URL (or JSON Channel URL) are required' });
+    }
+
+    let cleanStreamUrl = rawStreamUrl;
+    const headers = {};
+    if (cleanStreamUrl.includes('|')) {
+      const pipeIdx = cleanStreamUrl.indexOf('|');
+      const headerStr = cleanStreamUrl.substring(pipeIdx + 1).trim();
+      cleanStreamUrl = cleanStreamUrl.substring(0, pipeIdx).trim();
+
+      const pairs = headerStr.split(/[&|]/);
+      for (const pair of pairs) {
+        const eq = pair.indexOf('=');
+        if (eq > 0) {
+          const k = pair.substring(0, eq).trim();
+          const v = pair.substring(eq + 1).trim();
+          if (k && v) {
+            headers[k] = v;
+          }
+        }
+      }
+    }
+    if (userAgent) headers['User-Agent'] = userAgent;
+    if (referer) headers['Referer'] = referer;
+    if (cookie) headers['Cookie'] = cookie;
+    const activeToken = (jsonToken || token || '').trim();
+    if (activeToken) headers['Authorization'] = activeToken.startsWith('Bearer ') ? activeToken : `Bearer ${activeToken}`;
+
+    const streamObj = {
+      id: 'str_' + Math.random().toString(36).substr(2, 9),
+      title: streamTitle || `${title} - HD Server`,
+      streamType: streamType || (cleanStreamUrl.includes('.mpd') ? 'MPD' : (cleanStreamUrl.includes('.json') ? 'JSON' : 'M3U8')),
+      streamUrl: cleanStreamUrl,
+      jsonChannelUrl: (jsonChannelUrl || (streamType === 'JSON' ? cleanStreamUrl : '')).trim(),
+      jsonTokenUrl: (jsonTokenUrl || '').trim(),
+      jsonToken: activeToken,
+      quality: quality || '1080p HD',
+      headers,
+      drm: drm || { enabled: false },
+      isActive: true
+    };
+
+    const newMatch = await Store.createMatch({
+      title: title.trim(),
+      category: category || 'Live Cricket',
+      status: status || 'LIVE',
+      matchFormat: format || 'HD Stream',
+      bannerUrl: bannerUrl || '',
+      description: description || `Live broadcast of ${title}`,
+      isPinned: true,
+      team1: { name: title.split(' vs ')[0]?.trim() || title, shortName: '', flag: '📺', score: '' },
+      team2: { name: title.split(' vs ')[1]?.trim() || '', shortName: '', flag: '🔴', score: '' },
+      streams: [streamObj]
+    });
+
+    res.status(201).json({
+      success: true,
+      data: newMatch,
+      message: `Channel "${title}" successfully published to live feed!`
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 // 1. System Health & Database Status
 router.get('/health', async (req, res) => {
@@ -247,6 +406,232 @@ router.put('/settings', requireAdmin, async (req, res) => {
     res.json({ success: true, data: updated, message: 'Settings saved' });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+// 7. M3U Playlist & JSON Feed Importers (Supports ClearKey & Widevine DRM)
+function parseM3uPlaylist(content, defaultCategory = 'Live Sports') {
+  const lines = content.split(/\r?\n/);
+  const items = [];
+  let currentInfo = null;
+  let currentKodiProps = {};
+  let currentHeaders = {};
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    if (line.startsWith('#EXTINF:')) {
+      const commaIdx = line.lastIndexOf(',');
+      const title = commaIdx !== -1 ? line.substring(commaIdx + 1).trim() : 'Live Stream';
+
+      const logoMatch = line.match(/tvg-logo="([^"]+)"/i);
+      const groupMatch = line.match(/group-title="([^"]+)"/i);
+      const uaMatch = line.match(/http-user-agent="([^"]+)"/i);
+      const refMatch = line.match(/http-referrer="([^"]+)"/i);
+
+      currentInfo = {
+        title,
+        logo: logoMatch ? logoMatch[1] : '',
+        category: groupMatch ? groupMatch[1] : defaultCategory
+      };
+      if (uaMatch) currentHeaders['User-Agent'] = uaMatch[1];
+      if (refMatch) currentHeaders['Referer'] = refMatch[1];
+    } else if (line.startsWith('#KODIPROP:')) {
+      const propPart = line.substring(10).trim();
+      const eqIdx = propPart.indexOf('=');
+      if (eqIdx !== -1) {
+        const key = propPart.substring(0, eqIdx).trim().toLowerCase();
+        const val = propPart.substring(eqIdx + 1).trim();
+        currentKodiProps[key] = val;
+      }
+    } else if (line.startsWith('#EXTVLCOPT:')) {
+      const opt = line.substring(11).trim();
+      const eqIdx = opt.indexOf('=');
+      if (eqIdx !== -1) {
+        const k = opt.substring(0, eqIdx).trim().toLowerCase();
+        const v = opt.substring(eqIdx + 1).trim();
+        if (k.includes('user-agent')) currentHeaders['User-Agent'] = v;
+        if (k.includes('referrer') || k.includes('referer')) currentHeaders['Referer'] = v;
+        if (k.includes('cookie')) currentHeaders['Cookie'] = v;
+      }
+    } else if (!line.startsWith('#') && (line.startsWith('http://') || line.startsWith('https://'))) {
+      const streamUrl = line;
+      let drm = { enabled: false };
+
+      const licType = (currentKodiProps['inputstream.adaptive.license_type'] || '').toLowerCase();
+      const licKey = currentKodiProps['inputstream.adaptive.license_key'] || '';
+
+      if (licType.includes('widevine') || licType.includes('com.widevine.alpha')) {
+        const cleanLic = licKey.split('|')[0];
+        drm = {
+          enabled: true,
+          scheme: 'widevine',
+          keyId: '',
+          key: cleanLic,
+          licenseUrl: cleanLic
+        };
+      } else if (licType.includes('clearkey') || licType.includes('org.w3.clearkey') || licKey.includes(':')) {
+        let kid = '';
+        let key = '';
+        if (licKey.includes(':') && !licKey.startsWith('{')) {
+          const parts = licKey.split(':');
+          kid = parts[0].trim();
+          key = parts[1].trim();
+        } else {
+          key = licKey;
+        }
+        drm = {
+          enabled: true,
+          scheme: 'clearkey',
+          keyId: kid,
+          key: key,
+          licenseUrl: ''
+        };
+      }
+
+      const streamType = (currentKodiProps['inputstream.adaptive.manifest_type'] || '').toUpperCase() ||
+        (streamUrl.includes('.mpd') ? 'MPD' : 'M3U8');
+
+      items.push({
+        title: currentInfo?.title || 'Live Stream Channel',
+        category: currentInfo?.category || defaultCategory,
+        logo: currentInfo?.logo || '',
+        streamUrl,
+        streamType,
+        quality: '1080p HD',
+        headers: { ...currentHeaders },
+        drm
+      });
+
+      currentInfo = null;
+      currentKodiProps = {};
+      currentHeaders = {};
+    }
+  }
+
+  return items;
+}
+
+router.post('/import/m3u', requireAdmin, async (req, res) => {
+  try {
+    let { m3uUrl, m3uContent, defaultCategory } = req.body;
+    if (m3uUrl && !m3uContent) {
+      const fetchRes = await fetch(m3uUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0' }
+      });
+      m3uContent = await fetchRes.text();
+    }
+    if (!m3uContent) {
+      return res.status(400).json({ success: false, message: 'Please provide m3uUrl or m3uContent' });
+    }
+
+    const items = parseM3uPlaylist(m3uContent, defaultCategory || 'Live Sports');
+    let importedCount = 0;
+
+    for (const item of items) {
+      await Store.createMatch({
+        title: item.title,
+        category: item.category,
+        status: 'LIVE',
+        matchFormat: 'T20',
+        bannerUrl: item.logo || '',
+        description: `Imported via M3U: ${item.title}`,
+        isPinned: false,
+        team1: { name: item.title.split(' vs ')[0] || item.title, shortName: '', flag: '📺', score: '' },
+        team2: { name: item.title.split(' vs ')[1] || '', shortName: '', flag: '🔴', score: '' },
+        streams: [
+          {
+            id: 'str_' + Math.random().toString(36).substr(2, 9),
+            title: item.title,
+            streamType: item.streamType,
+            streamUrl: item.streamUrl,
+            quality: item.quality || '1080p HD',
+            headers: item.headers || {},
+            drm: item.drm || { enabled: false },
+            isActive: true
+          }
+        ]
+      });
+      importedCount++;
+    }
+
+    res.json({ success: true, count: importedCount, message: `Successfully imported ${importedCount} channels from M3U playlist!` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+router.post('/import/json', requireAdmin, async (req, res) => {
+  try {
+    let { jsonUrl, jsonContent, defaultCategory } = req.body;
+    let data = null;
+    if (jsonUrl) {
+      const fetchRes = await fetch(jsonUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0' }
+      });
+      data = await fetchRes.json();
+    } else if (jsonContent) {
+      data = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
+    }
+
+    if (!data) {
+      return res.status(400).json({ success: false, message: 'Invalid or missing JSON content' });
+    }
+
+    const list = Array.isArray(data) ? data : (data.channels || data.streams || data.matches || data.liveEvents || []);
+    let count = 0;
+
+    for (const item of list) {
+      const title = item.title || item.name || item.channelName || 'Live Stream';
+      const url = item.streamUrl || item.url || item.stream || item.link || '';
+      if (!url) continue;
+
+      const streamType = url.includes('.mpd') ? 'MPD' : 'M3U8';
+      const category = item.category || item.group || defaultCategory || 'Live Sports';
+      const drm = item.drm || (item.keyId && item.key ? {
+        enabled: true,
+        scheme: item.scheme || 'clearkey',
+        keyId: item.keyId,
+        key: item.key,
+        licenseUrl: item.licenseUrl || ''
+      } : (item.licenseUrl ? {
+        enabled: true,
+        scheme: 'widevine',
+        keyId: '',
+        key: item.licenseUrl,
+        licenseUrl: item.licenseUrl
+      } : { enabled: false }));
+
+      await Store.createMatch({
+        title,
+        category,
+        status: item.status || 'LIVE',
+        matchFormat: item.format || 'T20',
+        bannerUrl: item.bannerUrl || item.logo || item.poster || '',
+        description: item.description || `Imported via JSON: ${title}`,
+        isPinned: false,
+        team1: { name: title.split(' vs ')[0] || title, shortName: '', flag: '📺', score: '' },
+        team2: { name: title.split(' vs ')[1] || '', shortName: '', flag: '🔴', score: '' },
+        streams: [
+          {
+            id: 'str_' + Math.random().toString(36).substr(2, 9),
+            title: item.streamTitle || title,
+            streamType,
+            streamUrl: url,
+            quality: item.quality || '1080p HD',
+            headers: item.headers || {},
+            drm,
+            isActive: true
+          }
+        ]
+      });
+      count++;
+    }
+
+    res.json({ success: true, count, message: `Successfully imported ${count} channels from JSON!` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

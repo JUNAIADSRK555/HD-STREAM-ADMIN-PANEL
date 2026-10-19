@@ -16,11 +16,87 @@ document.addEventListener('DOMContentLoaded', () => {
   initClock();
   initNav();
   initInputs();
-  fetchAllData();
-
-  // Auto-refresh stats & live events every 30 seconds
-  setInterval(fetchDashboardStats, 30000);
+  initPipedUrlListeners();
+  checkAuthAndInit();
 });
+
+// --- AUTHENTICATION GATE & LOCK SCREEN ---
+function checkAuthAndInit() {
+  const overlay = document.getElementById('auth-lock-overlay');
+  const isLoggedIn = sessionStorage.getItem('hd_admin_logged_in') === 'true';
+
+  if (isLoggedIn) {
+    if (overlay) overlay.classList.add('hidden');
+    fetchAllData();
+    setInterval(fetchDashboardStats, 30000);
+  } else {
+    if (overlay) overlay.classList.remove('hidden');
+    const pwdInput = document.getElementById('auth-password');
+    if (pwdInput) pwdInput.focus();
+  }
+}
+
+async function handleAdminLogin(e) {
+  e.preventDefault();
+  const user = document.getElementById('auth-username').value.trim();
+  const pass = document.getElementById('auth-password').value.trim();
+  const errorBox = document.getElementById('auth-error-msg');
+  const errorText = document.getElementById('auth-error-text');
+  const submitBtn = document.getElementById('btn-auth-submit');
+
+  if (errorBox) errorBox.classList.add('hidden');
+  if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass })
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      sessionStorage.setItem('hd_admin_logged_in', 'true');
+      state.adminKey = data.token || pass;
+      localStorage.setItem('hd_stream_admin_key', state.adminKey);
+
+      const overlay = document.getElementById('auth-lock-overlay');
+      if (overlay) {
+        overlay.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+      }
+      showToast('Welcome to HD STREAM Admin Portal!', 'success');
+      fetchAllData();
+      setInterval(fetchDashboardStats, 30000);
+    } else {
+      if (errorBox && errorText) {
+        errorText.textContent = data.message || 'Invalid username or password';
+        errorBox.classList.remove('hidden');
+      }
+    }
+  } catch (err) {
+    if (errorBox && errorText) {
+      errorText.textContent = 'Server connection error: ' + err.message;
+      errorBox.classList.remove('hidden');
+    }
+  } finally {
+    if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-lock-open"></i> Unlock Dashboard';
+  }
+}
+
+function handleAdminLogout() {
+  sessionStorage.removeItem('hd_admin_logged_in');
+  const overlay = document.getElementById('auth-lock-overlay');
+  if (overlay) {
+    overlay.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+    const pwdInput = document.getElementById('auth-password');
+    if (pwdInput) {
+      pwdInput.value = '';
+      pwdInput.focus();
+    }
+  }
+  showToast('Admin session locked.', 'info');
+}
 
 function initClock() {
   const clock = document.getElementById('current-clock');
@@ -92,7 +168,7 @@ function switchTab(tabId) {
 
   const titles = {
     overview: ['Overview Dashboard', 'Real-time control center for live matches, streaming sources, and DRM keys.'],
-    matches: ['Live Events & Cricket Broadcasts', 'Manage matches, scoreboards, and multi-server streaming feeds.'],
+    matches: ['Live Events & Broadcasts', 'Manage live channels, events, and multi-server streaming feeds.'],
     categories: ['Categories & Channels', 'Organize content categories displayed on mobile app home screen.'],
     vod: ['Entertainment VOD & Shows', 'Manage reality shows, series like Bigg Boss, and episodes.'],
     feeds: ['Mobile API & M3U8 Feeds', 'Sync live endpoints with Android app and OTT players.'],
@@ -144,8 +220,8 @@ const defaultSampleData = {
       status: 'LIVE',
       matchFormat: 'ODI',
       startTime: '05:06:32',
-      team1: { name: 'Oman', shortName: 'OMA', flag: '🇴🇲', score: '210/6 (42 ov)' },
-      team2: { name: 'Nepal', shortName: 'NEP', flag: '🇳🇵', score: 'Target: 235' },
+      team1: { name: 'Oman', shortName: 'OMA', flag: '🇴🇲', score: '' },
+      team2: { name: 'Nepal', shortName: 'NEP', flag: '🇳🇵', score: '' },
       streams: [
         { id: 's1', title: 'ICC TV (1080p 60FPS)', streamType: 'M3U8', streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', quality: '1080p', isActive: true },
         { id: 's2', title: 'SK LIVE (720p Low Latency)', streamType: 'M3U8', streamUrl: 'https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8', quality: '720p', isActive: true }
@@ -158,8 +234,8 @@ const defaultSampleData = {
       status: 'LIVE',
       matchFormat: 'Test',
       startTime: '02:36:32',
-      team1: { name: 'South Africa', shortName: 'SA', flag: '🇿🇦', score: '380/7' },
-      team2: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺', score: '295 all out' },
+      team1: { name: 'South Africa', shortName: 'SA', flag: '🇿🇦', score: '' },
+      team2: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺', score: '' },
       streams: [
         { id: 's3', title: 'ICC TV', streamType: 'M3U8', streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', quality: '1080p', isActive: true },
         { id: 's4', title: 'SK LIVE', streamType: 'M3U8', streamUrl: 'https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8', quality: '720p', isActive: true }
@@ -382,10 +458,9 @@ function renderOverviewLiveList() {
         </div>
         <h4 class="font-bold text-white text-base">${m.title}</h4>
         <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80 text-xs">
-          <div class="text-slate-300 font-mono">
-            <span>${m.team1?.shortName || 'T1'}: <strong class="text-emerald-400">${m.team1?.score || '0/0'}</strong></span>
-            <span class="mx-2 text-slate-600">vs</span>
-            <span>${m.team2?.shortName || 'T2'}: <strong class="text-cyan-400">${m.team2?.score || '0/0'}</strong></span>
+          <div class="text-slate-300 font-medium flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold">${m.team1?.name || 'Live Broadcast'}</span>
+            ${m.team2?.name ? `<span class="text-slate-500 font-bold">vs</span><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold">${m.team2.name}</span>` : ''}
           </div>
           <button onclick="openStreamsModal('${m._id}')" class="text-emerald-400 hover:underline font-semibold flex items-center gap-1">
             <i class="fa-solid fa-server"></i> ${streamsCount} Streams &rarr;
@@ -435,22 +510,31 @@ function renderMatchesList() {
           </span>
         </div>
 
+        <!-- Full-Width Banner Image -->
+        ${m.bannerUrl ? `
+          <div class="w-full h-44 rounded-xl overflow-hidden relative border border-slate-800 shadow-lg">
+            <img src="${m.bannerUrl}" alt="${m.title}" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+          </div>
+        ` : ''}
+
         <!-- Title & Format -->
         <div>
           <h4 class="text-lg font-extrabold text-white group-hover:text-emerald-400 transition leading-snug">${m.title}</h4>
           <p class="text-xs text-slate-400 mt-0.5 font-medium">${m.matchFormat || 'T20'} • ${m.startTime || 'Scheduled'}</p>
         </div>
 
-        <!-- Teams Score Box -->
-        <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 space-y-2">
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-bold text-slate-200">${m.team1?.name || 'Team 1'}</span>
-            <span class="font-mono font-bold text-emerald-400">${m.team1?.score || 'Yet to bat'}</span>
-          </div>
-          <div class="flex items-center justify-between text-xs">
-            <span class="font-bold text-slate-200">${m.team2?.name || 'Team 2'}</span>
-            <span class="font-mono font-bold text-cyan-400">${m.team2?.score || ''}</span>
-          </div>
+        <!-- Teams / Participants Box (Clean - No Scoreboard) -->
+        <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 flex items-center justify-between text-xs">
+          <span class="font-bold text-slate-200 flex items-center gap-1.5">
+            <span>${m.team1?.flag || '📺'}</span> ${m.team1?.name || 'Channel / Team 1'}
+          </span>
+          ${m.team2?.name ? `
+            <span class="text-slate-500 font-bold px-2">VS</span>
+            <span class="font-bold text-slate-200 flex items-center gap-1.5">
+              <span>${m.team2?.flag || '🔴'}</span> ${m.team2?.name}
+            </span>
+          ` : ''}
         </div>
 
         <!-- Streams Accordion Summary -->
@@ -648,9 +732,7 @@ function editMatch(id) {
   setInputValue('match-start-time', m.startTime);
   setInputValue('match-banner', m.bannerUrl);
   setInputValue('match-team1-name', m.team1?.name || '');
-  setInputValue('match-team1-score', m.team1?.score || '');
   setInputValue('match-team2-name', m.team2?.name || '');
-  setInputValue('match-team2-score', m.team2?.score || '');
 
   const pinned = document.getElementById('match-pinned');
   if (pinned) pinned.checked = Boolean(m.isPinned);
@@ -669,14 +751,14 @@ async function handleSaveMatch(e) {
     matchFormat: document.getElementById('match-format').value.trim() || 'T20',
     startTime: document.getElementById('match-start-time').value.trim() || new Date().toISOString(),
     bannerUrl: document.getElementById('match-banner').value.trim(),
-    isPinned: document.getElementById('match-pinned').checked,
+    isPinned: document.getElementById('match-pinned')?.checked || false,
     team1: {
-      name: document.getElementById('match-team1-name').value.trim() || 'Team 1',
-      score: document.getElementById('match-team1-score').value.trim()
+      name: document.getElementById('match-team1-name')?.value.trim() || 'Team 1',
+      score: ''
     },
     team2: {
-      name: document.getElementById('match-team2-name').value.trim() || 'Team 2',
-      score: document.getElementById('match-team2-score').value.trim()
+      name: document.getElementById('match-team2-name')?.value.trim() || '',
+      score: ''
     }
   };
 
@@ -755,13 +837,15 @@ function renderStreamsModalList(match) {
 
   container.innerHTML = streams.map(s => `
     <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
-      <div class="flex-1 min-w-0">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
           <span class="font-bold text-xs text-white truncate">${s.title}</span>
           <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 uppercase">${s.streamType}</span>
           ${s.drm?.enabled ? '<span class="drm-pill text-[10px]">ClearKey DRM</span>' : ''}
+          ${s.jsonChannelUrl ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800">JSON Feed</span>' : ''}
+          ${s.jsonToken ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">Token</span>' : ''}
         </div>
-        <p class="text-[11px] font-mono text-emerald-400 truncate mt-0.5">${s.streamUrl}</p>
+        <p class="text-[11px] font-mono text-emerald-400 truncate mt-0.5">${s.streamUrl || s.jsonChannelUrl}</p>
+        ${s.jsonChannelUrl ? `<p class="text-[10px] text-amber-400 font-mono">JSON API: ${s.jsonChannelUrl}</p>` : ''}
         ${s.headers?.userAgent ? `<p class="text-[10px] text-slate-500 font-mono">UA: ${s.headers.userAgent}</p>` : ''}
       </div>
 
@@ -784,24 +868,82 @@ function toggleDrmInputs(checked) {
   }
 }
 
+function handleDrmSchemeChange(scheme) {
+  const isWidevine = scheme === 'widevine';
+  const ckFields = document.getElementById('clearkey-fields');
+  const wvFields = document.getElementById('widevine-fields');
+  if (ckFields) ckFields.classList.toggle('hidden', isWidevine);
+  if (wvFields) wvFields.classList.toggle('hidden', !isWidevine);
+}
+
+function applyOttPreset(type) {
+  const ua = document.getElementById('stream-user-agent');
+  const ref = document.getElementById('stream-referer');
+  const drmChk = document.getElementById('stream-drm-enable');
+  const schemeSel = document.getElementById('stream-drm-scheme');
+
+  if (type === 'hotstar') {
+    if (ua) ua.value = 'HotstarMobile/12.5.0 (Android 14; Mobile)';
+    if (ref) ref.value = 'https://www.hotstar.com/';
+    if (drmChk) { drmChk.checked = true; toggleDrmInputs(true); }
+    if (schemeSel) { schemeSel.value = 'widevine'; handleDrmSchemeChange('widevine'); }
+    showToast('Hotstar Preset applied (Widevine DRM + UA)', 'info');
+  } else if (type === 'jio') {
+    if (ua) ua.value = 'JioCinema/24.0.0 (Linux; Android 14)';
+    if (ref) ref.value = 'https://www.jiocinema.com/';
+    if (drmChk) { drmChk.checked = true; toggleDrmInputs(true); }
+    if (schemeSel) { schemeSel.value = 'widevine'; handleDrmSchemeChange('widevine'); }
+    showToast('JioCinema Preset applied (Widevine DRM + UA)', 'info');
+  } else if (type === 'sony') {
+    if (ua) ua.value = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0';
+    if (ref) ref.value = 'https://www.sonyliv.com/';
+    showToast('Sony LIV Preset applied (UA + Referer)', 'info');
+  }
+}
+
 async function handleSaveStream(e) {
   e.preventDefault();
   const matchId = document.getElementById('stream-match-id').value;
   const isDrm = document.getElementById('stream-drm-enable').checked;
+  const scheme = document.getElementById('stream-drm-scheme')?.value || 'clearkey';
+  const cookie = document.getElementById('stream-cookie')?.value.trim() || '';
+  const licUrl = document.getElementById('stream-drm-license-url')?.value.trim() || '';
+
+  let kid = document.getElementById('stream-drm-keyid')?.value.trim() || '';
+  let key = document.getElementById('stream-drm-key')?.value.trim() || '';
+
+  // Support combined kid:key format
+  if (kid.includes(':') && !key) {
+    const parts = kid.split(':');
+    kid = parts[0].trim();
+    key = parts[1].trim();
+  }
+
+  const jsonChannelUrl = document.getElementById('stream-json-channel-url')?.value.trim() || '';
+  const jsonTokenUrl = document.getElementById('stream-json-token-url')?.value.trim() || '';
+  const jsonToken = document.getElementById('stream-json-token')?.value.trim() || '';
+  const rawStreamUrl = document.getElementById('stream-url').value.trim();
+  const streamUrl = rawStreamUrl || jsonChannelUrl;
 
   const payload = {
     title: document.getElementById('stream-title').value.trim(),
     streamType: document.getElementById('stream-type').value,
-    streamUrl: document.getElementById('stream-url').value.trim(),
+    streamUrl,
+    jsonChannelUrl,
+    jsonTokenUrl,
+    jsonToken,
     headers: {
       userAgent: document.getElementById('stream-user-agent').value.trim(),
-      referer: document.getElementById('stream-referer').value.trim()
+      referer: document.getElementById('stream-referer').value.trim(),
+      cookie,
+      ...(jsonToken ? { Authorization: jsonToken.startsWith('Bearer ') ? jsonToken : `Bearer ${jsonToken}` } : {})
     },
     drm: {
       enabled: isDrm,
-      scheme: 'clearkey',
-      keyId: document.getElementById('stream-drm-keyid').value.trim(),
-      key: document.getElementById('stream-drm-key').value.trim()
+      scheme,
+      keyId: kid,
+      key: scheme === 'widevine' ? licUrl : key,
+      licenseUrl: licUrl
     }
   };
 
@@ -819,6 +961,89 @@ async function handleSaveStream(e) {
     if (updatedMatch) renderStreamsModalList(updatedMatch);
   } catch (err) {
     showToast(err.message, 'error');
+  }
+}
+
+function openImportModal() {
+  openModal('modal-import');
+}
+
+function switchImportTab(tab) {
+  const isM3u = tab === 'm3u';
+  const m3uForm = document.getElementById('form-import-m3u');
+  const jsonForm = document.getElementById('form-import-json');
+  if (m3uForm) m3uForm.classList.toggle('hidden', !isM3u);
+  if (jsonForm) jsonForm.classList.toggle('hidden', isM3u);
+
+  const m3uTab = document.getElementById('import-tab-m3u');
+  const jsonTab = document.getElementById('import-tab-json');
+  if (m3uTab) {
+    m3uTab.className = isM3u
+      ? 'flex-1 py-1.5 rounded-md font-bold text-xs bg-purple-600 text-white'
+      : 'flex-1 py-1.5 rounded-md font-bold text-xs text-slate-400 hover:text-white';
+  }
+  if (jsonTab) {
+    jsonTab.className = !isM3u
+      ? 'flex-1 py-1.5 rounded-md font-bold text-xs bg-purple-600 text-white'
+      : 'flex-1 py-1.5 rounded-md font-bold text-xs text-slate-400 hover:text-white';
+  }
+}
+
+async function handleImportM3u(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-submit-m3u');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Importing...';
+  }
+
+  try {
+    const m3uUrl = document.getElementById('import-m3u-url').value.trim();
+    const m3uContent = document.getElementById('import-m3u-text').value.trim();
+    const defaultCategory = document.getElementById('import-m3u-category').value.trim();
+
+    const res = await apiRequest('/api/import/m3u', 'POST', { m3uUrl, m3uContent, defaultCategory });
+    showToast(res.message || 'M3U channels imported successfully!', 'success');
+    closeModal('modal-import');
+    document.getElementById('form-import-m3u').reset();
+    await fetchMatches();
+    await fetchDashboardStats();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Import M3U Channels';
+    }
+  }
+}
+
+async function handleImportJson(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-submit-json');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Importing...';
+  }
+
+  try {
+    const jsonUrl = document.getElementById('import-json-url').value.trim();
+    const jsonContent = document.getElementById('import-json-text').value.trim();
+    const defaultCategory = document.getElementById('import-json-category').value.trim();
+
+    const res = await apiRequest('/api/import/json', 'POST', { jsonUrl, jsonContent, defaultCategory });
+    showToast(res.message || 'JSON channels imported successfully!', 'success');
+    closeModal('modal-import');
+    document.getElementById('form-import-json').reset();
+    await fetchMatches();
+    await fetchDashboardStats();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Import JSON Channels';
+    }
   }
 }
 
@@ -1026,4 +1251,211 @@ function setElemText(id, text) {
 function setInputValue(id, val) {
   const elem = document.getElementById(id);
   if (elem) elem.value = val;
+}
+
+// --- DIRECT CHANNEL (MANUAL + TOKEN + DRM JSON KEY) HANDLERS ---
+
+function openDirectChannelModal() {
+  const form = document.getElementById('form-direct-channel');
+  if (form) form.reset();
+  const select = document.getElementById('direct-channel-category');
+  if (select && state.categories && state.categories.length > 0) {
+    select.innerHTML = state.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+  }
+  openModal('modal-direct-channel');
+}
+
+function applyDirectPreset(preset) {
+  const ua = document.getElementById('direct-header-ua');
+  const ref = document.getElementById('direct-header-ref');
+  const presets = {
+    hotstar: { ua: 'Hotstar;Android/12.5.0 (Linux; Android 14; SM-S918B)', ref: 'https://www.hotstar.com/' },
+    jio: { ua: 'JioCinema/24.03.11 (Linux; Android 14)', ref: 'https://www.jiocinema.com/' },
+    sony: { ua: 'SonyLIV/6.12.0 (Android; 14; Mobile)', ref: 'https://www.sonyliv.com/' },
+    fancode: { ua: 'FanCode/7.10.0 (Android; 14)', ref: 'https://www.fancode.com/' }
+  };
+  if (presets[preset]) {
+    if (ua) ua.value = presets[preset].ua;
+    if (ref) ref.value = presets[preset].ref;
+    showToast(`Applied ${preset.toUpperCase()} preset headers!`, 'info');
+  }
+}
+
+function toggleDirectDrm(enabled) {
+  const container = document.getElementById('direct-drm-container');
+  if (container) container.classList.toggle('hidden', !enabled);
+}
+
+function handleDirectDrmSchemeChange(scheme) {
+  const clearkey = document.getElementById('direct-clearkey-fields');
+  const widevine = document.getElementById('direct-widevine-fields');
+  if (clearkey && widevine) {
+    clearkey.classList.toggle('hidden', scheme !== 'clearkey');
+    widevine.classList.toggle('hidden', scheme !== 'widevine');
+  }
+}
+
+async function handleDirectChannelSave(e) {
+  e.preventDefault();
+  const title = document.getElementById('direct-channel-title').value.trim();
+  const category = document.getElementById('direct-channel-category').value;
+  const streamUrl = document.getElementById('direct-stream-url').value.trim();
+  const streamType = document.getElementById('direct-stream-type').value;
+  const quality = document.getElementById('direct-stream-quality').value.trim();
+  const status = document.getElementById('direct-channel-status').value;
+  const token = document.getElementById('direct-stream-token').value.trim();
+  const userAgent = document.getElementById('direct-header-ua').value.trim();
+  const referer = document.getElementById('direct-header-ref').value.trim();
+  const origin = document.getElementById('direct-header-origin')?.value.trim() || '';
+  const cookie = document.getElementById('direct-header-cookie').value.trim();
+  const bannerUrl = document.getElementById('direct-channel-banner').value.trim();
+  const drmEnabled = document.getElementById('direct-drm-enable').checked;
+  const drmScheme = document.getElementById('direct-drm-scheme').value;
+  const kidKey = document.getElementById('direct-drm-kidkey').value.trim();
+  const licenseUrl = document.getElementById('direct-drm-license-url').value.trim();
+
+  let drm = { enabled: false };
+  if (drmEnabled) {
+    if (drmScheme === 'clearkey') {
+      let keyId = '';
+      let key = '';
+      if (kidKey.includes(':')) {
+        const parts = kidKey.split(':');
+        keyId = parts[0].trim();
+        key = parts[1].trim();
+      } else {
+        keyId = kidKey;
+        key = kidKey;
+      }
+      drm = { enabled: true, scheme: 'clearkey', keyId, key, licenseUrl: '' };
+    } else {
+      drm = { enabled: true, scheme: 'widevine', keyId: '', key: licenseUrl, licenseUrl };
+    }
+  }
+
+  const jsonChannelUrl = document.getElementById('direct-json-channel-url')?.value.trim() || '';
+  const jsonTokenUrl = document.getElementById('direct-json-token-url')?.value.trim() || '';
+  const effectiveStreamUrl = streamUrl || jsonChannelUrl;
+
+  const payload = {
+    title,
+    category,
+    status,
+    format: 'HD Stream',
+    bannerUrl,
+    description: `Official broadcast of ${title}`,
+    streamTitle: `${title} - High Quality`,
+    streamType,
+    streamUrl: effectiveStreamUrl,
+    jsonChannelUrl,
+    jsonTokenUrl,
+    jsonToken: token,
+    quality,
+    token,
+    userAgent,
+    referer,
+    origin,
+    cookie,
+    drm
+  };
+
+  const btn = document.getElementById('btn-save-direct-channel');
+  if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publishing...';
+
+  try {
+    const res = await apiRequest('/api/channels/direct-create', 'POST', payload);
+    showToast(res.message || 'Channel created and live in app feed!', 'success');
+    closeModal('modal-direct-channel');
+    await fetchMatches();
+    await fetchDashboardStats();
+  } catch (err) {
+    showToast(err.message, 'error');
+  } finally {
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Publish Channel to Feed';
+  }
+}
+
+// --- PIPED STREAM URL & HEADERS AUTO-PARSER ---
+// Auto-parses links like: https://example.com/master.m3u8?token=...|User-Agent=...&Referer=...&Origin=...
+function initPipedUrlListeners() {
+  function attach(urlId, uaId, refId, originId) {
+    const input = document.getElementById(urlId);
+    if (!input) return;
+
+    input.addEventListener('input', () => {
+      const val = input.value.trim();
+      if (val.includes('|')) {
+        const pipeIdx = val.indexOf('|');
+        const cleanUrl = val.substring(0, pipeIdx).trim();
+        const headerStr = val.substring(pipeIdx + 1).trim();
+
+        input.value = cleanUrl;
+
+        const pairs = headerStr.split(/[&|]/);
+        for (const pair of pairs) {
+          const eq = pair.indexOf('=');
+          if (eq > 0) {
+            const k = pair.substring(0, eq).trim().toLowerCase();
+            const v = pair.substring(eq + 1).trim();
+            if (k && v) {
+              if (k === 'user-agent' && uaId) {
+                const el = document.getElementById(uaId);
+                if (el) el.value = v;
+              } else if (k === 'referer' && refId) {
+                const el = document.getElementById(refId);
+                if (el) el.value = v;
+              } else if (k === 'origin' && originId) {
+                const el = document.getElementById(originId);
+                if (el) el.value = v;
+              }
+            }
+          }
+        }
+        showToast('✓ Auto-extracted Piped Stream URL & Headers (Sony LIV / Jio / Hotstar)!', 'success');
+      }
+    });
+  }
+
+  attach('stream-url', 'stream-user-agent', 'stream-referer', null);
+  attach('direct-stream-url', 'direct-header-ua', 'direct-header-ref', 'direct-header-origin');
+}
+
+// --- ADMIN CREDENTIALS UPDATE ---
+async function handleChangeCredentials(e) {
+  e.preventDefault();
+  const currentPassword = document.getElementById('cred-current-pass').value;
+  const newUsername = document.getElementById('cred-new-user').value.trim();
+  const newPassword = document.getElementById('cred-new-pass').value;
+  const statusEl = document.getElementById('cred-change-status');
+
+  if (statusEl) {
+    statusEl.textContent = 'Updating credentials...';
+    statusEl.className = 'text-xs text-amber-400 font-semibold';
+  }
+
+  try {
+    const res = await apiRequest('/api/auth/change-credentials', 'POST', {
+      currentPassword,
+      newUsername,
+      newPassword
+    });
+
+    if (res.token) {
+      state.adminKey = res.token;
+      localStorage.setItem('hd_stream_admin_key', res.token);
+    }
+
+    if (statusEl) {
+      statusEl.textContent = '✓ Updated successfully!';
+      statusEl.className = 'text-xs text-emerald-400 font-semibold';
+    }
+    showToast('Admin username & password updated!', 'success');
+    document.getElementById('form-change-credentials').reset();
+  } catch (err) {
+    if (statusEl) {
+      statusEl.textContent = '✗ ' + (err.message || 'Update failed');
+      statusEl.className = 'text-xs text-rose-400 font-semibold';
+    }
+    showToast(err.message || 'Failed to update credentials', 'error');
+  }
 }
