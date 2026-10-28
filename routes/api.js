@@ -517,7 +517,16 @@ router.post('/import/m3u', requireAdmin, async (req, res) => {
   try {
     let { m3uUrl, m3uContent, defaultCategory } = req.body;
     if (m3uUrl && !m3uContent) {
-      const fetchRes = await fetch(m3uUrl, {
+      let fetchUrl = m3uUrl.trim();
+      if (fetchUrl.includes('drive.google.com/file/d/')) {
+        const fileIdMatch = fetchUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+        if (fileIdMatch) {
+          fetchUrl = `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+        }
+      } else if (!/^https?:\/\//i.test(fetchUrl)) {
+        fetchUrl = 'https://' + fetchUrl;
+      }
+      const fetchRes = await fetch(fetchUrl, {
         headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0' }
       });
       m3uContent = await fetchRes.text();
@@ -567,7 +576,16 @@ router.post('/import/json', requireAdmin, async (req, res) => {
     let { jsonUrl, jsonContent, defaultCategory } = req.body;
     let data = null;
     if (jsonUrl) {
-      const fetchRes = await fetch(jsonUrl, {
+      let fetchUrl = jsonUrl.trim();
+      if (fetchUrl.includes('drive.google.com/file/d/')) {
+        const fileIdMatch = fetchUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+        if (fileIdMatch) {
+          fetchUrl = `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+        }
+      } else if (!/^https?:\/\//i.test(fetchUrl)) {
+        fetchUrl = 'https://' + fetchUrl;
+      }
+      const fetchRes = await fetch(fetchUrl, {
         headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0' }
       });
       data = await fetchRes.json();
@@ -583,12 +601,12 @@ router.post('/import/json', requireAdmin, async (req, res) => {
     let count = 0;
 
     for (const item of list) {
-      const title = item.title || item.name || item.channelName || 'Live Stream';
-      const url = item.streamUrl || item.url || item.stream || item.link || '';
+      const title = (item.title || item.name || item.channelName || 'Live Stream').trim();
+      const url = (item.streamUrl || item.m3uLink || item.url || item.stream || item.link || item.m3u || '').trim();
       if (!url) continue;
 
       const streamType = url.includes('.mpd') ? 'MPD' : 'M3U8';
-      const category = item.category || item.group || defaultCategory || 'Live Sports';
+      const category = (item.category || item.group || item.title || defaultCategory || 'Live Sports').trim();
       const drm = item.drm || (item.keyId && item.key ? {
         enabled: true,
         scheme: item.scheme || 'clearkey',
@@ -608,8 +626,8 @@ router.post('/import/json', requireAdmin, async (req, res) => {
         category,
         status: item.status || 'LIVE',
         matchFormat: item.format || 'T20',
-        bannerUrl: item.bannerUrl || item.logo || item.poster || '',
-        description: item.description || `Imported via JSON: ${title}`,
+        bannerUrl: item.bannerUrl || item.imageUrl || item.logo || item.poster || item.image || '',
+        description: item.description || `Imported channel: ${title}`,
         isPinned: false,
         team1: { name: title.split(' vs ')[0] || title, shortName: '', flag: '📺', score: '' },
         team2: { name: title.split(' vs ')[1] || '', shortName: '', flag: '🔴', score: '' },

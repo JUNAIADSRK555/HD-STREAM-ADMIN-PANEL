@@ -268,19 +268,96 @@ const defaultSampleData = {
         { id: 's7', title: 'Server 1 HD', streamType: 'M3U8', streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', quality: '1080p', isActive: true },
         { id: 's8', title: 'Server 2', streamType: 'M3U8', streamUrl: 'https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8', quality: '720p', isActive: true }
       ]
+    },
+    {
+      _id: 'ch_sample_jiotv',
+      title: 'JIO TV+ Live',
+      category: 'JIO TV+',
+      status: 'LIVE',
+      matchFormat: 'Live TV',
+      startTime: 'LIVE',
+      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s',
+      streams: [
+        { id: 's_jio_1', title: 'JIO TV+ Master Playlist', streamType: 'M3U8', streamUrl: 'https://plugxvipplaylist.lovable.app/api/playlist', quality: '1080p', isActive: true },
+        { id: 's_jio_2', title: 'JIO TV Direct Live', streamType: 'M3U8', streamUrl: 'https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8', quality: '1080p', isActive: true }
+      ]
+    },
+    {
+      _id: 'ch_sample_mixtv',
+      title: 'MIX TV Live Stream',
+      category: 'MIX TV',
+      status: 'LIVE',
+      matchFormat: 'Live TV',
+      startTime: 'LIVE',
+      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCm7hdWxlS5fbZ3Do-pqzytQVayxUNHFl5oD5E4TWtQfCnRw2pM2UOa8I&s=10',
+      streams: [
+        { id: 's_mix_1', title: 'MIX TV Playlist', streamType: 'M3U8', streamUrl: 'https://streamflexsmm.in/SFlex-StarShare/playlist.php', quality: '1080p', isActive: true }
+      ]
+    },
+    {
+      _id: 'ch_sample_pakistan',
+      title: 'PAKISTAN TV Live',
+      category: 'PAKISTAN TV',
+      status: 'LIVE',
+      matchFormat: 'Live TV',
+      startTime: 'LIVE',
+      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10',
+      streams: [
+        { id: 's_pak_1', title: 'Pakistan IPTV M3U', streamType: 'M3U8', streamUrl: 'https://iptv-org.github.io/iptv/countries/pk.m3u', quality: '1080p', isActive: true }
+      ]
+    },
+    {
+      _id: 'ch_sample_toffee',
+      title: 'TOFFEE Hindi TV',
+      category: 'TOFFEE',
+      status: 'LIVE',
+      matchFormat: 'Live TV',
+      startTime: 'LIVE',
+      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLjYG2Yb4mLqygUe_GDkKu5Rw73jqEQmxeXddimkUpE2NrKsvXfaMf-LMQ&s=10',
+      streams: [
+        { id: 's_tof_1', title: 'Toffee Hindi M3U', streamType: 'M3U8', streamUrl: 'https://iptv-org.github.io/iptv/languages/hin.m3u', quality: '1080p', isActive: true }
+      ]
+    },
+    {
+      _id: 'ch_sample_mxp',
+      title: 'MX PLAYER Live India',
+      category: 'MX PLAYER',
+      status: 'LIVE',
+      matchFormat: 'Live TV',
+      startTime: 'LIVE',
+      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10',
+      streams: [
+        { id: 's_mxp_1', title: 'MX Player India', streamType: 'M3U8', streamUrl: 'https://playlist-by-xfireflix.pages.dev/India/mxplayer', quality: '1080p', isActive: true }
+      ]
+    },
+    {
+      _id: 'ch_sample_yuppy',
+      title: 'YUPPY TV Live Channels',
+      category: 'YUPPY TV',
+      status: 'LIVE',
+      matchFormat: 'Live TV',
+      startTime: 'LIVE',
+      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s',
+      streams: [
+        { id: 's_yup_1', title: 'YuppTV Live M3U', streamType: 'M3U8', streamUrl: 'https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u', quality: '1080p', isActive: true }
+      ]
     }
   ],
   categories: [
-    { _id: 'c1', name: 'BIG BOSS', slug: 'big-boss', icon: 'fas fa-tv', order: 1 },
-    { _id: 'c2', name: 'House With Rohit', slug: 'rohit-house', icon: 'fas fa-baseball-bat-ball', order: 2 },
-    { _id: 'c3', name: 'FC LIVE', slug: 'fancode-live', icon: 'fas fa-satellite-dish', order: 3 },
-    { _id: 'c4', name: 'SONY LIVE', slug: 'sony-live', icon: 'fas fa-play', order: 4 },
-    { _id: 'c5', name: 'JTV+', slug: 'jtv-plus', icon: 'fas fa-tv', order: 5 },
-    { _id: 'c6', name: 'JIOSTAR', slug: 'jiostar', icon: 'fas fa-star', order: 6 },
-    { _id: 'c7', name: 'ZEE GLOBAL', slug: 'zee-global', icon: 'fas fa-globe', order: 7 },
-    { _id: 'c8', name: 'JIO CINEMA', slug: 'jio-cinema', icon: 'fas fa-film', order: 8 },
-    { _id: 'c9', name: 'SUN NXT', slug: 'sun-nxt', icon: 'fas fa-sun', order: 9 },
-    { _id: 'c10', name: 'DISH TV', slug: 'dish-tv', icon: 'fas fa-satellite', order: 10 }
+    { _id: 'c_jio', name: 'JIO TV+', slug: 'jio-tv', icon: 'fas fa-tv', order: 1 },
+    { _id: 'c_mix', name: 'MIX TV', slug: 'mix-tv', icon: 'fas fa-satellite-dish', order: 2 },
+    { _id: 'c_vzy', name: 'VZY', slug: 'vzy', icon: 'fas fa-play-circle', order: 3 },
+    { _id: 'c_pak', name: 'PAKISTAN TV', slug: 'pakistan-tv', icon: 'fas fa-globe-asia', order: 4 },
+    { _id: 'c_tof', name: 'TOFFEE', slug: 'toffee', icon: 'fas fa-film', order: 5 },
+    { _id: 'c_irn', name: 'IRAN TV', slug: 'iran-tv', icon: 'fas fa-tv', order: 6 },
+    { _id: 'c_afg', name: 'Afghanistan TV', slug: 'afghanistan-tv', icon: 'fas fa-tv', order: 7 },
+    { _id: 'c_cart', name: 'CARTOON MOVIE', slug: 'cartoon-movie', icon: 'fas fa-child', order: 8 },
+    { _id: 'c_mxp', name: 'MX PLAYER', slug: 'mx-player', icon: 'fas fa-play', order: 9 },
+    { _id: 'c_yup', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', order: 10 },
+    { _id: 'c1', name: 'BIG BOSS', slug: 'big-boss', icon: 'fas fa-tv', order: 11 },
+    { _id: 'c3', name: 'FC LIVE', slug: 'fancode-live', icon: 'fas fa-satellite-dish', order: 12 },
+    { _id: 'c4', name: 'SONY LIVE', slug: 'sony-live', icon: 'fas fa-play', order: 13 },
+    { _id: 'c8', name: 'JIO CINEMA', slug: 'jio-cinema', icon: 'fas fa-film', order: 14 }
   ],
   vods: [
     {

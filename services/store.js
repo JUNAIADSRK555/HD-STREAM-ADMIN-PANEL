@@ -7,10 +7,20 @@ const Settings = require('../models/Settings');
 // Initial seed data for immediate out-of-the-box demo
 const initialCategories = [
   { _id: 'cat_cricket', name: 'Live Cricket', slug: 'live-cricket', icon: 'fas fa-baseball-ball', order: 1, isActive: true },
-  { _id: 'cat_biggboss', name: 'Bigg Boss 18', slug: 'bigg-boss', icon: 'fas fa-tv', order: 2, isActive: true },
-  { _id: 'cat_sonyliv', name: 'Sony LIV', slug: 'sony-liv', icon: 'fas fa-play-circle', order: 3, isActive: true },
-  { _id: 'cat_zee5', name: 'Zee5 Shows', slug: 'zee5', icon: 'fas fa-film', order: 4, isActive: true },
-  { _id: 'cat_sports', name: 'Star Sports & OTT', slug: 'star-sports', icon: 'fas fa-satellite-dish', order: 5, isActive: true }
+  { _id: 'cat_jiotv', name: 'JIO TV+', slug: 'jio-tv', icon: 'fas fa-tv', order: 2, isActive: true },
+  { _id: 'cat_mixtv', name: 'MIX TV', slug: 'mix-tv', icon: 'fas fa-satellite-dish', order: 3, isActive: true },
+  { _id: 'cat_vzy', name: 'VZY', slug: 'vzy', icon: 'fas fa-play-circle', order: 4, isActive: true },
+  { _id: 'cat_pakistan', name: 'PAKISTAN TV', slug: 'pakistan-tv', icon: 'fas fa-globe-asia', order: 5, isActive: true },
+  { _id: 'cat_toffee', name: 'TOFFEE', slug: 'toffee', icon: 'fas fa-film', order: 6, isActive: true },
+  { _id: 'cat_irantv', name: 'IRAN TV', slug: 'iran-tv', icon: 'fas fa-tv', order: 7, isActive: true },
+  { _id: 'cat_afghan', name: 'Afghanistan TV', slug: 'afghanistan-tv', icon: 'fas fa-tv', order: 8, isActive: true },
+  { _id: 'cat_cartoon', name: 'CARTOON MOVIE', slug: 'cartoon-movie', icon: 'fas fa-child', order: 9, isActive: true },
+  { _id: 'cat_mxplayer', name: 'MX PLAYER', slug: 'mx-player', icon: 'fas fa-play', order: 10, isActive: true },
+  { _id: 'cat_yuppytv', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', order: 11, isActive: true },
+  { _id: 'cat_biggboss', name: 'Bigg Boss 18', slug: 'bigg-boss', icon: 'fas fa-tv', order: 12, isActive: true },
+  { _id: 'cat_sonyliv', name: 'Sony LIV', slug: 'sony-liv', icon: 'fas fa-play-circle', order: 13, isActive: true },
+  { _id: 'cat_zee5', name: 'Zee5 Shows', slug: 'zee5', icon: 'fas fa-film', order: 14, isActive: true },
+  { _id: 'cat_sports', name: 'Star Sports & OTT', slug: 'star-sports', icon: 'fas fa-satellite-dish', order: 15, isActive: true }
 ];
 
 const initialMatches = [
@@ -111,6 +121,303 @@ const initialMatches = [
     ],
     createdAt: new Date(),
     updatedAt: new Date()
+  },
+  {
+    _id: 'ch_jiotv_1',
+    title: 'JIO TV+',
+    category: 'JIO TV+',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s',
+    description: 'JIO TV+ Live Channels VIP Playlist API.',
+    isPinned: true,
+    team1: { name: 'JIO TV+', shortName: 'JIO', flag: '📺', score: '' },
+    team2: { name: 'VIP Stream', shortName: 'LIVE', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_jio_01',
+        title: 'JIO TV+ VIP Stream',
+        streamType: 'M3U8',
+        streamUrl: 'https://plugxvipplaylist.lovable.app/api/playlist',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_jiotv_2',
+    title: 'JIO TV+ (Server 2)',
+    category: 'JIO TV+',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s',
+    description: 'JIO TV+ Alternate Live Stream Feed.',
+    isPinned: false,
+    team1: { name: 'JIO TV+ 2', shortName: 'JIO', flag: '📺', score: '' },
+    team2: { name: 'Direct Feed', shortName: 'M3U8', flag: '⚡', score: '' },
+    streams: [
+      {
+        id: 'str_jio_02',
+        title: 'JIO TV 25 Live M3U8',
+        streamType: 'M3U8',
+        streamUrl: 'https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_mixtv',
+    title: 'MIX TV',
+    category: 'MIX TV',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCm7hdWxlS5fbZ3Do-pqzytQVayxUNHFl5oD5E4TWtQfCnRw2pM2UOa8I&s=10',
+    description: 'MIX TV Live Sports & Entertainment Stream.',
+    isPinned: false,
+    team1: { name: 'MIX TV', shortName: 'MIX', flag: '📺', score: '' },
+    team2: { name: 'StarShare', shortName: 'LIVE', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_mix_01',
+        title: 'MIX TV Live Feed',
+        streamType: 'M3U8',
+        streamUrl: 'https://streamflexsmm.in/SFlex-StarShare/playlist.php',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_vzy',
+    title: 'VZY',
+    category: 'VZY',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIYAVnSjMhpKILSGSOyqeLnackwGjeolKPRVv4Yh0UW8RJI-hYBKQbO319&s=10',
+    description: 'VZY Channels Playlist Feed.',
+    isPinned: false,
+    team1: { name: 'VZY', shortName: 'VZY', flag: '📺', score: '' },
+    team2: { name: 'Live', shortName: 'LIVE', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_vzy_01',
+        title: 'VZY M3U Raw Feed',
+        streamType: 'M3U8',
+        streamUrl: 'https://pastyx.pages.dev/api/paste/vzy-playlist-m3u/raw',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_pakistantv',
+    title: 'PAKISTAN TV',
+    category: 'PAKISTAN TV',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10',
+    description: 'Pakistan Live News, Sports & Entertainment channels.',
+    isPinned: false,
+    team1: { name: 'PAKISTAN TV', shortName: 'PAK', flag: '🇵🇰', score: '' },
+    team2: { name: 'Live All', shortName: 'IPTV', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_pak_01',
+        title: 'Pakistan IPTV M3U Playlist',
+        streamType: 'M3U8',
+        streamUrl: 'https://iptv-org.github.io/iptv/countries/pk.m3u',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_toffee',
+    title: 'TOFFEE',
+    category: 'TOFFEE',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLjYG2Yb4mLqygUe_GDkKu5Rw73jqEQmxeXddimkUpE2NrKsvXfaMf-LMQ&s=10',
+    description: 'Toffee Hindi Language Channels & Entertainment.',
+    isPinned: false,
+    team1: { name: 'TOFFEE', shortName: 'TOF', flag: '📺', score: '' },
+    team2: { name: 'Hindi Channels', shortName: 'HIN', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_tof_01',
+        title: 'Toffee Hindi IPTV Feed',
+        streamType: 'M3U8',
+        streamUrl: 'https://iptv-org.github.io/iptv/languages/hin.m3u',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_irantv',
+    title: 'IRAN TV',
+    category: 'IRAN TV',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdoOQ3JwH-PctWnHvCiXlG-Og7Vmav3MQANQ&s',
+    description: 'Iran National and Regional Television Channels.',
+    isPinned: false,
+    team1: { name: 'IRAN TV', shortName: 'IRN', flag: '🇮🇷', score: '' },
+    team2: { name: 'Live Broadcast', shortName: 'LIVE', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_irn_01',
+        title: 'Iran IPTV M3U Playlist',
+        streamType: 'M3U8',
+        streamUrl: 'https://iptv-org.github.io/iptv/countries/ir.m3u',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_afghantv',
+    title: 'Afghanistan TV',
+    category: 'Afghanistan TV',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-i-alUhNqSc08Q7HHJO2i7fCxKxZKBJCXfKf7QymkpmqVhEK4G75wQgs&s=10',
+    description: 'Afghanistan Live TV Channels Stream.',
+    isPinned: false,
+    team1: { name: 'Afghanistan TV', shortName: 'AFG', flag: '🇦🇫', score: '' },
+    team2: { name: 'Live Stream', shortName: 'LIVE', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_afg_01',
+        title: 'Afghanistan IPTV M3U',
+        streamType: 'M3U8',
+        streamUrl: 'https://iptv-org.github.io/iptv/countries/af.m3u',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_cartoonmovie',
+    title: 'CARTOON MOVIE',
+    category: 'CARTOON MOVIE',
+    status: 'LIVE',
+    matchFormat: 'Movies',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://logos-world.net/wp-content/uploads/2022/06/CMovies-Symbol.png',
+    description: 'Cartoon Movies and Kids Animation playlist.',
+    isPinned: false,
+    team1: { name: 'CARTOON MOVIE', shortName: 'KIDS', flag: '🎬', score: '' },
+    team2: { name: 'HD Animation', shortName: 'ANIM', flag: '⭐', score: '' },
+    streams: [
+      {
+        id: 'str_cart_01',
+        title: 'Cartoon Movie M3U Playlist',
+        streamType: 'M3U8',
+        streamUrl: 'https://drive.google.com/uc?export=download&id=1UZ1M-R5Lx58Hi7qkbi5Ylnf8UirfRFPH',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_mxplayer',
+    title: 'MX PLAYER',
+    category: 'MX PLAYER',
+    status: 'LIVE',
+    matchFormat: 'OTT Live',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10',
+    description: 'MX Player India Channels Stream Playlist.',
+    isPinned: false,
+    team1: { name: 'MX PLAYER', shortName: 'MXP', flag: '📺', score: '' },
+    team2: { name: 'India Live', shortName: 'IND', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_mxp_01',
+        title: 'MX Player India Playlist',
+        streamType: 'M3U8',
+        streamUrl: 'https://playlist-by-xfireflix.pages.dev/India/mxplayer',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_yuppytv',
+    title: 'YUPPY TV',
+    category: 'YUPPY TV',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s',
+    description: 'YuppTV Live Channels and Entertainment M3U.',
+    isPinned: false,
+    team1: { name: 'YUPPY TV', shortName: 'YUP', flag: '📺', score: '' },
+    team2: { name: 'Global Channels', shortName: 'TV', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_yup_01',
+        title: 'YuppTV Live M3U',
+        streamType: 'M3U8',
+        streamUrl: 'https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
   }
 ];
 
@@ -174,6 +481,303 @@ const initialVods = [
         streamType: 'M3U8',
         streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
         headers: { userAgent: '', referer: '' },
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_jiotv_1',
+    title: 'JIO TV+',
+    category: 'JIO TV+',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s',
+    description: 'JIO TV+ Live Channels VIP Playlist API.',
+    isPinned: true,
+    team1: { name: 'JIO TV+', shortName: 'JIO', flag: '📺', score: '' },
+    team2: { name: 'VIP Stream', shortName: 'LIVE', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_jio_01',
+        title: 'JIO TV+ VIP Stream',
+        streamType: 'M3U8',
+        streamUrl: 'https://plugxvipplaylist.lovable.app/api/playlist',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_jiotv_2',
+    title: 'JIO TV+ (Server 2)',
+    category: 'JIO TV+',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s',
+    description: 'JIO TV+ Alternate Live Stream Feed.',
+    isPinned: false,
+    team1: { name: 'JIO TV+ 2', shortName: 'JIO', flag: '📺', score: '' },
+    team2: { name: 'Direct Feed', shortName: 'M3U8', flag: '⚡', score: '' },
+    streams: [
+      {
+        id: 'str_jio_02',
+        title: 'JIO TV 25 Live M3U8',
+        streamType: 'M3U8',
+        streamUrl: 'https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_mixtv',
+    title: 'MIX TV',
+    category: 'MIX TV',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCm7hdWxlS5fbZ3Do-pqzytQVayxUNHFl5oD5E4TWtQfCnRw2pM2UOa8I&s=10',
+    description: 'MIX TV Live Sports & Entertainment Stream.',
+    isPinned: false,
+    team1: { name: 'MIX TV', shortName: 'MIX', flag: '📺', score: '' },
+    team2: { name: 'StarShare', shortName: 'LIVE', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_mix_01',
+        title: 'MIX TV Live Feed',
+        streamType: 'M3U8',
+        streamUrl: 'https://streamflexsmm.in/SFlex-StarShare/playlist.php',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_vzy',
+    title: 'VZY',
+    category: 'VZY',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIYAVnSjMhpKILSGSOyqeLnackwGjeolKPRVv4Yh0UW8RJI-hYBKQbO319&s=10',
+    description: 'VZY Channels Playlist Feed.',
+    isPinned: false,
+    team1: { name: 'VZY', shortName: 'VZY', flag: '📺', score: '' },
+    team2: { name: 'Live', shortName: 'LIVE', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_vzy_01',
+        title: 'VZY M3U Raw Feed',
+        streamType: 'M3U8',
+        streamUrl: 'https://pastyx.pages.dev/api/paste/vzy-playlist-m3u/raw',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_pakistantv',
+    title: 'PAKISTAN TV',
+    category: 'PAKISTAN TV',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10',
+    description: 'Pakistan Live News, Sports & Entertainment channels.',
+    isPinned: false,
+    team1: { name: 'PAKISTAN TV', shortName: 'PAK', flag: '🇵🇰', score: '' },
+    team2: { name: 'Live All', shortName: 'IPTV', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_pak_01',
+        title: 'Pakistan IPTV M3U Playlist',
+        streamType: 'M3U8',
+        streamUrl: 'https://iptv-org.github.io/iptv/countries/pk.m3u',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_toffee',
+    title: 'TOFFEE',
+    category: 'TOFFEE',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLjYG2Yb4mLqygUe_GDkKu5Rw73jqEQmxeXddimkUpE2NrKsvXfaMf-LMQ&s=10',
+    description: 'Toffee Hindi Language Channels & Entertainment.',
+    isPinned: false,
+    team1: { name: 'TOFFEE', shortName: 'TOF', flag: '📺', score: '' },
+    team2: { name: 'Hindi Channels', shortName: 'HIN', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_tof_01',
+        title: 'Toffee Hindi IPTV Feed',
+        streamType: 'M3U8',
+        streamUrl: 'https://iptv-org.github.io/iptv/languages/hin.m3u',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_irantv',
+    title: 'IRAN TV',
+    category: 'IRAN TV',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdoOQ3JwH-PctWnHvCiXlG-Og7Vmav3MQANQ&s',
+    description: 'Iran National and Regional Television Channels.',
+    isPinned: false,
+    team1: { name: 'IRAN TV', shortName: 'IRN', flag: '🇮🇷', score: '' },
+    team2: { name: 'Live Broadcast', shortName: 'LIVE', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_irn_01',
+        title: 'Iran IPTV M3U Playlist',
+        streamType: 'M3U8',
+        streamUrl: 'https://iptv-org.github.io/iptv/countries/ir.m3u',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_afghantv',
+    title: 'Afghanistan TV',
+    category: 'Afghanistan TV',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-i-alUhNqSc08Q7HHJO2i7fCxKxZKBJCXfKf7QymkpmqVhEK4G75wQgs&s=10',
+    description: 'Afghanistan Live TV Channels Stream.',
+    isPinned: false,
+    team1: { name: 'Afghanistan TV', shortName: 'AFG', flag: '🇦🇫', score: '' },
+    team2: { name: 'Live Stream', shortName: 'LIVE', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_afg_01',
+        title: 'Afghanistan IPTV M3U',
+        streamType: 'M3U8',
+        streamUrl: 'https://iptv-org.github.io/iptv/countries/af.m3u',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_cartoonmovie',
+    title: 'CARTOON MOVIE',
+    category: 'CARTOON MOVIE',
+    status: 'LIVE',
+    matchFormat: 'Movies',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://logos-world.net/wp-content/uploads/2022/06/CMovies-Symbol.png',
+    description: 'Cartoon Movies and Kids Animation playlist.',
+    isPinned: false,
+    team1: { name: 'CARTOON MOVIE', shortName: 'KIDS', flag: '🎬', score: '' },
+    team2: { name: 'HD Animation', shortName: 'ANIM', flag: '⭐', score: '' },
+    streams: [
+      {
+        id: 'str_cart_01',
+        title: 'Cartoon Movie M3U Playlist',
+        streamType: 'M3U8',
+        streamUrl: 'https://drive.google.com/uc?export=download&id=1UZ1M-R5Lx58Hi7qkbi5Ylnf8UirfRFPH',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_mxplayer',
+    title: 'MX PLAYER',
+    category: 'MX PLAYER',
+    status: 'LIVE',
+    matchFormat: 'OTT Live',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10',
+    description: 'MX Player India Channels Stream Playlist.',
+    isPinned: false,
+    team1: { name: 'MX PLAYER', shortName: 'MXP', flag: '📺', score: '' },
+    team2: { name: 'India Live', shortName: 'IND', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_mxp_01',
+        title: 'MX Player India Playlist',
+        streamType: 'M3U8',
+        streamUrl: 'https://playlist-by-xfireflix.pages.dev/India/mxplayer',
+        quality: '1080p HD',
+        headers: {},
+        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
+        isActive: true
+      }
+    ],
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    _id: 'ch_yuppytv',
+    title: 'YUPPY TV',
+    category: 'YUPPY TV',
+    status: 'LIVE',
+    matchFormat: 'Live TV',
+    startTime: new Date().toISOString(),
+    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s',
+    description: 'YuppTV Live Channels and Entertainment M3U.',
+    isPinned: false,
+    team1: { name: 'YUPPY TV', shortName: 'YUP', flag: '📺', score: '' },
+    team2: { name: 'Global Channels', shortName: 'TV', flag: '🔴', score: '' },
+    streams: [
+      {
+        id: 'str_yup_01',
+        title: 'YuppTV Live M3U',
+        streamType: 'M3U8',
+        streamUrl: 'https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u',
+        quality: '1080p HD',
+        headers: {},
         drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
         isActive: true
       }
