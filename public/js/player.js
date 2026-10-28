@@ -19,10 +19,21 @@ function initPlayer() {
   });
 }
 
-function playStreamUrl(streamUrl, streamType = 'M3U8') {
+function playStreamUrl(rawStreamUrl, streamType = 'M3U8') {
   const video = document.getElementById('admin-video-player');
   const input = document.getElementById('stream-test-input');
-  if (!video) return;
+  if (!video || !rawStreamUrl) return;
+
+  // Gracefully handle piped stream links: https://example.com/master.m3u8|User-Agent=...
+  let streamUrl = String(rawStreamUrl).trim();
+  if (streamUrl.includes('|')) {
+    streamUrl = streamUrl.split('|')[0].trim();
+  }
+
+  // Auto-prefix https:// if protocol is missing
+  if (!/^([a-z0-9+.-]+:)?\/\//i.test(streamUrl) && !streamUrl.startsWith('data:') && !streamUrl.startsWith('blob:')) {
+    streamUrl = 'https://' + streamUrl;
+  }
 
   if (input) input.value = streamUrl;
 
@@ -34,7 +45,12 @@ function playStreamUrl(streamUrl, streamType = 'M3U8') {
     hlsInstance = null;
   }
 
-  if (streamUrl.includes('.m3u8') || streamType === 'M3U8') {
+  const isHls = streamUrl.toLowerCase().includes('.m3u8') ||
+                streamUrl.toLowerCase().includes('.ts') ||
+                String(streamType).toUpperCase() === 'M3U8' ||
+                String(streamType).toUpperCase() === 'HLS';
+
+  if (isHls) {
     if (window.Hls && Hls.isSupported()) {
       hlsInstance = new Hls({
         debug: false,
@@ -45,7 +61,7 @@ function playStreamUrl(streamUrl, streamType = 'M3U8') {
       hlsInstance.attachMedia(video);
 
       hlsInstance.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-        logPlayerStatus(`✅ HLS Manifest Loaded. Available Qualities: ${data.levels.length}`);
+        logPlayerStatus(`✅ Stream Loaded. Available Qualities: ${data.levels.length}`);
         video.play().catch(e => logPlayerStatus(`Autoplay notice: User interaction needed to start audio.`));
       });
 
@@ -53,15 +69,15 @@ function playStreamUrl(streamUrl, streamType = 'M3U8') {
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
-              logPlayerStatus(`⚠️ Fatal Network Error. Attempting HLS recovery...`);
+              logPlayerStatus(`⚠️ Network Error. Attempting stream recovery...`);
               hlsInstance.startLoad();
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
-              logPlayerStatus(`⚠️ Fatal Media Error. Attempting HLS recovery...`);
+              logPlayerStatus(`⚠️ Media Error. Attempting stream recovery...`);
               hlsInstance.recoverMediaError();
               break;
             default:
-              logPlayerStatus(`❌ Unrecoverable HLS error: ${data.details}. (Check CORS or stream token)`);
+              logPlayerStatus(`❌ Stream notice: ${data.details}. (Check CORS or stream headers)`);
               hlsInstance.destroy();
               break;
           }
@@ -72,10 +88,11 @@ function playStreamUrl(streamUrl, streamType = 'M3U8') {
       video.src = streamUrl;
       video.play().catch(e => console.warn(e));
     } else {
-      logPlayerStatus(`❌ HLS is not supported in this browser.`);
+      video.src = streamUrl;
+      video.play().catch(e => logPlayerStatus(`Notice: Click play on video.`));
     }
   } else {
-    // Standard Direct MP4 / WebM
+    // Standard Direct MP4 / WebM / Other Streams
     video.src = streamUrl;
     video.play().catch(e => logPlayerStatus(`Notice: Click play on video.`));
   }
@@ -84,7 +101,7 @@ function playStreamUrl(streamUrl, streamType = 'M3U8') {
 function testStreamFromInput() {
   const input = document.getElementById('stream-test-input');
   if (!input || !input.value.trim()) {
-    showToast('Please enter or paste a valid stream URL', 'warning');
+    showToast('Please enter or paste any stream URL', 'warning');
     return;
   }
   playStreamUrl(input.value.trim());

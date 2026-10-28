@@ -270,7 +270,8 @@ const Store = {
 
   // --- STREAMS INSIDE A MATCH ---
   async addStreamToMatch(matchId, streamData) {
-    let cleanUrl = streamData.streamUrl ? String(streamData.streamUrl).trim() : '';
+    const rawUrl = streamData.streamUrl || streamData.url || streamData.link || streamData.stream || streamData.jsonChannelUrl || '';
+    let cleanUrl = rawUrl ? String(rawUrl).trim() : '';
     const headers = {
       userAgent: streamData.headers?.userAgent || streamData.headers?.['User-Agent'] || '',
       referer: streamData.headers?.referer || streamData.headers?.['Referer'] || '',

@@ -925,6 +925,11 @@ async function handleSaveStream(e) {
   const rawStreamUrl = document.getElementById('stream-url').value.trim();
   const streamUrl = rawStreamUrl || jsonChannelUrl;
 
+  if (!streamUrl) {
+    showToast('Please enter a Stream URL or JSON Channel URL', 'warning');
+    return;
+  }
+
   const payload = {
     title: document.getElementById('stream-title').value.trim(),
     streamType: document.getElementById('stream-type').value,
@@ -1165,11 +1170,17 @@ function openEpisodeModal(vodId, vodTitle) {
 async function handleSaveEpisode(e) {
   e.preventDefault();
   const vodId = document.getElementById('episode-vod-id').value;
+  const streamUrl = document.getElementById('episode-url').value.trim();
+
+  if (!streamUrl) {
+    showToast('Please enter a stream/video URL', 'warning');
+    return;
+  }
 
   const payload = {
     episodeNumber: Number(document.getElementById('episode-num').value) || 1,
     title: document.getElementById('episode-title').value.trim(),
-    streamUrl: document.getElementById('episode-url').value.trim(),
+    streamUrl,
     thumbnail: document.getElementById('episode-thumb').value.trim()
   };
 
@@ -1336,6 +1347,11 @@ async function handleDirectChannelSave(e) {
   const jsonChannelUrl = document.getElementById('direct-json-channel-url')?.value.trim() || '';
   const jsonTokenUrl = document.getElementById('direct-json-token-url')?.value.trim() || '';
   const effectiveStreamUrl = streamUrl || jsonChannelUrl;
+
+  if (!effectiveStreamUrl) {
+    showToast('Please enter a Stream URL or JSON Channel URL', 'warning');
+    return;
+  }
 
   const payload = {
     title,

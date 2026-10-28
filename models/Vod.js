@@ -6,7 +6,7 @@ const EpisodeSchema = new mongoose.Schema({
   title: { type: String, required: true },
   duration: { type: String, default: '45m' },
   thumbnail: { type: String, default: '' },
-  streamType: { type: String, enum: ['M3U8', 'MPD', 'DIRECT', 'EMBED'], default: 'M3U8' },
+  streamType: { type: String, default: 'M3U8' },
   streamUrl: { type: String, required: true },
   headers: {
     userAgent: { type: String, default: '' },

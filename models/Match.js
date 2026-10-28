@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const StreamSchema = new mongoose.Schema({
   id: { type: String, default: () => 'str_' + Math.random().toString(36).substr(2, 9) },
   title: { type: String, required: true },
-  streamType: { type: String, enum: ['M3U8', 'MPD', 'EMBED', 'DIRECT', 'JSON'], default: 'M3U8' },
+  streamType: { type: String, default: 'M3U8' },
   streamUrl: { type: String, required: true },
   jsonChannelUrl: { type: String, default: '' },
   jsonTokenUrl: { type: String, default: '' },
