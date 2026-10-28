@@ -211,13 +211,28 @@ router.get('/stats', async (req, res) => {
 // 3. Match / Live Event Endpoints
 router.get('/matches', async (req, res) => {
   try {
-    const { status, category } = req.query;
+    const { status, category, search } = req.query;
     const filter = {};
     if (status) filter.status = status;
     if (category) filter.category = category;
+    if (search) filter.search = search;
 
     const matches = await Store.getMatches(filter);
     res.json({ success: true, count: matches.length, data: matches });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Sync from Google Drive (One-click)
+router.all('/sync/gdrive', requireAdmin, async (req, res) => {
+  try {
+    const result = await Store.syncGdrive();
+    res.json({
+      success: true,
+      message: `Successfully synced ${result.totalChannels} channels across ${result.categoriesCount} categories!`,
+      data: result
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

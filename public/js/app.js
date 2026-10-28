@@ -1,3 +1,4 @@
+
 // HD STREAM — Live Sports & OTT Admin Dashboard Application Controller
 
 const state = {
@@ -8,7 +9,11 @@ const state = {
   settings: {},
   stats: {},
   activeTab: 'overview',
-  activeFilter: 'ALL'
+  activeFilter: 'ALL',
+  activeCategory: 'ALL',
+  searchQuery: '',
+  currentPage: 1,
+  pageSize: 24
 };
 
 // --- INITIALIZATION ---
@@ -548,27 +553,164 @@ function renderOverviewLiveList() {
   }).join('');
 }
 
+function filterCategory(catName) {
+  state.activeCategory = catName;
+  state.currentPage = 1;
+  const select = document.getElementById('matches-category-select');
+  if (select) select.value = catName;
+  renderMatchesList();
+}
+
+function handleSearchInput(val) {
+  state.searchQuery = (val || '').trim();
+  state.currentPage = 1;
+  renderMatchesList();
+}
+
+function changeMatchesPage(delta) {
+  state.currentPage += delta;
+  renderMatchesList();
+  window.scrollTo({ top: 250, behavior: 'smooth' });
+}
+
+function viewCategoryMatches(catName) {
+  state.activeCategory = catName;
+  state.currentPage = 1;
+  switchTab('matches');
+  renderMatchesList();
+}
+
+async function triggerGdriveSync() {
+  const btn1 = document.getElementById('btn-sync-gdrive');
+  const btn2 = document.getElementById('btn-sync-gdrive-top');
+  const origHtml1 = btn1 ? btn1.innerHTML : '';
+  const origHtml2 = btn2 ? btn2.innerHTML : '';
+
+  if (btn1) { btn1.disabled = true; btn1.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing Channels...'; }
+  if (btn2) { btn2.disabled = true; btn2.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing...'; }
+
+  showToast('Connecting to Google Drive and syncing all channels across categories...', 'info');
+
+  try {
+    const res = await apiRequest('/api/sync/gdrive', 'POST');
+    showToast(res.message || 'Google Drive channels synced successfully!', 'success');
+    await fetchCategories();
+    await fetchMatches();
+    await fetchDashboardStats();
+  } catch (err) {
+    showToast('Sync error: ' + err.message, 'error');
+  } finally {
+    if (btn1) { btn1.disabled = false; btn1.innerHTML = origHtml1; }
+    if (btn2) { btn2.disabled = false; btn2.innerHTML = origHtml2; }
+  }
+}
+
+function updateCategoryFilterUI(categories, matches) {
+  const catSelect = document.getElementById('matches-category-select');
+  const pillsBar = document.getElementById('category-pills-bar');
+  if (!catSelect && !pillsBar) return;
+
+  const countMap = {};
+  matches.forEach(m => {
+    const c = m.category || 'Unknown';
+    countMap[c] = (countMap[c] || 0) + 1;
+  });
+
+  const catList = categories && categories.length > 0 ? categories.map(c => c.name) : Object.keys(countMap);
+  Object.keys(countMap).forEach(k => {
+    if (!catList.includes(k)) catList.push(k);
+  });
+
+  if (catSelect) {
+    catSelect.innerHTML = `
+      <option value="ALL">📁 All Categories (${matches.length})</option>
+      ${catList.map(name => `
+        <option value="${name}" ${state.activeCategory === name ? 'selected' : ''}>
+          ${name} (${countMap[name] || 0})
+        </option>
+      `).join('')}
+    `;
+  }
+
+  if (pillsBar) {
+    pillsBar.innerHTML = `
+      <button onclick="filterCategory('ALL')" class="shrink-0 px-3 py-1 rounded-full font-bold transition flex items-center gap-1.5 cursor-pointer ${state.activeCategory === 'ALL' ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20' : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800'}">
+        <span>All (${matches.length})</span>
+      </button>
+      ${catList.map(name => `
+        <button onclick="filterCategory('${name}')" class="shrink-0 px-3 py-1 rounded-full font-bold transition flex items-center gap-1.5 cursor-pointer ${state.activeCategory === name ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20' : 'bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800'}">
+          <span>${name}</span>
+          <span class="text-[10px] px-1.5 py-0.2 rounded-full ${state.activeCategory === name ? 'bg-slate-950 text-emerald-400' : 'bg-slate-800 text-slate-400'}">${countMap[name] || 0}</span>
+        </button>
+      `).join('')}
+    `;
+  }
+}
+
 function renderMatchesList() {
   const container = document.getElementById('matches-grid');
   if (!container) return;
 
+  updateCategoryFilterUI(state.categories, state.matches);
+
   let list = state.matches;
+
+  // 1. Status Filter
   if (state.activeFilter !== 'ALL') {
     list = list.filter(m => m.status === state.activeFilter);
   }
 
+  // 2. Category Filter
+  if (state.activeCategory !== 'ALL') {
+    list = list.filter(m => m.category === state.activeCategory);
+  }
+
+  // 3. Search Filter
+  if (state.searchQuery) {
+    const q = state.searchQuery.toLowerCase();
+    list = list.filter(m => (m.title && m.title.toLowerCase().includes(q)) || (m.category && m.category.toLowerCase().includes(q)));
+  }
+
+  const pageInfo = document.getElementById('matches-page-info');
+  const pageNumbers = document.getElementById('matches-page-numbers');
+  const btnPrev = document.getElementById('btn-prev-page');
+  const btnNext = document.getElementById('btn-next-page');
+
   if (list.length === 0) {
     container.innerHTML = `
       <div class="col-span-2 p-12 text-center bg-slate-900/40 rounded-xl border border-slate-800">
-        <i class="fa-solid fa-baseball-bat-ball text-4xl text-slate-600 mb-3"></i>
-        <h4 class="text-lg font-bold text-slate-300">No events found in this category</h4>
-        <p class="text-xs text-slate-400 mt-1">Switch filter or create a new live match.</p>
+        <i class="fa-solid fa-satellite-dish text-4xl text-slate-600 mb-3"></i>
+        <h4 class="text-lg font-bold text-slate-300">No channels found in "${state.activeCategory === 'ALL' ? 'current filter' : state.activeCategory}"</h4>
+        <p class="text-xs text-slate-400 mt-1">Switch category above or click "Sync from Google Drive" to refresh channels.</p>
+        <button onclick="triggerGdriveSync()" class="mt-4 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs inline-flex items-center gap-2 hover:from-emerald-400 hover:to-teal-400 transition cursor-pointer shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-arrows-rotate"></i> ⚡ Sync Channels Now
+        </button>
       </div>
     `;
+    if (pageInfo) pageInfo.textContent = 'Showing 0 channels';
+    if (pageNumbers) pageNumbers.textContent = 'Page 0';
+    if (btnPrev) btnPrev.disabled = true;
+    if (btnNext) btnNext.disabled = true;
     return;
   }
 
-  container.innerHTML = list.map(m => {
+  const totalFiltered = list.length;
+  const totalPages = Math.ceil(totalFiltered / state.pageSize) || 1;
+  if (state.currentPage > totalPages) state.currentPage = totalPages;
+  if (state.currentPage < 1) state.currentPage = 1;
+
+  const startIndex = (state.currentPage - 1) * state.pageSize;
+  const endIndex = Math.min(startIndex + state.pageSize, totalFiltered);
+  const pageItems = list.slice(startIndex, endIndex);
+
+  if (pageInfo) {
+    pageInfo.innerHTML = `Showing <strong class="text-white">${startIndex + 1} - ${endIndex}</strong> of <strong class="text-emerald-400">${totalFiltered}</strong> channels ${state.activeCategory !== 'ALL' ? `(Category: <span class="text-white font-bold">${state.activeCategory}</span>)` : ''}`;
+  }
+  if (pageNumbers) pageNumbers.textContent = `Page ${state.currentPage} of ${totalPages}`;
+  if (btnPrev) btnPrev.disabled = state.currentPage <= 1;
+  if (btnNext) btnNext.disabled = state.currentPage >= totalPages;
+
+  container.innerHTML = pageItems.map(m => {
     const isLive = m.status === 'LIVE';
     const statusColor = isLive ? 'bg-red-500/20 text-red-400 border-red-500/30' : (m.status === 'UPCOMING' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' : 'bg-slate-700/30 text-slate-400 border-slate-700');
     const streams = m.streams || [];
@@ -625,8 +767,8 @@ function renderMatchesList() {
           </div>
 
           <div class="flex flex-wrap gap-1.5">
-            ${streams.length === 0 ? '<span class="text-xs text-slate-500 italic">No streaming links added yet.</span>' : 
-              streams.map(s => `
+            ${streams.length === 0 ? '<span class="text-xs text-slate-500 italic">No streaming links added yet.</span>' :
+        streams.map(s => `
                 <div class="stream-badge text-xs">
                   <span class="w-2 h-2 rounded-full ${s.isActive ? 'bg-emerald-400' : 'bg-slate-600'}"></span>
                   <span class="font-semibold text-slate-200">${s.title}</span>
@@ -636,7 +778,7 @@ function renderMatchesList() {
                   </button>
                 </div>
               `).join('')
-            }
+      }
           </div>
         </div>
 
@@ -733,14 +875,20 @@ function renderCategoriesTable() {
   if (!tbody) return;
 
   if (state.categories.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500">No categories found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">No categories found.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = state.categories.map(c => `
     <tr class="hover:bg-slate-900/50 transition">
-      <td class="p-4 text-emerald-400 text-lg"><i class="${c.icon || 'fas fa-play'}"></i></td>
-      <td class="p-4 font-bold text-white">${c.name}</td>
+      <td class="p-4 text-emerald-400 text-lg"><i class="${c.icon || 'fas fa-tv'}"></i></td>
+      <td class="p-4 font-bold text-white text-sm">${c.name}</td>
+      <td class="p-4">
+        <span class="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold text-xs inline-flex items-center gap-1.5">
+          <i class="fa-solid fa-satellite-dish text-[11px]"></i>
+          ${c.channelsCount || 0} Channels
+        </span>
+      </td>
       <td class="p-4 text-xs font-mono text-slate-400">${c.slug}</td>
       <td class="p-4">
         <span class="text-xs px-2 py-0.5 rounded-full ${c.isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400'}">
@@ -748,9 +896,14 @@ function renderCategoriesTable() {
         </span>
       </td>
       <td class="p-4 text-right">
-        <button onclick="deleteCategory('${c._id}')" class="text-red-400 hover:text-red-300 text-sm">
-          <i class="fa-solid fa-trash"></i>
-        </button>
+        <div class="flex items-center justify-end gap-2">
+          <button onclick="viewCategoryMatches('${c.name}')" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> View Channels
+          </button>
+          <button onclick="deleteCategory('${c._id}')" class="text-red-400 hover:text-red-300 p-1.5" title="Delete Category">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
       </td>
     </tr>
   `).join('');
@@ -888,8 +1041,8 @@ function filterMatches(status) {
   state.activeFilter = status;
   document.querySelectorAll('.match-filter-btn').forEach(btn => {
     const isTarget = btn.getAttribute('data-filter') === status;
-    btn.className = isTarget 
-      ? 'match-filter-btn px-4 py-2 rounded-lg bg-emerald-500 text-black font-bold' 
+    btn.className = isTarget
+      ? 'match-filter-btn px-4 py-2 rounded-lg bg-emerald-500 text-black font-bold'
       : 'match-filter-btn px-4 py-2 rounded-lg text-slate-300 hover:text-white';
   });
   renderMatchesList();

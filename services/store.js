@@ -808,23 +808,28 @@ const Store = {
   // --- MATCHES / LIVE EVENTS ---
   async getMatches(filter = {}) {
     if (isMongoConnected()) {
-      let matches = await Match.find(filter).sort({ isPinned: -1, createdAt: -1 });
-      if ((!matches || matches.length === 0) && Object.keys(filter).length === 0) {
-        for (const m of initialMatches) {
-          try {
-            await Match.create(m);
-          } catch (_) {}
-        }
-        matches = await Match.find(filter).sort({ isPinned: -1, createdAt: -1 });
+      const query = {};
+      if (filter.status && filter.status !== 'ALL') {
+        query.status = filter.status;
       }
-      return matches;
+      if (filter.category && filter.category !== 'ALL') {
+        query.category = filter.category;
+      }
+      if (filter.search) {
+        query.title = { $regex: filter.search, $options: 'i' };
+      }
+      return await Match.find(query).sort({ isPinned: -1, createdAt: -1 });
     }
     let list = inMemoryState.matches;
-    if (filter.status) {
+    if (filter.status && filter.status !== 'ALL') {
       list = list.filter(m => m.status === filter.status);
     }
-    if (filter.category) {
+    if (filter.category && filter.category !== 'ALL') {
       list = list.filter(m => m.category === filter.category);
+    }
+    if (filter.search) {
+      const term = filter.search.toLowerCase();
+      list = list.filter(m => m.title && m.title.toLowerCase().includes(term));
     }
     return list;
   },
@@ -1013,7 +1018,24 @@ const Store = {
         }
         cats = await Category.find({ isActive: true }).sort({ order: 1 });
       }
-      return cats;
+
+      // Add real-time channels count per category
+      try {
+        const counts = await Match.aggregate([
+          { $group: { _id: "$category", count: { $sum: 1 } } }
+        ]);
+        const countMap = {};
+        counts.forEach(c => { countMap[c._id] = c.count; });
+        return cats.map(cat => {
+          const obj = cat.toObject ? cat.toObject() : cat;
+          return {
+            ...obj,
+            channelsCount: countMap[obj.name] || 0
+          };
+        });
+      } catch (_) {
+        return cats;
+      }
     }
     return inMemoryState.categories.filter(c => !['Live Cricket', 'Bigg Boss 18', 'Sony LIV', 'Zee5 Shows', 'Star Sports & OTT', 'Live Sports', 'Sports', 'Cricket'].includes(c.name));
   },
@@ -1222,6 +1244,159 @@ const Store = {
       totalStreams,
       drmStreamsCount,
       databaseMode: isMongoConnected() ? 'MongoDB Atlas (Cloud)' : 'Local / In-Memory (Active)'
+    };
+  },
+
+  // --- SYNC CHANNELS & CATEGORIES FROM GOOGLE DRIVE ---
+  async syncGdrive() {
+    const GDRIVE_JSON_URL = "https://drive.google.com/uc?export=download&id=1KxcfPpIjkeRaHWyrN53otPBci5s6FMMO";
+    const res = await fetch(GDRIVE_JSON_URL, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
+    });
+    const sources = await res.json();
+    if (!Array.isArray(sources) || sources.length === 0) {
+      throw new Error("No categories found in Google Drive link");
+    }
+
+    const userCatNames = [...new Set(sources.map(s => s.title.trim()))];
+    if (isMongoConnected()) {
+      await Category.deleteMany({ name: { $nin: userCatNames } });
+      let orderIndex = 1;
+      for (const catName of userCatNames) {
+        const slug = catName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        await Category.findOneAndUpdate(
+          { name: catName },
+          { name: catName, slug, icon: 'fas fa-tv', order: orderIndex++, isActive: true },
+          { upsert: true, new: true }
+        );
+      }
+      await Match.deleteMany({});
+    }
+
+    const allMatches = [];
+
+    function parseSimpleM3u(content, defaultCat, defaultLogo, maxLimit = 500) {
+      const lines = content.split(/\r?\n/);
+      const items = [];
+      let currentTitle = null;
+      let currentLogo = defaultLogo || '';
+
+      for (let i = 0; i < lines.length; i++) {
+        if (items.length >= maxLimit) break;
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        if (line.startsWith('#EXTINF:')) {
+          const commaIdx = line.lastIndexOf(',');
+          currentTitle = commaIdx !== -1 ? line.substring(commaIdx + 1).trim() : 'Live Stream';
+          const logoMatch = line.match(/tvg-logo="([^"]+)"/i);
+          if (logoMatch && logoMatch[1]) currentLogo = logoMatch[1];
+        } else if (!line.startsWith('#') && (line.startsWith('http://') || line.startsWith('https://'))) {
+          const streamUrl = line;
+          const title = currentTitle || `${defaultCat} Channel`;
+          items.push({
+            title,
+            category: defaultCat,
+            status: 'LIVE',
+            matchFormat: 'HD',
+            bannerUrl: currentLogo || defaultLogo || '',
+            description: `${defaultCat} Live: ${title}`,
+            isPinned: false,
+            team1: { name: title.split(' vs ')[0] || title, shortName: '', flag: '📺', score: '' },
+            team2: { name: title.split(' vs ')[1] || '', shortName: '', flag: '🔴', score: '' },
+            streams: [
+              {
+                id: 'str_' + Math.random().toString(36).substr(2, 9),
+                title,
+                streamType: streamUrl.includes('.mpd') ? 'MPD' : 'M3U8',
+                streamUrl,
+                quality: '1080p HD',
+                headers: {},
+                drm: { enabled: false },
+                isActive: true
+              }
+            ]
+          });
+          currentTitle = null;
+          currentLogo = defaultLogo || '';
+        }
+      }
+      return items;
+    }
+
+    for (const s of sources) {
+      const catName = s.title.trim();
+      const logo = s.imageUrl || '';
+      const m3uUrl = s.m3uLink ? s.m3uLink.trim() : '';
+
+      let playlistText = '';
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 8000);
+        let fetchUrl = m3uUrl;
+        if (fetchUrl.includes('drive.google.com/file/d/')) {
+          const fileIdMatch = fetchUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+          if (fileIdMatch) {
+            fetchUrl = `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
+          }
+        }
+        const resp = await fetch(fetchUrl, {
+          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+          redirect: 'follow',
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+        if (resp.ok) playlistText = await resp.text();
+      } catch (_) {}
+
+      const maxLimit = (catName === 'MIX TV' || catName === 'JIO TV+') ? 150 : 500;
+      if (playlistText && (playlistText.includes('#EXTM3U') || playlistText.includes('#EXTINF') || playlistText.includes('http'))) {
+        const items = parseSimpleM3u(playlistText, catName, logo, maxLimit);
+        if (items.length > 0) {
+          allMatches.push(...items);
+          continue;
+        }
+      }
+
+      allMatches.push({
+        title: catName,
+        category: catName,
+        status: 'LIVE',
+        matchFormat: 'HD',
+        bannerUrl: logo,
+        description: `Live Stream: ${catName}`,
+        isPinned: false,
+        team1: { name: catName, shortName: '', flag: '📺', score: '' },
+        team2: { name: '', shortName: '', flag: '🔴', score: '' },
+        streams: [
+          {
+            id: 'str_' + Math.random().toString(36).substr(2, 9),
+            title: `${catName} - Live`,
+            streamType: m3uUrl.includes('.mpd') ? 'MPD' : 'M3U8',
+            streamUrl: m3uUrl,
+            quality: '1080p HD',
+            headers: {},
+            drm: { enabled: false },
+            isActive: true
+          }
+        ]
+      });
+    }
+
+    if (isMongoConnected()) {
+      const chunkSize = 500;
+      for (let i = 0; i < allMatches.length; i += chunkSize) {
+        const chunk = allMatches.slice(i, i + chunkSize);
+        await Match.insertMany(chunk, { ordered: false });
+      }
+    } else {
+      inMemoryState.matches = allMatches;
+    }
+
+    return {
+      success: true,
+      totalChannels: allMatches.length,
+      categoriesCount: userCatNames.length
     };
   }
 };
