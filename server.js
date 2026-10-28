@@ -30,6 +30,16 @@ app.use(async (req, res, next) => {
 // Serve Admin Dashboard Static Frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Direct APK Download Endpoint
+app.get('/HD-STREAM.apk', (req, res) => {
+  const apkPath = path.join(__dirname, 'public', 'HD-STREAM.apk');
+  res.download(apkPath, 'HD-STREAM.apk', (err) => {
+    if (err && !res.headersSent) {
+      res.status(404).send('APK file not found');
+    }
+  });
+});
+
 // API Routes
 const apiRoutes = require('./routes/api');
 const feedRoutes = require('./routes/feeds');

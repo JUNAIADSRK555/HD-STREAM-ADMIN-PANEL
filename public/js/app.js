@@ -468,11 +468,13 @@ async function fetchMatches() {
   renderOverviewLiveList();
 }
 
-async function fetchCategories() {
+async function fetchCategories(forceRefresh = false) {
   try {
-    const res = await apiRequest('/api/categories');
+    const url = forceRefresh ? '/api/categories?refresh=true' : '/api/categories';
+    const res = await apiRequest(url);
     if (res && res.success) {
       state.categories = res.data;
+      if (forceRefresh) showToast('Categories refreshed from Google Drive!', 'success');
     } else {
       state.categories = defaultSampleData.categories;
     }
@@ -651,24 +653,21 @@ function renderMatchesList() {
   const container = document.getElementById('matches-grid');
   if (!container) return;
 
-  updateCategoryFilterUI(state.categories, state.matches);
-
-  let list = state.matches;
+  let list = state.matches || [];
 
   // 1. Status Filter
   if (state.activeFilter !== 'ALL') {
     list = list.filter(m => m.status === state.activeFilter);
   }
 
-  // 2. Category Filter
-  if (state.activeCategory !== 'ALL') {
-    list = list.filter(m => m.category === state.activeCategory);
-  }
-
-  // 3. Search Filter
+  // 2. Live Search Filter (Title or Teams)
   if (state.searchQuery) {
     const q = state.searchQuery.toLowerCase();
-    list = list.filter(m => (m.title && m.title.toLowerCase().includes(q)) || (m.category && m.category.toLowerCase().includes(q)));
+    list = list.filter(m =>
+      (m.title && m.title.toLowerCase().includes(q)) ||
+      (m.team1?.name && m.team1.name.toLowerCase().includes(q)) ||
+      (m.team2?.name && m.team2.name.toLowerCase().includes(q))
+    );
   }
 
   const pageInfo = document.getElementById('matches-page-info');
@@ -679,15 +678,15 @@ function renderMatchesList() {
   if (list.length === 0) {
     container.innerHTML = `
       <div class="col-span-2 p-12 text-center bg-slate-900/40 rounded-xl border border-slate-800">
-        <i class="fa-solid fa-satellite-dish text-4xl text-slate-600 mb-3"></i>
-        <h4 class="text-lg font-bold text-slate-300">No channels found in "${state.activeCategory === 'ALL' ? 'current filter' : state.activeCategory}"</h4>
-        <p class="text-xs text-slate-400 mt-1">Switch category above or click "Sync from Google Drive" to refresh channels.</p>
-        <button onclick="triggerGdriveSync()" class="mt-4 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-black text-xs inline-flex items-center gap-2 hover:from-emerald-400 hover:to-teal-400 transition cursor-pointer shadow-lg shadow-emerald-500/20">
-          <i class="fa-solid fa-arrows-rotate"></i> ⚡ Sync Channels Now
+        <i class="fa-solid fa-tower-broadcast text-4xl text-slate-600 mb-3"></i>
+        <h4 class="text-lg font-bold text-slate-300">No live events found matching current filter</h4>
+        <p class="text-xs text-slate-400 mt-1">Click below to add a live match, stream URL, headers, and DRM keys directly.</p>
+        <button onclick="openNewMatchModal()" class="mt-4 px-4 py-2.5 rounded-xl bg-[#d48a7b] text-slate-950 font-black text-xs inline-flex items-center gap-2 hover:bg-[#e29b8d] transition cursor-pointer shadow-lg shadow-[#d48a7b]/25">
+          <i class="fa-solid fa-plus-circle"></i> + Add Live Event & Stream
         </button>
       </div>
     `;
-    if (pageInfo) pageInfo.textContent = 'Showing 0 channels';
+    if (pageInfo) pageInfo.textContent = 'Showing 0 events';
     if (pageNumbers) pageNumbers.textContent = 'Page 0';
     if (btnPrev) btnPrev.disabled = true;
     if (btnNext) btnNext.disabled = true;
@@ -704,7 +703,7 @@ function renderMatchesList() {
   const pageItems = list.slice(startIndex, endIndex);
 
   if (pageInfo) {
-    pageInfo.innerHTML = `Showing <strong class="text-white">${startIndex + 1} - ${endIndex}</strong> of <strong class="text-emerald-400">${totalFiltered}</strong> channels ${state.activeCategory !== 'ALL' ? `(Category: <span class="text-white font-bold">${state.activeCategory}</span>)` : ''}`;
+    pageInfo.innerHTML = `Showing <strong class="text-white">${startIndex + 1} - ${endIndex}</strong> of <strong class="text-emerald-400">${totalFiltered}</strong> live events`;
   }
   if (pageNumbers) pageNumbers.textContent = `Page ${state.currentPage} of ${totalPages}`;
   if (btnPrev) btnPrev.disabled = state.currentPage <= 1;
@@ -874,35 +873,50 @@ function renderCategoriesTable() {
   const tbody = document.getElementById('categories-table-body');
   if (!tbody) return;
 
-  if (state.categories.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">No categories found.</td></tr>`;
+  if (!state.categories || state.categories.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">Loading categories from Google Drive feed...</td></tr>`;
     return;
   }
 
   tbody.innerHTML = state.categories.map(c => `
     <tr class="hover:bg-slate-900/50 transition">
-      <td class="p-4 text-emerald-400 text-lg"><i class="${c.icon || 'fas fa-tv'}"></i></td>
-      <td class="p-4 font-bold text-white text-sm">${c.name}</td>
       <td class="p-4">
-        <span class="px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold text-xs inline-flex items-center gap-1.5">
-          <i class="fa-solid fa-satellite-dish text-[11px]"></i>
-          ${c.channelsCount || 0} Channels
-        </span>
+        <div class="w-10 h-10 rounded-lg overflow-hidden bg-slate-950 border border-slate-700/80 flex items-center justify-center p-1 shrink-0">
+          ${c.imageUrl ? `
+            <img src="${c.imageUrl}" alt="${c.name}" class="w-full h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\\'fa-solid fa-tv text-emerald-400 text-sm\\'></i>'">
+          ` : `
+            <i class="${c.icon || 'fa-solid fa-tv'} text-emerald-400 text-sm"></i>
+          `}
+        </div>
       </td>
-      <td class="p-4 text-xs font-mono text-slate-400">${c.slug}</td>
       <td class="p-4">
-        <span class="text-xs px-2 py-0.5 rounded-full ${c.isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400'}">
-          ${c.isActive ? 'Active' : 'Disabled'}
+        <div class="font-extrabold text-white text-sm">${c.name}</div>
+        <div class="text-[11px] font-mono text-slate-400 mt-0.5">${c.slug}</div>
+      </td>
+      <td class="p-4">
+        <div class="flex items-center gap-2 max-w-md">
+          <input type="text" readonly value="${c.m3uLink || ''}"
+                 class="bg-black/60 border border-slate-800 text-[11px] font-mono text-cyan-300 rounded-lg px-2.5 py-1.5 w-full truncate select-all focus:border-cyan-500 focus:outline-none">
+          <button onclick="copyToClipboard('${c.m3uLink || ''}')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs shrink-0 cursor-pointer transition" title="Copy Playlist Link">
+            <i class="fa-solid fa-copy"></i>
+          </button>
+        </div>
+      </td>
+      <td class="p-4">
+        <span class="text-xs font-mono font-bold text-slate-400 bg-slate-950 px-2 py-1 rounded border border-slate-800">#${c.order || 1}</span>
+      </td>
+      <td class="p-4">
+        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 inline-flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active
         </span>
       </td>
       <td class="p-4 text-right">
         <div class="flex items-center justify-end gap-2">
-          <button onclick="viewCategoryMatches('${c.name}')" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
-            <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> View Channels
-          </button>
-          <button onclick="deleteCategory('${c._id}')" class="text-red-400 hover:text-red-300 p-1.5" title="Delete Category">
-            <i class="fa-solid fa-trash"></i>
-          </button>
+          ${c.m3uLink ? `
+            <a href="${c.m3uLink}" target="_blank" class="px-3 py-1.5 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Test Link
+            </a>
+          ` : ''}
         </div>
       </td>
     </tr>
@@ -989,7 +1003,8 @@ function populateSettingsInputs(settings) {
 
 // --- APK LINK & LIVE QR CODE ---
 function updateApkQrCode(apkUrl, appVersion) {
-  const url = apkUrl || 'https://example.com/download/app-release.apk';
+  const defaultDirectUrl = `${window.location.origin}/HD-STREAM.apk`;
+  const url = (apkUrl && !apkUrl.includes('example.com') && !apkUrl.includes('10.129')) ? apkUrl : defaultDirectUrl;
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}`;
 
   const dashInput = document.getElementById('dashboard-apk-url');
@@ -999,7 +1014,10 @@ function updateApkQrCode(apkUrl, appVersion) {
   if (dashQr) dashQr.src = qrUrl;
 
   const directBtn = document.getElementById('btn-download-apk-direct');
-  if (directBtn) directBtn.href = url;
+  if (directBtn) {
+    directBtn.href = url;
+    directBtn.setAttribute('download', 'HD-STREAM.apk');
+  }
 
   const versionBadge = document.getElementById('apk-version-badge');
   if (versionBadge && appVersion) versionBadge.textContent = 'v' + appVersion;
@@ -1008,7 +1026,10 @@ function updateApkQrCode(apkUrl, appVersion) {
   if (modalQr) modalQr.src = qrUrl;
 
   const modalBtn = document.getElementById('modal-apk-download-btn');
-  if (modalBtn) modalBtn.href = url;
+  if (modalBtn) {
+    modalBtn.href = url;
+    modalBtn.setAttribute('download', 'HD-STREAM.apk');
+  }
 }
 
 function openApkModal() {
@@ -1197,6 +1218,11 @@ async function handleSaveMatch(e) {
       payload.streams = [streamObj, ...remainingStreams];
     } else {
       payload.streams = [streamObj];
+    }
+  } else if (id) {
+    const existing = state.matches.find(m => m._id === id);
+    if (existing?.streams) {
+      payload.streams = existing.streams;
     }
   }
 

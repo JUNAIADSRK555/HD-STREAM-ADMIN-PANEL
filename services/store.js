@@ -6,16 +6,16 @@ const Settings = require('../models/Settings');
 
 // Initial seed data for immediate out-of-the-box demo
 const initialCategories = [
-  { _id: 'cat_jiotv', name: 'JIO TV+', slug: 'jio-tv', icon: 'fas fa-tv', order: 1, isActive: true },
-  { _id: 'cat_mixtv', name: 'MIX TV', slug: 'mix-tv', icon: 'fas fa-satellite-dish', order: 2, isActive: true },
-  { _id: 'cat_vzy', name: 'VZY', slug: 'vzy', icon: 'fas fa-play-circle', order: 3, isActive: true },
-  { _id: 'cat_pakistan', name: 'PAKISTAN TV', slug: 'pakistan-tv', icon: 'fas fa-globe-asia', order: 4, isActive: true },
-  { _id: 'cat_toffee', name: 'TOFFEE', slug: 'toffee', icon: 'fas fa-film', order: 5, isActive: true },
-  { _id: 'cat_irantv', name: 'IRAN TV', slug: 'iran-tv', icon: 'fas fa-tv', order: 6, isActive: true },
-  { _id: 'cat_afghan', name: 'Afghanistan TV', slug: 'afghanistan-tv', icon: 'fas fa-tv', order: 7, isActive: true },
-  { _id: 'cat_cartoon', name: 'CARTOON MOVIE', slug: 'cartoon-movie', icon: 'fas fa-child', order: 8, isActive: true },
-  { _id: 'cat_mxplayer', name: 'MX PLAYER', slug: 'mx-player', icon: 'fas fa-play', order: 9, isActive: true },
-  { _id: 'cat_yuppytv', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', order: 10, isActive: true }
+  { _id: 'cat_jiotv', id: 'cat_jiotv', name: 'JIO TV+', slug: 'jio-tv', icon: 'fas fa-tv', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s', m3uLink: 'https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8', order: 1, isActive: true },
+  { _id: 'cat_mixtv', id: 'cat_mixtv', name: 'MIX TV', slug: 'mix-tv', icon: 'fas fa-satellite-dish', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCm7hdWxlS5fbZ3Do-pqzytQVayxUNHFl5oD5E4TWtQfCnRw2pM2UOa8I&s=10', m3uLink: 'https://streamflexsmm.in/SFlex-StarShare/playlist.php', order: 2, isActive: true },
+  { _id: 'cat_vzy', id: 'cat_vzy', name: 'VZY', slug: 'vzy', icon: 'fas fa-play-circle', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIYAVnSjMhpKILSGSOyqeLnackwGjeolKPRVv4Yh0UW8RJI-hYBKQbO319&s=10', m3uLink: 'https://pastyx.pages.dev/api/paste/vzy-playlist-m3u/raw', order: 3, isActive: true },
+  { _id: 'cat_pakistan', id: 'cat_pakistan', name: 'PAKISTAN TV', slug: 'pakistan-tv', icon: 'fas fa-globe-asia', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10', m3uLink: 'https://iptv-org.github.io/iptv/countries/pk.m3u', order: 4, isActive: true },
+  { _id: 'cat_toffee', id: 'cat_toffee', name: 'TOFFEE', slug: 'toffee', icon: 'fas fa-film', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLjYG2Yb4mLqygUe_GDkKu5Rw73jqEQmxeXddimkUpE2NrKsvXfaMf-LMQ&s=10', m3uLink: 'https://iptv-org.github.io/iptv/languages/hin.m3u', order: 5, isActive: true },
+  { _id: 'cat_irantv', id: 'cat_irantv', name: 'IRAN TV', slug: 'iran-tv', icon: 'fas fa-tv', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdoOQ3JwH-PctWnHvCiXlG-Og7Vmav3MQANQ&s', m3uLink: 'https://iptv-org.github.io/iptv/countries/ir.m3u', order: 6, isActive: true },
+  { _id: 'cat_afghan', id: 'cat_afghan', name: 'Afghanistan TV', slug: 'afghanistan-tv', icon: 'fas fa-tv', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-i-alUhNqSc08Q7HHJO2i7fCxKxZKBJCXfKf7QymkpmqVhEK4G75wQgs&s=10', m3uLink: 'https://iptv-org.github.io/iptv/countries/af.m3u', order: 7, isActive: true },
+  { _id: 'cat_cartoon', id: 'cat_cartoon', name: 'CARTOON MOVIE', slug: 'cartoon-movie', icon: 'fas fa-child', imageUrl: 'https://logos-world.net/wp-content/uploads/2022/06/CMovies-Symbol.png', m3uLink: 'https://drive.google.com/uc?export=download&id=1UZ1M-R5Lx58Hi7qkbi5Ylnf8UirfRFPH', order: 8, isActive: true },
+  { _id: 'cat_mxplayer', id: 'cat_mxplayer', name: 'MX PLAYER', slug: 'mx-player', icon: 'fas fa-play', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10', m3uLink: 'https://playlist-by-xfireflix.pages.dev/India/mxplayer', order: 9, isActive: true },
+  { _id: 'cat_yuppytv', id: 'cat_yuppytv', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s', m3uLink: 'https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u', order: 10, isActive: true }
 ];
 
 const initialMatches = [
@@ -1001,43 +1001,57 @@ const Store = {
     return match;
   },
 
-  // --- CATEGORIES ---
-  async getCategories() {
-    if (isMongoConnected()) {
-      // Clean up any default admin template categories so ONLY user categories exist
-      await Category.deleteMany({
-        name: { $in: ['Live Cricket', 'Bigg Boss 18', 'Sony LIV', 'Zee5 Shows', 'Star Sports & OTT', 'Live Sports', 'Sports', 'Cricket'] }
-      });
+  // --- CATEGORIES (LOADED DIRECTLY FROM GOOGLE DRIVE LINK) ---
+  async getCategories(forceRefresh = false) {
+    const GDRIVE_URL = 'https://drive.google.com/uc?export=download&id=1KxcfPpIjkeRaHWyrN53otPBci5s6FMMO';
 
-      let cats = await Category.find({ isActive: true }).sort({ order: 1 });
-      if (!cats || cats.length === 0) {
-        for (const c of initialCategories) {
-          try {
-            await Category.create({ name: c.name, slug: c.slug, icon: c.icon, order: c.order, isActive: true });
-          } catch (_) {}
-        }
-        cats = await Category.find({ isActive: true }).sort({ order: 1 });
-      }
-
-      // Add real-time channels count per category
-      try {
-        const counts = await Match.aggregate([
-          { $group: { _id: "$category", count: { $sum: 1 } } }
-        ]);
-        const countMap = {};
-        counts.forEach(c => { countMap[c._id] = c.count; });
-        return cats.map(cat => {
-          const obj = cat.toObject ? cat.toObject() : cat;
-          return {
-            ...obj,
-            channelsCount: countMap[obj.name] || 0
-          };
-        });
-      } catch (_) {
-        return cats;
-      }
+    if (!forceRefresh && this._gdriveCache && (Date.now() - (this._gdriveCacheTime || 0) < 60000)) {
+      return this._gdriveCache;
     }
-    return inMemoryState.categories.filter(c => !['Live Cricket', 'Bigg Boss 18', 'Sony LIV', 'Zee5 Shows', 'Star Sports & OTT', 'Live Sports', 'Sports', 'Cricket'].includes(c.name));
+
+    const unescapeHtml = (s) => String(s || '')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .trim();
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch(GDRIVE_URL, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const cats = data.map((item, idx) => {
+            const rawTitle = item.title || item.name || 'Category';
+            return {
+              _id: 'gcat_' + (idx + 1),
+              id: 'gcat_' + (idx + 1),
+              name: unescapeHtml(rawTitle),
+              slug: rawTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              icon: 'fas fa-tv',
+              imageUrl: unescapeHtml(item.imageUrl),
+              m3uLink: unescapeHtml(item.m3uLink),
+              order: idx + 1,
+              isActive: true
+            };
+          });
+          this._gdriveCache = cats;
+          this._gdriveCacheTime = Date.now();
+          return cats;
+        }
+      }
+    } catch (err) {
+      console.warn('Google Drive categories fetch warning:', err.message);
+    }
+
+    return this._gdriveCache || initialCategories;
   },
 
   async ensureCategory(name) {
@@ -1196,12 +1210,23 @@ const Store = {
 
   // --- SETTINGS ---
   async getSettings() {
+    const defaultApkUrl = 'https://stream-admin-backend.vercel.app/HD-STREAM.apk';
     if (isMongoConnected()) {
       let settings = await Settings.findOne();
       if (!settings) {
-        settings = await Settings.create(inMemoryState.settings);
+        settings = await Settings.create({
+          ...inMemoryState.settings,
+          apkDownloadUrl: defaultApkUrl
+        });
+      }
+      if (!settings.apkDownloadUrl || settings.apkDownloadUrl.includes('example.com') || settings.apkDownloadUrl.includes('10.129') || settings.apkDownloadUrl.endsWith('.app')) {
+        settings.apkDownloadUrl = defaultApkUrl;
+        await settings.save();
       }
       return settings;
+    }
+    if (!inMemoryState.settings.apkDownloadUrl || inMemoryState.settings.apkDownloadUrl.includes('example.com') || inMemoryState.settings.apkDownloadUrl.includes('10.129')) {
+      inMemoryState.settings.apkDownloadUrl = defaultApkUrl;
     }
     return inMemoryState.settings;
   },

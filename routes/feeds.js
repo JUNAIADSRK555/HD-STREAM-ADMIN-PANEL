@@ -47,16 +47,18 @@ router.get(['/mobile', '/app-data'], async (req, res) => {
         announcementEnabled: settings.announcementEnabled,
         appVersion: settings.appVersion,
         minVersion: settings.minVersion,
-        apkDownloadUrl: settings.apkDownloadUrl,
+        apkDownloadUrl: settings.apkDownloadUrl || 'https://stream-admin-backend.vercel.app/HD-STREAM.apk',
         maintenanceMode: settings.maintenanceMode,
         telegramLink: settings.telegramLink,
         supportEmail: settings.supportEmail
       },
       categories: categories.map(c => ({
-        id: c._id,
+        id: c._id || c.id,
         name: c.name,
         slug: c.slug,
-        icon: c.icon
+        icon: c.icon || 'fas fa-tv',
+        imageUrl: c.imageUrl || '',
+        m3uLink: c.m3uLink || ''
       })),
       liveEvents,
       upcomingEvents,

@@ -332,10 +332,11 @@ router.delete('/matches/:id/streams/:streamId', requireAdmin, async (req, res) =
   }
 });
 
-// 4. Categories Endpoints
+// 4. Categories Endpoints (Synced directly from Google Drive)
 router.get('/categories', async (req, res) => {
   try {
-    const categories = await Store.getCategories();
+    const forceRefresh = req.query.refresh === 'true';
+    const categories = await Store.getCategories(forceRefresh);
     res.json({ success: true, data: categories });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
