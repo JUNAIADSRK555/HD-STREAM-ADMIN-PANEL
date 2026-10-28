@@ -1167,6 +1167,24 @@ function switchImportTab(tab) {
   }
 }
 
+async function loadUserGoogleDriveM3u() {
+  const gdriveUrl = 'https://drive.google.com/uc?export=download&id=1KxcfPpIjkeRaHWyrN53otPBci5s6FMMO';
+  const urlInput = document.getElementById('import-m3u-url');
+  if (urlInput) urlInput.value = gdriveUrl;
+  showToast('Loading Google Drive M3U playlists...', 'info');
+
+  try {
+    const res = await apiRequest('/api/import/m3u', 'POST', { m3uUrl: gdriveUrl });
+    showToast(res.message || 'Successfully loaded playlists!', 'success');
+    closeModal('modal-import');
+    await fetchMatches();
+    await fetchCategories();
+    await fetchDashboardStats();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
 async function handleImportM3u(e) {
   e.preventDefault();
   const btn = document.getElementById('btn-submit-m3u');
@@ -1185,6 +1203,7 @@ async function handleImportM3u(e) {
     closeModal('modal-import');
     document.getElementById('form-import-m3u').reset();
     await fetchMatches();
+    await fetchCategories();
     await fetchDashboardStats();
   } catch (err) {
     showToast(err.message, 'error');
@@ -1214,6 +1233,7 @@ async function handleImportJson(e) {
     closeModal('modal-import');
     document.getElementById('form-import-json').reset();
     await fetchMatches();
+    await fetchCategories();
     await fetchDashboardStats();
   } catch (err) {
     showToast(err.message, 'error');

@@ -411,6 +411,36 @@ router.put('/settings', requireAdmin, async (req, res) => {
 
 // 7. M3U Playlist & JSON Feed Importers (Supports ClearKey & Widevine DRM)
 function parseM3uPlaylist(content, defaultCategory = 'Live Sports') {
+  if (!content) return [];
+  const trimmed = content.trim();
+
+  // If content is JSON array or JSON object (e.g. from Google Drive JSON file)
+  if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      const list = Array.isArray(parsed) ? parsed : (parsed.channels || parsed.streams || parsed.matches || parsed.liveEvents || []);
+      const jsonItems = [];
+      for (const item of list) {
+        const title = (item.title || item.name || item.channelName || 'Live Channel').trim();
+        const url = (item.m3uLink || item.streamUrl || item.url || item.stream || item.link || item.m3u || '').trim();
+        if (!url) continue;
+        const category = (item.category || item.group || item.title || defaultCategory).trim();
+        const logo = item.imageUrl || item.logo || item.bannerUrl || '';
+        const streamType = url.includes('.mpd') ? 'MPD' : 'M3U8';
+        jsonItems.push({
+          title,
+          category,
+          streamUrl: url,
+          streamType,
+          logo,
+          headers: item.headers || {},
+          drm: item.drm || { enabled: false }
+        });
+      }
+      if (jsonItems.length > 0) return jsonItems;
+    } catch (_) {}
+  }
+
   const lines = content.split(/\r?\n/);
   const items = [];
   let currentInfo = null;
@@ -539,6 +569,13 @@ router.post('/import/m3u', requireAdmin, async (req, res) => {
     let importedCount = 0;
 
     for (const item of items) {
+      if (item.category) {
+        await Store.ensureCategory(item.category);
+      }
+      if (category) {
+        await Store.ensureCategory(category);
+      }
+
       await Store.createMatch({
         title: item.title,
         category: item.category,
@@ -548,12 +585,12 @@ router.post('/import/m3u', requireAdmin, async (req, res) => {
         description: `Imported via M3U: ${item.title}`,
         isPinned: false,
         team1: { name: item.title.split(' vs ')[0] || item.title, shortName: '', flag: '📺', score: '' },
-        team2: { name: item.title.split(' vs ')[1] || '', shortName: '', flag: '🔴', score: '' },
+        team2: { name: '', shortName: '', flag: '🔴', score: '' },
         streams: [
           {
             id: 'str_' + Math.random().toString(36).substr(2, 9),
             title: item.title,
-            streamType: item.streamType,
+            streamType: item.streamType || (item.streamUrl?.includes('.mpd') ? 'MPD' : 'M3U8'),
             streamUrl: item.streamUrl,
             quality: item.quality || '1080p HD',
             headers: item.headers || {},
@@ -620,6 +657,10 @@ router.post('/import/json', requireAdmin, async (req, res) => {
         key: item.licenseUrl,
         licenseUrl: item.licenseUrl
       } : { enabled: false }));
+
+      if (category) {
+        await Store.ensureCategory(category);
+      }
 
       await Store.createMatch({
         title,

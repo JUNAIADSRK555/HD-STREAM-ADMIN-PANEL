@@ -6,21 +6,16 @@ const Settings = require('../models/Settings');
 
 // Initial seed data for immediate out-of-the-box demo
 const initialCategories = [
-  { _id: 'cat_cricket', name: 'Live Cricket', slug: 'live-cricket', icon: 'fas fa-baseball-ball', order: 1, isActive: true },
-  { _id: 'cat_jiotv', name: 'JIO TV+', slug: 'jio-tv', icon: 'fas fa-tv', order: 2, isActive: true },
-  { _id: 'cat_mixtv', name: 'MIX TV', slug: 'mix-tv', icon: 'fas fa-satellite-dish', order: 3, isActive: true },
-  { _id: 'cat_vzy', name: 'VZY', slug: 'vzy', icon: 'fas fa-play-circle', order: 4, isActive: true },
-  { _id: 'cat_pakistan', name: 'PAKISTAN TV', slug: 'pakistan-tv', icon: 'fas fa-globe-asia', order: 5, isActive: true },
-  { _id: 'cat_toffee', name: 'TOFFEE', slug: 'toffee', icon: 'fas fa-film', order: 6, isActive: true },
-  { _id: 'cat_irantv', name: 'IRAN TV', slug: 'iran-tv', icon: 'fas fa-tv', order: 7, isActive: true },
-  { _id: 'cat_afghan', name: 'Afghanistan TV', slug: 'afghanistan-tv', icon: 'fas fa-tv', order: 8, isActive: true },
-  { _id: 'cat_cartoon', name: 'CARTOON MOVIE', slug: 'cartoon-movie', icon: 'fas fa-child', order: 9, isActive: true },
-  { _id: 'cat_mxplayer', name: 'MX PLAYER', slug: 'mx-player', icon: 'fas fa-play', order: 10, isActive: true },
-  { _id: 'cat_yuppytv', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', order: 11, isActive: true },
-  { _id: 'cat_biggboss', name: 'Bigg Boss 18', slug: 'bigg-boss', icon: 'fas fa-tv', order: 12, isActive: true },
-  { _id: 'cat_sonyliv', name: 'Sony LIV', slug: 'sony-liv', icon: 'fas fa-play-circle', order: 13, isActive: true },
-  { _id: 'cat_zee5', name: 'Zee5 Shows', slug: 'zee5', icon: 'fas fa-film', order: 14, isActive: true },
-  { _id: 'cat_sports', name: 'Star Sports & OTT', slug: 'star-sports', icon: 'fas fa-satellite-dish', order: 15, isActive: true }
+  { _id: 'cat_jiotv', name: 'JIO TV+', slug: 'jio-tv', icon: 'fas fa-tv', order: 1, isActive: true },
+  { _id: 'cat_mixtv', name: 'MIX TV', slug: 'mix-tv', icon: 'fas fa-satellite-dish', order: 2, isActive: true },
+  { _id: 'cat_vzy', name: 'VZY', slug: 'vzy', icon: 'fas fa-play-circle', order: 3, isActive: true },
+  { _id: 'cat_pakistan', name: 'PAKISTAN TV', slug: 'pakistan-tv', icon: 'fas fa-globe-asia', order: 4, isActive: true },
+  { _id: 'cat_toffee', name: 'TOFFEE', slug: 'toffee', icon: 'fas fa-film', order: 5, isActive: true },
+  { _id: 'cat_irantv', name: 'IRAN TV', slug: 'iran-tv', icon: 'fas fa-tv', order: 6, isActive: true },
+  { _id: 'cat_afghan', name: 'Afghanistan TV', slug: 'afghanistan-tv', icon: 'fas fa-tv', order: 7, isActive: true },
+  { _id: 'cat_cartoon', name: 'CARTOON MOVIE', slug: 'cartoon-movie', icon: 'fas fa-child', order: 8, isActive: true },
+  { _id: 'cat_mxplayer', name: 'MX PLAYER', slug: 'mx-player', icon: 'fas fa-play', order: 9, isActive: true },
+  { _id: 'cat_yuppytv', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', order: 10, isActive: true }
 ];
 
 const initialMatches = [
@@ -983,6 +978,11 @@ const Store = {
   // --- CATEGORIES ---
   async getCategories() {
     if (isMongoConnected()) {
+      // Clean up any default admin template categories so ONLY user categories exist
+      await Category.deleteMany({
+        name: { $in: ['Live Cricket', 'Bigg Boss 18', 'Sony LIV', 'Zee5 Shows', 'Star Sports & OTT', 'Live Sports', 'Sports', 'Cricket'] }
+      });
+
       let cats = await Category.find({ isActive: true }).sort({ order: 1 });
       if (!cats || cats.length === 0) {
         for (const c of initialCategories) {
@@ -994,7 +994,32 @@ const Store = {
       }
       return cats;
     }
-    return inMemoryState.categories.filter(c => c.isActive !== false);
+    return inMemoryState.categories.filter(c => !['Live Cricket', 'Bigg Boss 18', 'Sony LIV', 'Zee5 Shows', 'Star Sports & OTT', 'Live Sports', 'Sports', 'Cricket'].includes(c.name));
+  },
+
+  async ensureCategory(name) {
+    if (!name) return;
+    const cleanName = String(name).trim();
+    if (!cleanName || ['Live Cricket', 'Bigg Boss 18', 'Sony LIV', 'Zee5 Shows', 'Star Sports & OTT', 'Live Sports', 'Sports', 'Cricket'].includes(cleanName)) return;
+    if (isMongoConnected()) {
+      const exists = await Category.findOne({ name: cleanName });
+      if (!exists) {
+        const slug = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        await Category.create({ name: cleanName, slug, icon: 'fas fa-tv', order: 10, isActive: true });
+      }
+    } else {
+      const exists = inMemoryState.categories.find(c => c.name.toLowerCase() === cleanName.toLowerCase());
+      if (!exists) {
+        inMemoryState.categories.push({
+          _id: 'cat_' + Date.now().toString(36),
+          name: cleanName,
+          slug: cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          icon: 'fas fa-tv',
+          order: inMemoryState.categories.length + 1,
+          isActive: true
+        });
+      }
+    }
   },
 
   async createCategory(data) {

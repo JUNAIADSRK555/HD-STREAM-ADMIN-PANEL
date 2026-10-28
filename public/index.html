@@ -808,6 +808,19 @@
       </div>
 
       <div class="pt-4 space-y-4">
+        <!-- 1-Click Google Drive Load Box -->
+        <div class="p-3 bg-gradient-to-r from-purple-900/40 to-slate-900 rounded-xl border border-purple-500/40 flex items-center justify-between gap-3">
+          <div>
+            <span class="text-xs font-bold text-purple-300 flex items-center gap-1.5">
+              <i class="fa-brands fa-google-drive"></i> Your Google Drive M3U Playlists
+            </span>
+            <p class="text-[11px] text-slate-300">Auto-load all 11 playlists & categories</p>
+          </div>
+          <button type="button" onclick="loadUserGoogleDriveM3u()" class="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/30 cursor-pointer transition-all">
+            <i class="fa-solid fa-cloud-arrow-down"></i> Load 1-Click
+          </button>
+        </div>
+
         <!-- Import Type Tabs -->
         <div class="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
           <button id="import-tab-m3u" onclick="switchImportTab('m3u')" class="flex-1 py-1.5 rounded-md font-bold text-xs bg-purple-600 text-white">
@@ -821,8 +834,8 @@
         <!-- M3U Form -->
         <form id="form-import-m3u" novalidate onsubmit="handleImportM3u(event)" class="space-y-3">
           <div>
-            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">M3U Playlist URL (Online)</label>
-            <input type="text" id="import-m3u-url" placeholder="https://example.com/live-sports.m3u or any playlist link"
+            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">M3U Playlist URL (Online / Google Drive)</label>
+            <input type="text" id="import-m3u-url" placeholder="https://drive.google.com/uc?export=download&id=... or .m3u link"
                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono">
           </div>
           <div>
