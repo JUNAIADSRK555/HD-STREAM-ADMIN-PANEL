@@ -858,7 +858,7 @@ function populateCategoryDropdowns() {
 
 function populateSettingsInputs(settings) {
   setInputValue('setting-announcement', settings.announcement || '');
-  setInputValue('setting-app-version', settings.appVersion || '1.5.0');
+  setInputValue('setting-app-version', settings.appVersion || '2.0.0');
   setInputValue('setting-apk-url', settings.apkDownloadUrl || '');
   const maint = document.getElementById('setting-maintenance');
   if (maint) maint.checked = Boolean(settings.maintenanceMode);

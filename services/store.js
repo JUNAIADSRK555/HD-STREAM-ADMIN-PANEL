@@ -787,15 +787,15 @@ let inMemoryState = {
   matches: [...initialMatches],
   vods: [...initialVods],
   settings: {
-    appName: 'JDCRIC & Entertainment Live',
-    announcement: 'Welcome to Live Streaming HD! Enjoy high quality cricket & entertainment.',
+    appName: 'HD STREAM',
+    announcement: '🔴 New HD STREAM v2.0 is LIVE! Please update APK for all live streams and channels.',
     announcementEnabled: true,
-    appVersion: '1.5.0',
-    minVersion: '1.0.0',
-    apkDownloadUrl: 'https://example.com/download/jdcric-live-v1.5.apk',
+    appVersion: '2.0.0',
+    minVersion: '2.0.0',
+    apkDownloadUrl: 'https://stream-admin-backend.vercel.app/HD-STREAM.apk',
     maintenanceMode: false,
-    telegramLink: 'https://t.me/jdcric_official',
-    supportEmail: 'support@jdcric.live',
+    telegramLink: 'https://t.me/hdstream_official',
+    supportEmail: 'support@hdstream.live',
     updatedAt: new Date()
   }
 };
@@ -1216,18 +1216,22 @@ const Store = {
       if (!settings) {
         settings = await Settings.create({
           ...inMemoryState.settings,
+          appVersion: '2.0.0',
+          minVersion: '2.0.0',
           apkDownloadUrl: defaultApkUrl
         });
       }
       if (!settings.apkDownloadUrl || settings.apkDownloadUrl.includes('example.com') || settings.apkDownloadUrl.includes('10.129') || settings.apkDownloadUrl.endsWith('.app')) {
         settings.apkDownloadUrl = defaultApkUrl;
-        await settings.save();
       }
+      settings.appVersion = '2.0.0';
+      settings.minVersion = '2.0.0';
+      await settings.save();
       return settings;
     }
-    if (!inMemoryState.settings.apkDownloadUrl || inMemoryState.settings.apkDownloadUrl.includes('example.com') || inMemoryState.settings.apkDownloadUrl.includes('10.129')) {
-      inMemoryState.settings.apkDownloadUrl = defaultApkUrl;
-    }
+    inMemoryState.settings.apkDownloadUrl = defaultApkUrl;
+    inMemoryState.settings.appVersion = '2.0.0';
+    inMemoryState.settings.minVersion = '2.0.0';
     return inMemoryState.settings;
   },
 
