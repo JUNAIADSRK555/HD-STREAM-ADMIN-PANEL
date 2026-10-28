@@ -216,153 +216,19 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
 
 // --- DATA FETCHING ---
 const defaultSampleData = {
-  stats: { liveEvents: 2, upcomingEvents: 2, totalStreams: 8, drmStreamsCount: 2, vodShowsCount: 2, totalEpisodes: 9 },
-  matches: [
-    {
-      _id: 'match_01',
-      title: 'Cricket || ICC CWC League 2',
-      category: 'Cricket',
-      status: 'LIVE',
-      matchFormat: 'ODI',
-      startTime: '05:06:32',
-      team1: { name: 'Oman', shortName: 'OMA', flag: '🇴🇲', score: '' },
-      team2: { name: 'Nepal', shortName: 'NEP', flag: '🇳🇵', score: '' },
-      streams: [
-        { id: 's1', title: 'ICC TV (1080p 60FPS)', streamType: 'M3U8', streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', quality: '1080p', isActive: true },
-        { id: 's2', title: 'SK LIVE (720p Low Latency)', streamType: 'M3U8', streamUrl: 'https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8', quality: '720p', isActive: true }
-      ]
-    },
-    {
-      _id: 'match_02',
-      title: 'Cricket || ICC World Test Championship',
-      category: 'Cricket',
-      status: 'LIVE',
-      matchFormat: 'Test',
-      startTime: '02:36:32',
-      team1: { name: 'South Africa', shortName: 'SA', flag: '🇿🇦', score: '' },
-      team2: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺', score: '' },
-      streams: [
-        { id: 's3', title: 'ICC TV', streamType: 'M3U8', streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', quality: '1080p', isActive: true },
-        { id: 's4', title: 'SK LIVE', streamType: 'M3U8', streamUrl: 'https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8', quality: '720p', isActive: true }
-      ]
-    },
-    {
-      _id: 'match_03',
-      title: 'Cricket || ODI Tri-Series in United Arab Emirates',
-      category: 'Cricket',
-      status: 'UPCOMING',
-      matchFormat: 'ODI',
-      startTime: '05:00 PM',
-      team1: { name: 'Afghanistan', shortName: 'AFG', flag: '🇦🇫', score: '' },
-      team2: { name: 'Zimbabwe', shortName: 'ZIM', flag: '🇿🇼', score: '' },
-      streams: [
-        { id: 's5', title: 'ICC TV', streamType: 'M3U8', streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', quality: '1080p', isActive: true },
-        { id: 's6', title: 'SK LIVE', streamType: 'M3U8', streamUrl: 'https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8', quality: '720p', isActive: true }
-      ]
-    },
-    {
-      _id: 'match_04',
-      title: 'Football || Saudi Pro League',
-      category: 'Football',
-      status: 'UPCOMING',
-      matchFormat: 'SPL',
-      startTime: '08:35 PM',
-      team1: { name: 'Al-Fayha', shortName: 'FAY', flag: '⚽', score: '' },
-      team2: { name: 'Al-Ahli', shortName: 'AHL', flag: '🇸🇦', score: '' },
-      streams: [
-        { id: 's7', title: 'Server 1 HD', streamType: 'M3U8', streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8', quality: '1080p', isActive: true },
-        { id: 's8', title: 'Server 2', streamType: 'M3U8', streamUrl: 'https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8', quality: '720p', isActive: true }
-      ]
-    },
-    {
-      _id: 'ch_sample_jiotv',
-      title: 'JIO TV+ Live',
-      category: 'JIO TV+',
-      status: 'LIVE',
-      matchFormat: 'Live TV',
-      startTime: 'LIVE',
-      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s',
-      streams: [
-        { id: 's_jio_1', title: 'JIO TV+ Master Playlist', streamType: 'M3U8', streamUrl: 'https://plugxvipplaylist.lovable.app/api/playlist', quality: '1080p', isActive: true },
-        { id: 's_jio_2', title: 'JIO TV Direct Live', streamType: 'M3U8', streamUrl: 'https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8', quality: '1080p', isActive: true }
-      ]
-    },
-    {
-      _id: 'ch_sample_mixtv',
-      title: 'MIX TV Live Stream',
-      category: 'MIX TV',
-      status: 'LIVE',
-      matchFormat: 'Live TV',
-      startTime: 'LIVE',
-      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCm7hdWxlS5fbZ3Do-pqzytQVayxUNHFl5oD5E4TWtQfCnRw2pM2UOa8I&s=10',
-      streams: [
-        { id: 's_mix_1', title: 'MIX TV Playlist', streamType: 'M3U8', streamUrl: 'https://streamflexsmm.in/SFlex-StarShare/playlist.php', quality: '1080p', isActive: true }
-      ]
-    },
-    {
-      _id: 'ch_sample_pakistan',
-      title: 'PAKISTAN TV Live',
-      category: 'PAKISTAN TV',
-      status: 'LIVE',
-      matchFormat: 'Live TV',
-      startTime: 'LIVE',
-      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10',
-      streams: [
-        { id: 's_pak_1', title: 'Pakistan IPTV M3U', streamType: 'M3U8', streamUrl: 'https://iptv-org.github.io/iptv/countries/pk.m3u', quality: '1080p', isActive: true }
-      ]
-    },
-    {
-      _id: 'ch_sample_toffee',
-      title: 'TOFFEE Hindi TV',
-      category: 'TOFFEE',
-      status: 'LIVE',
-      matchFormat: 'Live TV',
-      startTime: 'LIVE',
-      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLjYG2Yb4mLqygUe_GDkKu5Rw73jqEQmxeXddimkUpE2NrKsvXfaMf-LMQ&s=10',
-      streams: [
-        { id: 's_tof_1', title: 'Toffee Hindi M3U', streamType: 'M3U8', streamUrl: 'https://iptv-org.github.io/iptv/languages/hin.m3u', quality: '1080p', isActive: true }
-      ]
-    },
-    {
-      _id: 'ch_sample_mxp',
-      title: 'MX PLAYER Live India',
-      category: 'MX PLAYER',
-      status: 'LIVE',
-      matchFormat: 'Live TV',
-      startTime: 'LIVE',
-      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10',
-      streams: [
-        { id: 's_mxp_1', title: 'MX Player India', streamType: 'M3U8', streamUrl: 'https://playlist-by-xfireflix.pages.dev/India/mxplayer', quality: '1080p', isActive: true }
-      ]
-    },
-    {
-      _id: 'ch_sample_yuppy',
-      title: 'YUPPY TV Live Channels',
-      category: 'YUPPY TV',
-      status: 'LIVE',
-      matchFormat: 'Live TV',
-      startTime: 'LIVE',
-      bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s',
-      streams: [
-        { id: 's_yup_1', title: 'YuppTV Live M3U', streamType: 'M3U8', streamUrl: 'https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u', quality: '1080p', isActive: true }
-      ]
-    }
-  ],
+  stats: { liveEvents: 0, upcomingEvents: 0, totalStreams: 0, drmStreamsCount: 0, vodShowsCount: 0, totalEpisodes: 0 },
+  matches: [],
   categories: [
-    { _id: 'c_jio', name: 'JIO TV+', slug: 'jio-tv', icon: 'fas fa-tv', order: 1 },
-    { _id: 'c_mix', name: 'MIX TV', slug: 'mix-tv', icon: 'fas fa-satellite-dish', order: 2 },
-    { _id: 'c_vzy', name: 'VZY', slug: 'vzy', icon: 'fas fa-play-circle', order: 3 },
-    { _id: 'c_pak', name: 'PAKISTAN TV', slug: 'pakistan-tv', icon: 'fas fa-globe-asia', order: 4 },
-    { _id: 'c_tof', name: 'TOFFEE', slug: 'toffee', icon: 'fas fa-film', order: 5 },
-    { _id: 'c_irn', name: 'IRAN TV', slug: 'iran-tv', icon: 'fas fa-tv', order: 6 },
-    { _id: 'c_afg', name: 'Afghanistan TV', slug: 'afghanistan-tv', icon: 'fas fa-tv', order: 7 },
-    { _id: 'c_cart', name: 'CARTOON MOVIE', slug: 'cartoon-movie', icon: 'fas fa-child', order: 8 },
-    { _id: 'c_mxp', name: 'MX PLAYER', slug: 'mx-player', icon: 'fas fa-play', order: 9 },
-    { _id: 'c_yup', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', order: 10 },
-    { _id: 'c1', name: 'BIG BOSS', slug: 'big-boss', icon: 'fas fa-tv', order: 11 },
-    { _id: 'c3', name: 'FC LIVE', slug: 'fancode-live', icon: 'fas fa-satellite-dish', order: 12 },
-    { _id: 'c4', name: 'SONY LIVE', slug: 'sony-live', icon: 'fas fa-play', order: 13 },
-    { _id: 'c8', name: 'JIO CINEMA', slug: 'jio-cinema', icon: 'fas fa-film', order: 14 }
+    { _id: 'c_jio', name: 'JIO TV+', slug: 'jio-tv', icon: 'fas fa-tv', imageUrl: '', m3uLink: '', order: 1 },
+    { _id: 'c_mix', name: 'MIX TV', slug: 'mix-tv', icon: 'fas fa-satellite-dish', imageUrl: '', m3uLink: '', order: 2 },
+    { _id: 'c_vzy', name: 'VZY', slug: 'vzy', icon: 'fas fa-play-circle', imageUrl: '', m3uLink: '', order: 3 },
+    { _id: 'c_pak', name: 'PAKISTAN TV', slug: 'pakistan-tv', icon: 'fas fa-globe-asia', imageUrl: '', m3uLink: '', order: 4 },
+    { _id: 'c_tof', name: 'TOFFEE', slug: 'toffee', icon: 'fas fa-film', imageUrl: '', m3uLink: '', order: 5 },
+    { _id: 'c_irn', name: 'IRAN TV', slug: 'iran-tv', icon: 'fas fa-tv', imageUrl: '', m3uLink: '', order: 6 },
+    { _id: 'c_afg', name: 'Afghanistan TV', slug: 'afghanistan-tv', icon: 'fas fa-tv', imageUrl: '', m3uLink: '', order: 7 },
+    { _id: 'c_cart', name: 'CARTOON MOVIE', slug: 'cartoon-movie', icon: 'fas fa-child', imageUrl: '', m3uLink: '', order: 8 },
+    { _id: 'c_mxp', name: 'MX PLAYER', slug: 'mx-player', icon: 'fas fa-play', imageUrl: '', m3uLink: '', order: 9 },
+    { _id: 'c_yup', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', imageUrl: '', m3uLink: '', order: 10 }
   ],
   vods: [
     {
@@ -982,13 +848,12 @@ function renderVodGrid() {
 }
 
 function populateCategoryDropdowns() {
-  const matchCat = document.getElementById('match-category');
+  // match-category is now a hidden input (value = "Live Event"), skip it
   const vodCat = document.getElementById('vod-category');
-
-  const options = state.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
-
-  if (matchCat) matchCat.innerHTML = options || '<option value="Live Cricket">Live Cricket</option>';
-  if (vodCat) vodCat.innerHTML = options || '<option value="Bigg Boss">Bigg Boss</option>';
+  if (vodCat) {
+    const options = state.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    vodCat.innerHTML = options || '<option value="Entertainment">Entertainment</option>';
+  }
 }
 
 function populateSettingsInputs(settings) {
@@ -1180,11 +1045,13 @@ async function handleSaveMatch(e) {
     let key = '';
     let licenseUrl = '';
     if (drmLicUrl) {
-      if (drmLicUrl.includes(':') && !drmLicUrl.startsWith('http')) {
-        const parts = drmLicUrl.split(':');
-        keyId = parts[0].trim();
-        key = parts[1].trim();
+      // Format: KID:KEY hex pair (e.g. "abc123:def456") - only if NOT a URL
+      if (!drmLicUrl.startsWith('http') && drmLicUrl.includes(':')) {
+        const colonIdx = drmLicUrl.indexOf(':');
+        keyId = drmLicUrl.substring(0, colonIdx).trim();
+        key = drmLicUrl.substring(colonIdx + 1).trim();
       } else {
+        // It's a license URL (Widevine / ClearKey endpoint)
         licenseUrl = drmLicUrl;
         key = drmLicUrl;
       }
@@ -1299,30 +1166,32 @@ function renderStreamsModalList(match) {
     return;
   }
 
-  container.innerHTML = streams.map(s => `
+  container.innerHTML = streams.map(s => {
+    const sid = s.id || s._id || '';
+    return `
     <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3">
-        <div class="flex items-center gap-2 flex-wrap">
-          <span class="font-bold text-xs text-white truncate">${s.title}</span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 uppercase">${s.streamType}</span>
-          ${s.drm?.enabled ? '<span class="drm-pill text-[10px]">ClearKey DRM</span>' : ''}
-          ${s.jsonChannelUrl ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800">JSON Feed</span>' : ''}
-          ${s.jsonToken ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">Token</span>' : ''}
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap mb-1">
+            <span class="font-bold text-xs text-white truncate">${s.title}</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 uppercase">${s.streamType}</span>
+            ${s.drm?.enabled ? '<span class="drm-pill text-[10px]">DRM</span>' : ''}
+          </div>
+          <p class="text-[11px] font-mono text-emerald-400 truncate">${s.streamUrl || s.jsonChannelUrl || ''}</p>
+          ${s.headers?.userAgent ? `<p class="text-[10px] text-slate-500 font-mono truncate">UA: ${s.headers.userAgent}</p>` : ''}
+          ${s.headers?.referer ? `<p class="text-[10px] text-slate-500 font-mono truncate">Ref: ${s.headers.referer}</p>` : ''}
+          ${s.drm?.licenseUrl ? `<p class="text-[10px] text-amber-400 font-mono truncate">DRM: ${s.drm.licenseUrl}</p>` : ''}
         </div>
-        <p class="text-[11px] font-mono text-emerald-400 truncate mt-0.5">${s.streamUrl || s.jsonChannelUrl}</p>
-        ${s.jsonChannelUrl ? `<p class="text-[10px] text-amber-400 font-mono">JSON API: ${s.jsonChannelUrl}</p>` : ''}
-        ${s.headers?.userAgent ? `<p class="text-[10px] text-slate-500 font-mono">UA: ${s.headers.userAgent}</p>` : ''}
-      </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 shrink-0">
         <button onclick="previewStream('${s.streamUrl}', '${s.streamType}')" class="btn-ghost text-xs p-1.5" title="Test Playback">
           <i class="fa-solid fa-play text-emerald-400"></i>
         </button>
-        <button onclick="deleteStream('${match._id}', '${s.id || s._id}')" class="text-red-400 hover:text-red-300 text-xs p-1.5" title="Delete Stream">
+        <button onclick="deleteStream('${match._id}', '${sid}')" class="text-red-400 hover:text-red-300 text-xs p-1.5" title="Delete Stream">
           <i class="fa-solid fa-trash"></i>
         </button>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 function toggleDrmInputs(checked) {
@@ -1546,7 +1415,7 @@ async function deleteStream(matchId, streamId) {
   if (!confirm('Remove this streaming link?')) return;
   const match = state.matches.find(m => String(m._id) === String(matchId));
   if (match && match.streams) {
-    match.streams = match.streams.filter(s => String(s.id) !== String(streamId));
+    match.streams = match.streams.filter(s => String(s.id || s._id) !== String(streamId));
     renderStreamsModalList(match);
     renderMatchesList();
   }
@@ -1925,6 +1794,7 @@ function initPipedUrlListeners() {
     });
   }
 
+  attach('match-stream-url', 'match-user-agent', 'match-referer-value', 'match-origin-value');
   attach('stream-url', 'stream-user-agent', 'stream-referer', null);
   attach('direct-stream-url', 'direct-header-ua', 'direct-header-ref', 'direct-header-origin');
 }
