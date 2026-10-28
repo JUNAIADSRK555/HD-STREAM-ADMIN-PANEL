@@ -793,6 +793,13 @@ function openNewMatchModal() {
   document.getElementById('match-modal-title').textContent = 'Add New Live Event';
   document.getElementById('form-match').reset();
   document.getElementById('match-edit-id').value = '';
+  setInputValue('match-stream-url', '');
+  setInputValue('match-cookie-value', '');
+  setInputValue('match-referer-value', '');
+  setInputValue('match-origin-value', '');
+  setInputValue('match-drm-license-url', '');
+  setInputValue('match-user-agent', 'Default');
+  setInputValue('match-drm-scheme', 'clearkey');
   openModal('modal-match');
 }
 
@@ -813,6 +820,27 @@ function editMatch(id) {
 
   const pinned = document.getElementById('match-pinned');
   if (pinned) pinned.checked = Boolean(m.isPinned);
+
+  const firstStream = m.streams?.[0];
+  if (firstStream) {
+    setInputValue('match-stream-url', firstStream.streamUrl || '');
+    setInputValue('match-cookie-value', firstStream.headers?.cookie || '');
+    setInputValue('match-referer-value', firstStream.headers?.referer || '');
+    setInputValue('match-origin-value', firstStream.headers?.origin || '');
+    const drmLic = firstStream.drm?.licenseUrl || firstStream.drm?.key || (firstStream.drm?.keyId ? `${firstStream.drm.keyId}:${firstStream.drm.key}` : '');
+    setInputValue('match-drm-license-url', drmLic);
+    const ua = firstStream.headers?.userAgent || '';
+    setInputValue('match-user-agent', ua.includes('Hotstar') ? 'Hotstar' : (ua.includes('Jio') ? 'JioCinema' : (ua.includes('Exo') ? 'ExoPlayer' : (ua.includes('Chrome') || ua.includes('Mozilla') ? 'Chrome' : 'Default'))));
+    setInputValue('match-drm-scheme', firstStream.drm?.scheme || (firstStream.drm?.enabled ? 'clearkey' : 'none'));
+  } else {
+    setInputValue('match-stream-url', '');
+    setInputValue('match-cookie-value', '');
+    setInputValue('match-referer-value', '');
+    setInputValue('match-origin-value', '');
+    setInputValue('match-drm-license-url', '');
+    setInputValue('match-user-agent', 'Default');
+    setInputValue('match-drm-scheme', 'clearkey');
+  }
 
   openModal('modal-match');
 }
@@ -838,6 +866,68 @@ async function handleSaveMatch(e) {
       score: ''
     }
   };
+
+  const streamUrlInput = document.getElementById('match-stream-url')?.value.trim();
+  if (streamUrlInput) {
+    const cookieVal = document.getElementById('match-cookie-value')?.value.trim() || '';
+    const refererVal = document.getElementById('match-referer-value')?.value.trim() || '';
+    const originVal = document.getElementById('match-origin-value')?.value.trim() || '';
+    const drmLicUrl = document.getElementById('match-drm-license-url')?.value.trim() || '';
+    const userAgentVal = document.getElementById('match-user-agent')?.value || 'Default';
+    const drmSchemeVal = document.getElementById('match-drm-scheme')?.value || 'clearkey';
+
+    let finalUa = '';
+    if (userAgentVal === 'Hotstar') finalUa = 'HotstarMobile/12.5.0 (Android 14; Mobile)';
+    else if (userAgentVal === 'JioCinema') finalUa = 'JioCinema/24.0.0 (Linux; Android 14)';
+    else if (userAgentVal === 'ExoPlayer') finalUa = 'ExoPlayer (Android)';
+    else if (userAgentVal === 'Chrome') finalUa = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0';
+    else if (userAgentVal !== 'Default') finalUa = userAgentVal;
+
+    let isDrm = Boolean(drmLicUrl && drmSchemeVal !== 'none');
+    let keyId = '';
+    let key = '';
+    let licenseUrl = '';
+    if (drmLicUrl) {
+      if (drmLicUrl.includes(':') && !drmLicUrl.startsWith('http')) {
+        const parts = drmLicUrl.split(':');
+        keyId = parts[0].trim();
+        key = parts[1].trim();
+      } else {
+        licenseUrl = drmLicUrl;
+        key = drmLicUrl;
+      }
+    }
+
+    const streamObj = {
+      id: 'str_' + Math.random().toString(36).substr(2, 9),
+      title: payload.title || 'Live Stream Server',
+      streamType: streamUrlInput.includes('.mpd') ? 'MPD' : 'M3U8',
+      streamUrl: streamUrlInput,
+      quality: '1080p HD',
+      headers: {
+        userAgent: finalUa,
+        referer: refererVal,
+        origin: originVal,
+        cookie: cookieVal
+      },
+      drm: {
+        enabled: isDrm,
+        scheme: drmSchemeVal,
+        keyId,
+        key,
+        licenseUrl
+      },
+      isActive: true
+    };
+
+    if (id) {
+      const existing = state.matches.find(m => m._id === id);
+      const remainingStreams = (existing?.streams || []).slice(1);
+      payload.streams = [streamObj, ...remainingStreams];
+    } else {
+      payload.streams = [streamObj];
+    }
+  }
 
   try {
     if (id) {
@@ -981,51 +1071,58 @@ function applyOttPreset(type) {
 async function handleSaveStream(e) {
   e.preventDefault();
   const matchId = document.getElementById('stream-match-id').value;
-  const isDrm = document.getElementById('stream-drm-enable').checked;
-  const scheme = document.getElementById('stream-drm-scheme')?.value || 'clearkey';
-  const cookie = document.getElementById('stream-cookie')?.value.trim() || '';
-  const licUrl = document.getElementById('stream-drm-license-url')?.value.trim() || '';
-
-  let kid = document.getElementById('stream-drm-keyid')?.value.trim() || '';
-  let key = document.getElementById('stream-drm-key')?.value.trim() || '';
-
-  // Support combined kid:key format
-  if (kid.includes(':') && !key) {
-    const parts = kid.split(':');
-    kid = parts[0].trim();
-    key = parts[1].trim();
-  }
-
-  const jsonChannelUrl = document.getElementById('stream-json-channel-url')?.value.trim() || '';
-  const jsonTokenUrl = document.getElementById('stream-json-token-url')?.value.trim() || '';
-  const jsonToken = document.getElementById('stream-json-token')?.value.trim() || '';
-  const rawStreamUrl = document.getElementById('stream-url').value.trim();
-  const streamUrl = rawStreamUrl || jsonChannelUrl;
-
-  if (!streamUrl) {
-    showToast('Please enter a Stream URL or JSON Channel URL', 'warning');
+  const rawStreamUrl = document.getElementById('stream-url')?.value.trim();
+  if (!rawStreamUrl) {
+    showToast('Please enter a Media Stream URL', 'warning');
     return;
   }
 
+  const cookieVal = document.getElementById('stream-cookie')?.value.trim() || '';
+  const refererVal = document.getElementById('stream-referer')?.value.trim() || '';
+  const originVal = document.getElementById('stream-origin')?.value.trim() || '';
+  const drmLicUrl = document.getElementById('stream-drm-license-url')?.value.trim() || '';
+  const userAgentVal = document.getElementById('stream-user-agent')?.value || 'Default';
+  const drmSchemeVal = document.getElementById('stream-drm-scheme')?.value || 'clearkey';
+
+  let finalUa = '';
+  if (userAgentVal === 'Hotstar') finalUa = 'HotstarMobile/12.5.0 (Android 14; Mobile)';
+  else if (userAgentVal === 'JioCinema') finalUa = 'JioCinema/24.0.0 (Linux; Android 14)';
+  else if (userAgentVal === 'ExoPlayer') finalUa = 'ExoPlayer (Android)';
+  else if (userAgentVal === 'Chrome') finalUa = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0';
+  else if (userAgentVal !== 'Default') finalUa = userAgentVal;
+
+  let isDrm = Boolean(drmLicUrl && drmSchemeVal !== 'none');
+  let keyId = '';
+  let key = '';
+  let licenseUrl = '';
+  if (drmLicUrl) {
+    if (drmLicUrl.includes(':') && !drmLicUrl.startsWith('http')) {
+      const parts = drmLicUrl.split(':');
+      keyId = parts[0].trim();
+      key = parts[1].trim();
+    } else {
+      licenseUrl = drmLicUrl;
+      key = drmLicUrl;
+    }
+  }
+
   const payload = {
-    title: document.getElementById('stream-title').value.trim(),
-    streamType: document.getElementById('stream-type').value,
-    streamUrl,
-    jsonChannelUrl,
-    jsonTokenUrl,
-    jsonToken,
+    title: document.getElementById('stream-title')?.value.trim() || 'Live Stream Server',
+    streamType: document.getElementById('stream-type')?.value || (rawStreamUrl.includes('.mpd') ? 'MPD' : 'M3U8'),
+    streamUrl: rawStreamUrl,
+    quality: '1080p HD',
     headers: {
-      userAgent: document.getElementById('stream-user-agent').value.trim(),
-      referer: document.getElementById('stream-referer').value.trim(),
-      cookie,
-      ...(jsonToken ? { Authorization: jsonToken.startsWith('Bearer ') ? jsonToken : `Bearer ${jsonToken}` } : {})
+      userAgent: finalUa,
+      referer: refererVal,
+      origin: originVal,
+      cookie: cookieVal
     },
     drm: {
       enabled: isDrm,
-      scheme,
-      keyId: kid,
-      key: scheme === 'widevine' ? licUrl : key,
-      licenseUrl: licUrl
+      scheme: drmSchemeVal,
+      keyId,
+      key,
+      licenseUrl
     }
   };
 
@@ -1033,7 +1130,6 @@ async function handleSaveStream(e) {
     const res = await apiRequest(`/api/matches/${matchId}/streams`, 'POST', payload);
     showToast('Streaming server added successfully!', 'success');
     document.getElementById('form-stream').reset();
-    toggleDrmInputs(false);
 
     await fetchMatches();
     await fetchDashboardStats();

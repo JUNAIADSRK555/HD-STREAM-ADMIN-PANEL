@@ -17,9 +17,10 @@ const StreamSchema = new mongoose.Schema({
   },
   drm: {
     enabled: { type: Boolean, default: false },
-    scheme: { type: String, enum: ['clearkey', 'widevine', 'playready'], default: 'clearkey' },
+    scheme: { type: String, default: 'clearkey' },
     keyId: { type: String, default: '' }, // Key 1 (KID)
-    key: { type: String, default: '' }     // Key 2 (Hex key)
+    key: { type: String, default: '' },    // Key 2 (Hex key)
+    licenseUrl: { type: String, default: '' }
   },
   isActive: { type: Boolean, default: true }
 });

@@ -101,7 +101,7 @@
       </a>
       <a class="nav-link" data-tab="matches">
         <i class="fa-solid fa-tower-broadcast w-5 text-red-400"></i>
-        <span>Live Matches & Cricket</span>
+        <span>Live Events & Matches</span>
         <span id="badge-live-count" class="ml-auto text-xs font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30">0</span>
       </a>
       <a class="nav-link" data-tab="categories">
@@ -292,6 +292,21 @@
 
     <!-- TAB 2: LIVE EVENTS & MATCHES -->
     <section id="tab-matches" class="tab-pane hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+        <div>
+          <h3 class="text-xl font-bold flex items-center gap-2 text-white">
+            <i class="fa-solid fa-tower-broadcast text-red-500"></i> Live Events & Stream Management
+          </h3>
+          <p class="text-xs text-slate-400">Add live events, stream URLs, cookies, headers, and ClearKey / Widevine DRM parameters directly.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="openNewMatchModal()" class="px-4 py-2.5 rounded-xl bg-[#d48a7b] text-slate-950 hover:bg-[#e29b8d] font-black text-xs flex items-center gap-2 transition-all shadow-lg shadow-[#d48a7b]/25 cursor-pointer">
+            <i class="fa-solid fa-plus-circle"></i> + Add Live Event & Stream
+          </button>
+        </div>
+      </div>
+
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <!-- Filter Tabs -->
         <div class="inline-flex p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold">
@@ -299,12 +314,6 @@
           <button onclick="filterMatches('LIVE')" class="match-filter-btn px-4 py-2 rounded-lg text-slate-300 hover:text-white" data-filter="LIVE">Live Now</button>
           <button onclick="filterMatches('UPCOMING')" class="match-filter-btn px-4 py-2 rounded-lg text-slate-300 hover:text-white" data-filter="UPCOMING">Upcoming</button>
           <button onclick="filterMatches('FINISHED')" class="match-filter-btn px-4 py-2 rounded-lg text-slate-300 hover:text-white" data-filter="FINISHED">Finished</button>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button onclick="openNewMatchModal()" class="btn-primary-glow text-sm">
-            <i class="fa-solid fa-plus"></i> New Match / Event
-          </button>
         </div>
       </div>
 
@@ -594,6 +603,68 @@
           <input type="text" id="match-banner" placeholder="https://images.unsplash.com/photo-... or any image link" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white font-mono">
         </div>
 
+        <!-- Live Event Stream & DRM Section (Photo Style) -->
+        <div class="pt-2">
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold text-[#d48a7b] uppercase flex items-center gap-2">
+              <i class="fa-solid fa-tower-broadcast"></i> Live Stream & DRM Setup (Direct)
+            </label>
+            <span class="text-[10px] text-slate-400">Add stream directly with event</span>
+          </div>
+
+          <div class="photo-stream-container">
+            <!-- Media Stream URL -->
+            <div class="photo-input-group">
+              <input type="text" id="match-stream-url" placeholder="Media Stream URL" class="photo-input font-mono">
+            </div>
+
+            <!-- Cookie Value -->
+            <div class="photo-input-group">
+              <input type="text" id="match-cookie-value" placeholder="Cookie Value" class="photo-input font-mono">
+            </div>
+
+            <!-- Referer Value -->
+            <div class="photo-input-group">
+              <input type="text" id="match-referer-value" placeholder="Referer Value" class="photo-input font-mono">
+            </div>
+
+            <!-- Origin Value -->
+            <div class="photo-input-group">
+              <input type="text" id="match-origin-value" placeholder="Origin Value" class="photo-input font-mono">
+            </div>
+
+            <!-- DRM License URL (Outlined Notch Label) -->
+            <fieldset class="photo-fieldset">
+              <legend class="photo-legend">DRM License URL</legend>
+              <input type="text" id="match-drm-license-url" placeholder="DRM License URL or ClearKey KID:KEY" class="photo-fieldset-input font-mono">
+            </fieldset>
+
+            <!-- UserAgent & DrmScheme (Two Columns) -->
+            <div class="grid grid-cols-2 gap-3">
+              <fieldset class="photo-fieldset">
+                <legend class="photo-legend">UserAgent</legend>
+                <select id="match-user-agent" class="photo-select">
+                  <option value="Default" selected>Default</option>
+                  <option value="Hotstar">HotstarMobile/12.5.0</option>
+                  <option value="JioCinema">JioCinema/24.0.0</option>
+                  <option value="ExoPlayer">ExoPlayer (Android)</option>
+                  <option value="Chrome">Mozilla/5.0 (Windows)</option>
+                </select>
+              </fieldset>
+
+              <fieldset class="photo-fieldset">
+                <legend class="photo-legend">DrmScheme</legend>
+                <select id="match-drm-scheme" class="photo-select">
+                  <option value="clearkey" selected>clearkey</option>
+                  <option value="widevine">widevine</option>
+                  <option value="playready">playready</option>
+                  <option value="none">none</option>
+                </select>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+
         <div class="flex items-center gap-2">
           <input type="checkbox" id="match-pinned" class="w-4 h-4 rounded accent-emerald-500">
           <label for="match-pinned" class="text-xs font-semibold text-slate-300">Pin to top of mobile home screen (Featured Event)</label>
@@ -630,7 +701,7 @@
 
       <!-- Add New Stream Accordion Form -->
       <div class="pt-4 border-t border-slate-800">
-        <h5 class="text-xs font-bold uppercase text-emerald-400 tracking-wider mb-3">
+        <h5 class="text-xs font-bold uppercase text-[#d48a7b] tracking-wider mb-3 flex items-center gap-2">
           <i class="fa-solid fa-plus-circle"></i> Add New Stream Link / DRM Server
         </h5>
 
@@ -639,12 +710,12 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="sm:col-span-2">
-              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Server Title *</label>
-              <input type="text" id="stream-title" required placeholder="e.g. ICC TV 1080p (Hindi) or SK Live Server 2"
+              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Server Title (Optional)</label>
+              <input type="text" id="stream-title" placeholder="e.g. Server 1 HD or 1080p Stream"
                      class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
             </div>
             <div>
-              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Stream Type *</label>
+              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Stream Type</label>
               <select id="stream-type" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
                 <option value="M3U8">HLS (.m3u8)</option>
                 <option value="MPD">DASH (.mpd)</option>
@@ -655,109 +726,56 @@
             </div>
           </div>
 
-          <div>
-            <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Stream / Manifest URL (M3U8 / MPD / Piped Headers) *</label>
-            <input type="text" id="stream-url" required placeholder="https://cdn.example.com/live/master.m3u8 or paste with |User-Agent=...&Referer=..."
-                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono">
-          </div>
-
-          <!-- JSON Channel & Token Inputs -->
-          <div class="p-3 bg-amber-950/20 rounded-xl border border-amber-500/30 space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="text-[11px] font-bold text-amber-400 uppercase flex items-center gap-1.5">
-                <i class="fa-solid fa-code"></i> JSON Channel URL & Token (Optional)
-              </label>
-              <span class="text-[10px] text-amber-300/80">Dynamic Feed & Auth</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div>
-                <input type="text" id="stream-json-channel-url" placeholder="JSON Channel URL (e.g. https://.../channel.json)"
-                       class="w-full bg-black/60 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-200 font-mono">
-              </div>
-              <div>
-                <input type="text" id="stream-json-token-url" placeholder="JSON Token URL (e.g. https://.../token.php)"
-                       class="w-full bg-black/60 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-200 font-mono">
-              </div>
-            </div>
-            <div>
-              <input type="text" id="stream-json-token" placeholder="JSON Bearer Token / Session Key (e.g. eyJhbGci...)"
-                     class="w-full bg-black/60 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-amber-200 font-mono">
-            </div>
-          </div>
-
-          <!-- OTT Headers Presets -->
-          <div class="flex items-center gap-2 pt-1">
-            <span class="text-[10px] uppercase font-bold text-slate-400">OTT Quick Presets:</span>
-            <button type="button" onclick="applyOttPreset('hotstar')" class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 text-[10px] font-bold hover:bg-cyan-900">
-              ⚡ Hotstar
-            </button>
-            <button type="button" onclick="applyOttPreset('jio')" class="px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800 text-[10px] font-bold hover:bg-rose-900">
-              ⚡ JioCinema
-            </button>
-            <button type="button" onclick="applyOttPreset('sony')" class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 text-[10px] font-bold hover:bg-amber-900">
-              ⚡ Sony LIV
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Custom User-Agent</label>
-              <input type="text" id="stream-user-agent" placeholder="HotstarMobile/12.5.0 or ExoPlayer"
-                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
-            </div>
-            <div>
-              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Custom HTTP Referer</label>
-              <input type="text" id="stream-referer" placeholder="https://www.hotstar.com/"
-                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
-            </div>
-            <div>
-              <label class="block text-[11px] font-bold text-slate-300 uppercase mb-1">Session Cookie / Token</label>
-              <input type="text" id="stream-cookie" placeholder="hdnts=... or token"
-                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
-            </div>
-          </div>
-
-          <!-- DRM Security Section -->
-          <div class="p-3 bg-purple-950/20 rounded-xl border border-purple-500/30 space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="text-xs font-bold text-purple-300 flex items-center gap-1.5">
-                <i class="fa-solid fa-shield-halved"></i> DRM Security (ClearKey / Widevine)
-              </label>
-              <div class="flex items-center gap-2">
-                <input type="checkbox" id="stream-drm-enable" onchange="toggleDrmInputs(this.checked)" class="w-4 h-4 rounded accent-purple-500">
-                <span class="text-xs text-purple-200">Enable DRM</span>
-              </div>
+          <!-- PHOTO STYLE FORM CARD -->
+          <div class="photo-stream-container">
+            <!-- Media Stream URL -->
+            <div class="photo-input-group">
+              <input type="text" id="stream-url" required placeholder="Media Stream URL" class="photo-input font-mono">
             </div>
 
-            <div id="drm-inputs-container" class="space-y-2 pt-1 hidden">
-              <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">DRM Scheme</label>
-                <select id="stream-drm-scheme" onchange="handleDrmSchemeChange(this.value)" class="w-full bg-black/70 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-purple-300">
-                  <option value="clearkey">ClearKey DRM (Key ID + Key Hex or kid:key)</option>
-                  <option value="widevine">Widevine Modular (Jio, Hotstar, TataPlay License URL)</option>
+            <!-- Cookie Value -->
+            <div class="photo-input-group">
+              <input type="text" id="stream-cookie" placeholder="Cookie Value" class="photo-input font-mono">
+            </div>
+
+            <!-- Referer Value -->
+            <div class="photo-input-group">
+              <input type="text" id="stream-referer" placeholder="Referer Value" class="photo-input font-mono">
+            </div>
+
+            <!-- Origin Value -->
+            <div class="photo-input-group">
+              <input type="text" id="stream-origin" placeholder="Origin Value" class="photo-input font-mono">
+            </div>
+
+            <!-- DRM License URL (Outlined Notch Label) -->
+            <fieldset class="photo-fieldset">
+              <legend class="photo-legend">DRM License URL</legend>
+              <input type="text" id="stream-drm-license-url" placeholder="DRM License URL or ClearKey KID:KEY" class="photo-fieldset-input font-mono">
+            </fieldset>
+
+            <!-- UserAgent & DrmScheme (Two Columns) -->
+            <div class="grid grid-cols-2 gap-3">
+              <fieldset class="photo-fieldset">
+                <legend class="photo-legend">UserAgent</legend>
+                <select id="stream-user-agent" class="photo-select">
+                  <option value="Default" selected>Default</option>
+                  <option value="Hotstar">HotstarMobile/12.5.0</option>
+                  <option value="JioCinema">JioCinema/24.0.0</option>
+                  <option value="ExoPlayer">ExoPlayer (Android)</option>
+                  <option value="Chrome">Mozilla/5.0 (Windows)</option>
                 </select>
-              </div>
+              </fieldset>
 
-              <!-- ClearKey Inputs -->
-              <div id="clearkey-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Key ID (KID Hex or kid:key)</label>
-                  <input type="text" id="stream-drm-keyid" placeholder="eb63836f296d4532a4eb52f6d831e674"
-                         class="w-full bg-black/70 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-purple-300 font-mono">
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Key (Key Hex)</label>
-                  <input type="text" id="stream-drm-key" placeholder="a68eed132d1a4e1792617f69208fc440"
-                         class="w-full bg-black/70 border border-purple-500/40 rounded-lg px-3 py-1.5 text-xs text-purple-300 font-mono">
-                </div>
-              </div>
-
-              <!-- Widevine License Input -->
-              <div id="widevine-fields" class="hidden">
-                <label class="block text-[10px] font-bold text-cyan-400 uppercase mb-1">Widevine License Server URL</label>
-                <input type="text" id="stream-drm-license-url" placeholder="https://license.example.com/widevine/license"
-                       class="w-full bg-black/70 border border-cyan-500/40 rounded-lg px-3 py-1.5 text-xs text-cyan-300 font-mono">
-              </div>
+              <fieldset class="photo-fieldset">
+                <legend class="photo-legend">DrmScheme</legend>
+                <select id="stream-drm-scheme" class="photo-select">
+                  <option value="clearkey" selected>clearkey</option>
+                  <option value="widevine">widevine</option>
+                  <option value="playready">playready</option>
+                  <option value="none">none</option>
+                </select>
+              </fieldset>
             </div>
           </div>
 

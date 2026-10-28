@@ -928,7 +928,8 @@ const Store = {
         enabled: Boolean(streamData.drm?.enabled),
         scheme: streamData.drm?.scheme || 'clearkey',
         keyId: streamData.drm?.keyId || '',
-        key: streamData.drm?.key || ''
+        key: streamData.drm?.key || streamData.drm?.licenseUrl || '',
+        licenseUrl: streamData.drm?.licenseUrl || streamData.drm?.key || ''
       },
       isActive: streamData.isActive !== false
     };
