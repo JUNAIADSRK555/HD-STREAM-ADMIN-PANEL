@@ -30,10 +30,14 @@ app.use(async (req, res, next) => {
 // Serve Admin Dashboard Static Frontend
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Direct APK Download Endpoint
-app.get('/HD-STREAM.apk', (req, res) => {
-  const apkPath = path.join(__dirname, 'public', 'HD-STREAM.apk');
-  res.download(apkPath, 'HD-STREAM.apk', (err) => {
+// Direct APK Download Endpoints (No-Cache so phone always gets the fresh new APK)
+app.get(['/HD-STREAM.apk', '/HD-STREAM-v2-NEW.apk', '/HD-STREAM-release.apk'], (req, res) => {
+  const reqFile = req.path.replace('/', '') || 'HD-STREAM.apk';
+  const apkPath = path.join(__dirname, 'public', reqFile);
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.download(apkPath, reqFile, (err) => {
     if (err && !res.headersSent) {
       res.status(404).send('APK file not found');
     }
