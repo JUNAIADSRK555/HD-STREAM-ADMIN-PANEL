@@ -572,9 +572,6 @@ router.post('/import/m3u', requireAdmin, async (req, res) => {
       if (item.category) {
         await Store.ensureCategory(item.category);
       }
-      if (category) {
-        await Store.ensureCategory(category);
-      }
 
       await Store.createMatch({
         title: item.title,
