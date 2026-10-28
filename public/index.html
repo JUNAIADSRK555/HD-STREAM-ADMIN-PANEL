@@ -171,6 +171,12 @@
           <span>Import M3U / JSON</span>
         </button>
 
+        <!-- Latest APK & QR Code -->
+        <button onclick="openApkModal()" class="px-3 py-2 rounded-xl bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-600/50 font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-cyan-600/10 cursor-pointer">
+          <i class="fa-brands fa-android"></i>
+          <span>APK & QR Code</span>
+        </button>
+
         <!-- Add Live Event -->
         <button onclick="openNewMatchModal()" class="btn-primary-glow text-xs py-2 px-3">
           <i class="fa-solid fa-plus"></i>
@@ -244,6 +250,53 @@
         </div>
       </div>
 
+      <!-- APK Download Link & Live QR Code Card -->
+      <div class="glass-panel p-6 border-cyan-500/30 bg-gradient-to-r from-cyan-950/20 via-slate-900/60 to-slate-900/80">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
+          <!-- Left: Info & Link -->
+          <div class="space-y-3 flex-1 w-full">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold">
+              <i class="fa-brands fa-android"></i> Latest Mobile App Release
+            </div>
+            <h3 class="text-xl font-bold text-white flex items-center gap-2">
+              <span>Android APK Download & Live QR Code</span>
+              <span id="apk-version-badge" class="text-xs px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-mono">v1.5.0</span>
+            </h3>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Scan the QR code with any mobile camera or click below to directly download and install the latest APK. Updates in real-time when changed.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
+              <input type="text" id="dashboard-apk-url" placeholder="https://.../app-release.apk"
+                     class="flex-1 bg-black/70 border border-cyan-500/40 rounded-xl px-4 py-2.5 text-xs text-cyan-200 font-mono select-all">
+              <button onclick="saveDashboardApkUrl()" class="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-cyan-500/20 cursor-pointer">
+                <i class="fa-solid fa-floppy-disk"></i> Update APK Link
+              </button>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <a id="btn-download-apk-direct" href="#" target="_blank"
+                 class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all">
+                <i class="fa-solid fa-download"></i> Direct APK Download
+              </a>
+              <button onclick="copyToClipboard(document.getElementById('dashboard-apk-url').value)"
+                      class="btn-ghost text-xs hover:text-cyan-400">
+                <i class="fa-solid fa-copy"></i> Copy Link
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Live QR Code -->
+          <div class="flex flex-col items-center justify-center p-4 bg-white/95 rounded-2xl shadow-2xl border-4 border-cyan-500/40 text-center shrink-0">
+            <img id="dashboard-apk-qr" src="" alt="Scan APK QR" class="w-36 h-36 object-contain rounded-lg">
+            <span class="text-[11px] font-black text-slate-900 mt-2 tracking-wide flex items-center gap-1 uppercase">
+              <i class="fa-solid fa-qrcode text-cyan-600"></i> Scan on Mobile
+            </span>
+            <span class="text-[9px] font-semibold text-slate-500">Camera / Google Lens</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Quick Feeds Quick Copy Box -->
       <div class="glass-panel p-6 border-emerald-500/20 bg-gradient-to-r from-emerald-950/20 via-slate-900/40 to-slate-900/60">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -314,6 +367,27 @@
           <button onclick="filterMatches('LIVE')" class="match-filter-btn px-4 py-2 rounded-lg text-slate-300 hover:text-white" data-filter="LIVE">Live Now</button>
           <button onclick="filterMatches('UPCOMING')" class="match-filter-btn px-4 py-2 rounded-lg text-slate-300 hover:text-white" data-filter="UPCOMING">Upcoming</button>
           <button onclick="filterMatches('FINISHED')" class="match-filter-btn px-4 py-2 rounded-lg text-slate-300 hover:text-white" data-filter="FINISHED">Finished</button>
+        </div>
+      </div>
+
+      <!-- Bulk Actions & Selection Bar -->
+      <div class="glass-panel p-3.5 flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 border-slate-800 rounded-xl">
+        <div class="flex items-center gap-3">
+          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-300 hover:text-white select-none">
+            <input type="checkbox" id="select-all-matches" onchange="toggleSelectAllMatches(this.checked)" class="w-4 h-4 rounded accent-emerald-500 cursor-pointer">
+            <span>Select All Events (<span id="matches-selected-count" class="text-emerald-400 font-bold">0</span> selected)</span>
+          </label>
+        </div>
+
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <button id="btn-delete-selected" onclick="deleteSelectedMatches()" disabled
+                  class="px-3.5 py-1.5 rounded-lg bg-red-600/30 text-red-300 border border-red-500/40 hover:bg-red-600 hover:text-white disabled:opacity-40 disabled:pointer-events-none text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+            <i class="fa-solid fa-trash-can"></i> Delete Selected
+          </button>
+          <button onclick="deleteAllLiveEvents()"
+                  class="px-3.5 py-1.5 rounded-lg bg-rose-950/60 text-rose-400 border border-rose-800 hover:bg-rose-900/90 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+            <i class="fa-solid fa-dumpster-fire"></i> Delete All Live Events
+          </button>
         </div>
       </div>
 
@@ -1220,6 +1294,36 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal: APK Download & QR Code -->
+  <div id="modal-apk-qr" class="modal-overlay">
+    <div class="modal-box p-6 max-w-md text-center">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <h4 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-brands fa-android text-cyan-400"></i> Latest Mobile APK Download
+        </h4>
+        <button onclick="closeModal('modal-apk-qr')" class="text-slate-400 hover:text-white text-lg cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="py-4 flex flex-col items-center space-y-3">
+        <div class="p-3 bg-white rounded-2xl shadow-xl border-4 border-cyan-500/40">
+          <img id="modal-apk-qr-img" src="" alt="Scan APK QR" class="w-48 h-48 object-contain">
+        </div>
+        <p class="text-xs text-slate-300">Scan with your mobile camera or Google Lens to download and install the latest APK directly.</p>
+        <div class="w-full pt-2 space-y-2">
+          <a id="modal-apk-download-btn" href="#" target="_blank"
+             class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all cursor-pointer">
+            <i class="fa-solid fa-download"></i> Direct Download APK
+          </a>
+          <button onclick="copyToClipboard(document.getElementById('dashboard-apk-url').value)" class="w-full btn-ghost text-xs justify-center cursor-pointer">
+            <i class="fa-solid fa-copy"></i> Copy Download Link
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 

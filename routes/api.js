@@ -262,6 +262,30 @@ router.delete('/matches/:id', requireAdmin, async (req, res) => {
   }
 });
 
+// Bulk Delete Multiple Matches (Selected)
+router.post('/matches/bulk-delete', requireAdmin, async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, message: 'Please provide an array of match IDs to delete' });
+    }
+    const count = await Store.deleteMultipleMatches(ids);
+    res.json({ success: true, count, message: `Successfully deleted ${count} live events!` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Delete All Live Events
+router.post('/matches/delete-all', requireAdmin, async (req, res) => {
+  try {
+    const count = await Store.deleteAllMatches();
+    res.json({ success: true, count, message: `Successfully deleted all ${count} live events!` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // Add / Delete Streams inside a match
 router.post('/matches/:id/streams', requireAdmin, async (req, res) => {
   try {

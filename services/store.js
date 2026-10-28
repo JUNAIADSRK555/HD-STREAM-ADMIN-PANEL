@@ -876,6 +876,27 @@ const Store = {
     return deleted[0];
   },
 
+  async deleteMultipleMatches(ids) {
+    if (!Array.isArray(ids) || ids.length === 0) return 0;
+    if (isMongoConnected()) {
+      const res = await Match.deleteMany({ _id: { $in: ids } });
+      return res.deletedCount || 0;
+    }
+    const initialLen = inMemoryState.matches.length;
+    inMemoryState.matches = inMemoryState.matches.filter(m => !ids.includes(String(m._id)));
+    return initialLen - inMemoryState.matches.length;
+  },
+
+  async deleteAllMatches() {
+    if (isMongoConnected()) {
+      const res = await Match.deleteMany({});
+      return res.deletedCount || 0;
+    }
+    const count = inMemoryState.matches.length;
+    inMemoryState.matches = [];
+    return count;
+  },
+
   // --- STREAMS INSIDE A MATCH ---
   async addStreamToMatch(matchId, streamData) {
     const rawUrl = streamData.streamUrl || streamData.url || streamData.link || streamData.stream || streamData.jsonChannelUrl || '';

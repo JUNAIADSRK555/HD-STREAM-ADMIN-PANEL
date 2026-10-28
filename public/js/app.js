@@ -577,10 +577,11 @@ function renderMatchesList() {
       <div class="glass-panel p-5 space-y-4 relative overflow-hidden group">
         <!-- Card Top Bar -->
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
+          <label class="flex items-center gap-2.5 cursor-pointer select-none">
+            <input type="checkbox" class="match-select-checkbox w-4 h-4 rounded accent-emerald-500 cursor-pointer" value="${m._id}" onchange="updateSelectedMatchesCount()">
             <span class="text-xs font-bold text-slate-400">${m.category}</span>
             ${m.isPinned ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30"><i class="fa-solid fa-thumbtack"></i> PINNED</span>' : ''}
-          </div>
+          </label>
           <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${statusColor} flex items-center gap-1">
             ${isLive ? '<span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>' : ''}
             ${m.status}
@@ -659,6 +660,72 @@ function renderMatchesList() {
       </div>
     `;
   }).join('');
+
+  const selectAll = document.getElementById('select-all-matches');
+  if (selectAll) selectAll.checked = false;
+  updateSelectedMatchesCount();
+}
+
+// --- BULK SELECTION & BULK DELETE ---
+function toggleSelectAllMatches(checked) {
+  document.querySelectorAll('.match-select-checkbox').forEach(cb => {
+    cb.checked = checked;
+  });
+  updateSelectedMatchesCount();
+}
+
+function updateSelectedMatchesCount() {
+  const checkboxes = document.querySelectorAll('.match-select-checkbox');
+  const checkedBoxes = document.querySelectorAll('.match-select-checkbox:checked');
+  const countSpan = document.getElementById('matches-selected-count');
+  if (countSpan) countSpan.textContent = checkedBoxes.length;
+
+  const btnDelete = document.getElementById('btn-delete-selected');
+  if (btnDelete) {
+    btnDelete.disabled = checkedBoxes.length === 0;
+    btnDelete.innerHTML = `<i class="fa-solid fa-trash-can"></i> Delete Selected (${checkedBoxes.length})`;
+  }
+
+  const selectAll = document.getElementById('select-all-matches');
+  if (selectAll && checkboxes.length > 0) {
+    selectAll.checked = checkedBoxes.length === checkboxes.length;
+  }
+}
+
+async function deleteSelectedMatches() {
+  const checkedBoxes = Array.from(document.querySelectorAll('.match-select-checkbox:checked'));
+  const ids = checkedBoxes.map(cb => cb.value);
+  if (ids.length === 0) return;
+
+  if (!confirm(`Are you sure you want to delete ${ids.length} selected live events?`)) return;
+
+  try {
+    const res = await apiRequest('/api/matches/bulk-delete', 'POST', { ids });
+    showToast(res.message || `Deleted ${ids.length} events!`, 'success');
+    await fetchMatches();
+    await fetchDashboardStats();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function deleteAllLiveEvents() {
+  const total = state.matches.length;
+  if (total === 0) {
+    showToast('No live events to delete', 'info');
+    return;
+  }
+
+  if (!confirm(`⚠️ DANGER: Are you sure you want to delete ALL ${total} live events? This will remove all channels and streams.`)) return;
+
+  try {
+    const res = await apiRequest('/api/matches/delete-all', 'POST');
+    showToast(res.message || 'All live events deleted successfully!', 'success');
+    await fetchMatches();
+    await fetchDashboardStats();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
 }
 
 function renderCategoriesTable() {
@@ -763,6 +830,57 @@ function populateSettingsInputs(settings) {
   setInputValue('setting-apk-url', settings.apkDownloadUrl || '');
   const maint = document.getElementById('setting-maintenance');
   if (maint) maint.checked = Boolean(settings.maintenanceMode);
+
+  updateApkQrCode(settings.apkDownloadUrl, settings.appVersion);
+}
+
+// --- APK LINK & LIVE QR CODE ---
+function updateApkQrCode(apkUrl, appVersion) {
+  const url = apkUrl || 'https://example.com/download/app-release.apk';
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}`;
+
+  const dashInput = document.getElementById('dashboard-apk-url');
+  if (dashInput) dashInput.value = url;
+
+  const dashQr = document.getElementById('dashboard-apk-qr');
+  if (dashQr) dashQr.src = qrUrl;
+
+  const directBtn = document.getElementById('btn-download-apk-direct');
+  if (directBtn) directBtn.href = url;
+
+  const versionBadge = document.getElementById('apk-version-badge');
+  if (versionBadge && appVersion) versionBadge.textContent = 'v' + appVersion;
+
+  const modalQr = document.getElementById('modal-apk-qr-img');
+  if (modalQr) modalQr.src = qrUrl;
+
+  const modalBtn = document.getElementById('modal-apk-download-btn');
+  if (modalBtn) modalBtn.href = url;
+}
+
+function openApkModal() {
+  const apkUrl = document.getElementById('dashboard-apk-url')?.value || state.settings?.apkDownloadUrl || '';
+  updateApkQrCode(apkUrl, state.settings?.appVersion);
+  openModal('modal-apk-qr');
+}
+
+async function saveDashboardApkUrl() {
+  const apkUrl = document.getElementById('dashboard-apk-url')?.value.trim();
+  if (!apkUrl) {
+    showToast('Please enter an APK URL', 'warning');
+    return;
+  }
+
+  try {
+    await apiRequest('/api/settings', 'PUT', { apkDownloadUrl: apkUrl });
+    if (!state.settings) state.settings = {};
+    state.settings.apkDownloadUrl = apkUrl;
+    setInputValue('setting-apk-url', apkUrl);
+    updateApkQrCode(apkUrl, state.settings?.appVersion);
+    showToast('APK link updated & QR code regenerated!', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
 }
 
 // --- FILTERING ---
@@ -1408,6 +1526,9 @@ async function saveAppSettings() {
 
   try {
     await apiRequest('/api/settings', 'PUT', payload);
+    if (!state.settings) state.settings = {};
+    Object.assign(state.settings, payload);
+    updateApkQrCode(payload.apkDownloadUrl, payload.appVersion);
     showToast('App settings saved & live in mobile feed!', 'success');
   } catch (err) {
     showToast(err.message, 'error');
