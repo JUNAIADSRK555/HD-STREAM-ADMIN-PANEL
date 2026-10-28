@@ -813,7 +813,16 @@ const Store = {
   // --- MATCHES / LIVE EVENTS ---
   async getMatches(filter = {}) {
     if (isMongoConnected()) {
-      return await Match.find(filter).sort({ isPinned: -1, createdAt: -1 });
+      let matches = await Match.find(filter).sort({ isPinned: -1, createdAt: -1 });
+      if ((!matches || matches.length === 0) && Object.keys(filter).length === 0) {
+        for (const m of initialMatches) {
+          try {
+            await Match.create(m);
+          } catch (_) {}
+        }
+        matches = await Match.find(filter).sort({ isPinned: -1, createdAt: -1 });
+      }
+      return matches;
     }
     let list = inMemoryState.matches;
     if (filter.status) {
@@ -973,7 +982,16 @@ const Store = {
   // --- CATEGORIES ---
   async getCategories() {
     if (isMongoConnected()) {
-      return await Category.find({ isActive: true }).sort({ order: 1 });
+      let cats = await Category.find({ isActive: true }).sort({ order: 1 });
+      if (!cats || cats.length === 0) {
+        for (const c of initialCategories) {
+          try {
+            await Category.create({ name: c.name, slug: c.slug, icon: c.icon, order: c.order, isActive: true });
+          } catch (_) {}
+        }
+        cats = await Category.find({ isActive: true }).sort({ order: 1 });
+      }
+      return cats;
     }
     return inMemoryState.categories.filter(c => c.isActive !== false);
   },
