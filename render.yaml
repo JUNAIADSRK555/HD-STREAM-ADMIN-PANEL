@@ -1,18 +1,19 @@
 services:
   - type: web
-    name: stream-admin-backend
-    env: node
+    name: hd-stream-backend
+    runtime: node
     plan: free
+    region: singapore
+    branch: main
     buildCommand: npm install
     startCommand: node server.js
+    healthCheckPath: /api/ping
     envVars:
+      - key: MONGODB_URI
+        value: mongodb+srv://admin_user:Junaid123@cluster0.9x4qbno.mongodb.net/?retryWrites=true&w=majority
+      - key: ADMIN_USER
+        value: shaikhabutlha506@gmail.com
+      - key: ADMIN_API_KEY
+        value: Junaidsrk555
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
-      - key: ADMIN_API_KEY
-        generateValue: true
-      - key: MONGODB_URI
-        sync: false
-      - key: APP_BASE_URL
-        sync: false
