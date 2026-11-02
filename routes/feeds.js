@@ -52,10 +52,16 @@ router.get(['/mobile', '/app-data'], async (req, res) => {
         announcementEnabled: settings.announcementEnabled,
         appVersion: settings.appVersion,
         minVersion: settings.minVersion,
-        apkDownloadUrl: settings.apkDownloadUrl || 'https://stream-admin-backend.vercel.app/HD-STREAM.apk',
+        apkDownloadUrl: settings.apkDownloadUrl || 'https://struck-christ-memories-amend.trycloudflare.com/HD-STREAM.apk',
         maintenanceMode: settings.maintenanceMode,
-        telegramLink: settings.telegramLink,
-        supportEmail: settings.supportEmail
+        telegramLink: settings.telegramLink || 'https://t.me/livetvofficialapp',
+        supportEmail: settings.supportEmail || 'shaikhabutlha506@gmail.com',
+        sponsorBannerUrl: settings.sponsorBannerUrl || '',
+        sponsorRedirectUrl: settings.sponsorRedirectUrl || 'https://t.me/livetvofficialapp',
+        adsterraEnabled: settings.adsterraEnabled !== false,
+        adsterraZoneId: settings.adsterraZoneId || '8492041',
+        adsterraPublisherId: settings.adsterraPublisherId || 'shaikhabutlha506@gmail.com',
+        channelChangeAdFrequency: settings.channelChangeAdFrequency || 5
       },
       categories: categories.map(c => ({
         id: c._id || c.id,
