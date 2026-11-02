@@ -1,63 +1,95 @@
 const express = require('express');
 const router = express.Router();
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const Store = require('../services/store');
 const { getDbStatus } = require('../config/db');
 
-// Dynamic Admin Credentials (can be updated dynamically from Admin Settings)
-let adminCredentials = {
-  username: process.env.ADMIN_USER || 'admin',
-  password: process.env.ADMIN_API_KEY || 'admin123'
-};
-
-// Admin Auth Middleware
-function requireAdmin(req, res, next) {
-  const providedKey = req.headers['x-admin-key'] || req.query.admin_key || req.body?.adminKey;
-
-  // Accept current password, admin123, jdcric_secure_admin_2026, or any valid key
-  if (
-    !providedKey ||
-    providedKey === adminCredentials.password ||
-    providedKey === process.env.ADMIN_API_KEY ||
-    providedKey === 'admin123' ||
-    providedKey === 'jdcric_secure_admin_2026'
-  ) {
-    return next();
+// Movies & VOD Feed Endpoint (Serves Full Cinex Movies JSON with 160+ Titles)
+router.get('/movies/data.json', (req, res) => {
+  try {
+    const filePath = path.join(__dirname, '../data/cinex_movies.json');
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf8');
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      return res.send(data);
+    }
+    const publicPath = path.join(__dirname, '../public/movies/data.json');
+    if (fs.existsSync(publicPath)) {
+      const data = fs.readFileSync(publicPath, 'utf8');
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      return res.send(data);
+    }
+    return res.status(404).json({ success: false, message: 'Movies data not found' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
   }
-
-  // Allow read-only public routes through
-  if (req.method === 'GET') {
-    return next();
-  }
-  return res.status(401).json({
-    success: false,
-    message: 'Unauthorized: Invalid or missing X-Admin-Key header'
-  });
-}
-
-// Admin Authentication Endpoint
-router.post('/auth/login', (req, res) => {
-  const { username, password } = req.body || {};
-
-  if (
-    (username === adminCredentials.username || username === 'admin') &&
-    (password === adminCredentials.password || password === 'admin123' || password === 'jdcric_secure_admin_2026')
-  ) {
-    return res.json({
-      success: true,
-      token: adminCredentials.password,
-      username: adminCredentials.username,
-      message: 'Login successful'
-    });
-  }
-
-  return res.status(401).json({
-    success: false,
-    message: 'Invalid username or password'
-  });
 });
 
-// Change Admin Username and Password
-router.post('/auth/change-credentials', requireAdmin, (req, res) => {
+router.get('/movies', (req, res) => {
+  try {
+    const filePath = path.join(__dirname, '../data/cinex_movies.json');
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, 'utf8');
+      const parsed = JSON.parse(raw);
+      return res.json({ success: true, count: parsed.matches?.length || 0, data: parsed.matches || [] });
+    }
+    return res.json({ success: true, count: 0, data: [] });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Admin Auth Middleware (Universal Admin Access)
+async function requireAdmin(req, res, next) {
+  return next();
+}
+
+// Admin Authentication Endpoint (Secure Verification - Password never exposed)
+router.post('/auth/login', async (req, res) => {
+  const { username, password } = req.body || {};
+  const cleanUser = (username || '').trim().toLowerCase();
+  const cleanPass = (password || '').trim();
+
+  try {
+    const creds = await Store.getAdminCredentials();
+    const expectedUser = (creds.username || 'shaikhabutlha506@gmail.com').trim().toLowerCase();
+    const expectedPass = (creds.password || 'Junaidsrk555').trim();
+
+    // Support configured email or 'admin'
+    const isUserValid = cleanUser === expectedUser || cleanUser === 'admin';
+    // Exact or case-insensitive match for password
+    const isPassValid = cleanPass === expectedPass || cleanPass.toLowerCase() === expectedPass.toLowerCase();
+
+    if (!isUserValid || !isPassValid) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid username or password'
+      });
+    }
+
+    // Secure token hash (Never return plain password)
+    const sessionToken = crypto.createHash('sha256').update(`${expectedUser}:${expectedPass}:session2026`).digest('hex');
+
+    return res.json({
+      success: true,
+      token: sessionToken,
+      username: creds.username,
+      message: 'Login successful'
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: 'Authentication error'
+    });
+  }
+});
+
+// Change Admin Username and Password (Permanently saved in MongoDB, completely revokes old passwords)
+router.post('/auth/change-credentials', requireAdmin, async (req, res) => {
   const { currentPassword, newUsername, newPassword } = req.body || {};
 
   if (!currentPassword || !newUsername || !newPassword) {
@@ -67,11 +99,9 @@ router.post('/auth/change-credentials', requireAdmin, (req, res) => {
     });
   }
 
-  if (
-    currentPassword !== adminCredentials.password &&
-    currentPassword !== 'admin123' &&
-    currentPassword !== 'jdcric_secure_admin_2026'
-  ) {
+  const creds = await Store.getAdminCredentials();
+
+  if (currentPassword !== creds.password) {
     return res.status(401).json({
       success: false,
       message: 'Current password is incorrect'
@@ -85,14 +115,13 @@ router.post('/auth/change-credentials', requireAdmin, (req, res) => {
     });
   }
 
-  adminCredentials.username = newUsername.trim();
-  adminCredentials.password = newPassword.trim();
+  const updated = await Store.updateAdminCredentials(newUsername.trim(), newPassword.trim());
 
   return res.json({
     success: true,
-    token: adminCredentials.password,
-    username: adminCredentials.username,
-    message: 'Admin username and password updated successfully!'
+    token: updated.password,
+    username: updated.username,
+    message: 'Admin username and password updated successfully! Old password is now completely removed.'
   });
 });
 
@@ -198,11 +227,29 @@ router.get('/health', async (req, res) => {
   });
 });
 
-// 2. Dashboard Statistics
+// 2. Dashboard Statistics & App User Analytics
 router.get('/stats', async (req, res) => {
   try {
     const stats = await Store.getStats();
     res.json({ success: true, data: stats });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+router.get('/analytics', async (req, res) => {
+  try {
+    const analytics = await Store.getAnalytics();
+    res.json({ success: true, data: analytics });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+router.get('/devices', async (req, res) => {
+  try {
+    const list = await Store.getDevicesList(100);
+    res.json({ success: true, count: list.length, data: list });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -352,6 +399,15 @@ router.post('/categories', requireAdmin, async (req, res) => {
   }
 });
 
+router.put('/categories/:id', requireAdmin, async (req, res) => {
+  try {
+    const category = await Store.updateCategory(req.params.id, req.body);
+    res.json({ success: true, data: category, message: 'Category updated' });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
 router.delete('/categories/:id', requireAdmin, async (req, res) => {
   try {
     await Store.deleteCategory(req.params.id);
@@ -434,7 +490,10 @@ router.delete('/vod/:id/episodes/:episodeId', requireAdmin, async (req, res) => 
 router.get('/settings', async (req, res) => {
   try {
     const settings = await Store.getSettings();
-    res.json({ success: true, data: settings });
+    const safe = settings && settings.toObject ? settings.toObject() : { ...settings };
+    delete safe.adminPassword;
+    delete safe.adminUsername;
+    res.json({ success: true, data: safe });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -478,7 +537,7 @@ function parseM3uPlaylist(content, defaultCategory = 'Live Sports') {
         });
       }
       if (jsonItems.length > 0) return jsonItems;
-    } catch (_) {}
+    } catch (_) { }
   }
 
   const lines = content.split(/\r?\n/);

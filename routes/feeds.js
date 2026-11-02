@@ -17,6 +17,11 @@ function hexToBase64Url(hexStr) {
  */
 router.get(['/mobile', '/app-data'], async (req, res) => {
   try {
+    // Track device activity in background
+    const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '';
+    const userAgent = req.headers['user-agent'] || '';
+    Store.trackDevice(clientIp, userAgent).catch(() => {});
+
     const [matches, categories, vods, settings] = await Promise.all([
       Store.getMatches(),
       Store.getCategories(),
@@ -88,7 +93,9 @@ router.get(['/mobile', '/app-data'], async (req, res) => {
       }))
     };
 
-    res.set('Cache-Control', 'public, max-age=15'); // 15 seconds cache for blazing fast performance
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
     res.json(responsePayload);
   } catch (error) {
     res.status(500).json({ status: 'error', message: error.message });
@@ -130,11 +137,11 @@ function formatMatchForMobile(match) {
           'Cookie': s.headers?.cookie || ''
         },
         drm: {
-          enabled: Boolean(s.drm?.enabled),
-          scheme: s.drm?.scheme || 'none',
+          enabled: Boolean(s.drm?.enabled || s.drm?.keyId || s.drm?.key || s.drm?.licenseUrl),
+          scheme: s.drm?.scheme || (s.drm?.keyId || s.drm?.key ? 'clearkey' : 'none'),
           keyId: s.drm?.keyId || '',
           key: s.drm?.key || '',
-          licenseUrl: s.drm?.licenseUrl || (s.drm?.scheme === 'widevine' ? s.drm?.key : (s.drm?.enabled ? `/api/feed/clearkey/${match._id}/${s.id}` : null)),
+          licenseUrl: s.drm?.licenseUrl || (s.drm?.keyId && s.drm?.key ? `${s.drm.keyId}:${s.drm.key}` : (s.drm?.scheme === 'widevine' ? s.drm?.key : '')),
           clearKeyLicense
         }
       };
@@ -150,8 +157,20 @@ function formatMatchForMobile(match) {
     bannerUrl: match.bannerUrl,
     description: match.description,
     isPinned: Boolean(match.isPinned),
-    team1: match.team1 || { name: 'Team 1', shortName: 'T1', flag: '', score: '' },
-    team2: match.team2 || { name: 'Team 2', shortName: 'T2', flag: '', score: '' },
+    team1: {
+      name: match.team1?.name || 'Team 1',
+      shortName: match.team1?.shortName || 'T1',
+      flag: match.team1?.flag || match.team1?.logo || '',
+      logo: match.team1?.logo || match.team1?.flag || '',
+      score: match.team1?.score || ''
+    },
+    team2: {
+      name: match.team2?.name || 'Team 2',
+      shortName: match.team2?.shortName || 'T2',
+      flag: match.team2?.flag || match.team2?.logo || '',
+      logo: match.team2?.logo || match.team2?.flag || '',
+      score: match.team2?.score || ''
+    },
     totalStreams: activeStreams.length,
     streams: activeStreams
   };

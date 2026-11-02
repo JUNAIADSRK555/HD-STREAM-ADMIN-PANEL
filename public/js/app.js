@@ -17,90 +17,233 @@ const state = {
 };
 
 // --- INITIALIZATION ---
+
+// --- ClearKey Box Helpers (Exact Photo Style: KID / kid:key + Key Hex) ---
+function getCombinedDrmValue(prefix = '') {
+  let keysArray = [];
+
+  const pfx = prefix ? `${prefix}-clearkey-` : '';
+
+  const kId1 = (document.getElementById(`${pfx}id1`) || document.getElementById('keyId1'))?.value.trim() || '';
+  const kVal1 = (document.getElementById(`${pfx}key1`) || document.getElementById('keyValue1'))?.value.trim() || '';
+
+  if (kId1 && kVal1) {
+    const cleanId = kId1.includes(':') ? kId1.split(':')[0].trim() : kId1;
+    keysArray.push(`${cleanId}:${kVal1}`);
+  } else if (kId1) {
+    keysArray.push(kId1);
+  } else if (kVal1) {
+    keysArray.push(kVal1);
+  }
+
+  const kId2 = (document.getElementById(`${pfx}id2`) || document.getElementById('keyId2'))?.value?.trim() || '';
+  const kVal2 = (document.getElementById(`${pfx}key2`) || document.getElementById('keyValue2'))?.value?.trim() || '';
+  if (kId2 && kVal2) {
+    keysArray.push(`${kId2}:${kVal2}`);
+  }
+
+  return keysArray.join(',');
+}
+window.getCombinedDrmValue = getCombinedDrmValue;
+
+function combineClearKeys(baseDrm, keyId1, keyVal1, keyId2 = '', keyVal2 = '') {
+  let keysArray = [];
+  const kId1 = (keyId1 || '').trim();
+  const kVal1 = (keyVal1 || '').trim();
+  const kId2 = (keyId2 || '').trim();
+  const kVal2 = (keyVal2 || '').trim();
+
+  if (kId1 && kVal1) {
+    const cleanId = kId1.includes(':') ? kId1.split(':')[0].trim() : kId1;
+    keysArray.push(`${cleanId}:${kVal1}`);
+  } else if (kId1) {
+    keysArray.push(kId1);
+  }
+
+  if (kId2 && kVal2) {
+    keysArray.push(`${kId2}:${kVal2}`);
+  }
+
+  if (keysArray.length > 0) {
+    return keysArray.join(',');
+  }
+
+  return (baseDrm || '').trim();
+}
+
+function populateClearKeyBoxes(drmValue, prefix = '') {
+  const pfx = prefix ? `${prefix}-clearkey-` : '';
+  const id1 = document.getElementById(`${pfx}id1`) || document.getElementById('keyId1');
+  const key1 = document.getElementById(`${pfx}key1`) || document.getElementById('keyValue1');
+  const id2 = document.getElementById(`${pfx}id2`) || document.getElementById('keyId2');
+  const key2 = document.getElementById(`${pfx}key2`) || document.getElementById('keyValue2');
+
+  if (id1) id1.value = '';
+  if (key1) key1.value = '';
+  if (id2) id2.value = '';
+  if (key2) key2.value = '';
+
+  if (!drmValue) return;
+
+  const trimmed = drmValue.trim();
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    if (id1) id1.value = trimmed;
+    return;
+  }
+
+  // Comma separated pairs: keyId1:key1,keyId2:key2
+  const pairs = trimmed.split(',');
+  if (pairs.length >= 1 && pairs[0].includes(':')) {
+    const parts1 = pairs[0].split(':');
+    if (id1) id1.value = parts1[0]?.trim() || '';
+    if (key1) key1.value = parts1[1]?.trim() || '';
+  } else if (id1) {
+    id1.value = trimmed;
+  }
+
+  if (pairs.length >= 2 && pairs[1].includes(':')) {
+    const parts2 = pairs[1].split(':');
+    if (id2) id2.value = parts2[0]?.trim() || '';
+    if (key2) key2.value = parts2[1]?.trim() || '';
+  }
+}
+
+function bindClearKeySync(prefix, mainInputId) {
+  const mainInput = document.getElementById(mainInputId);
+  const pfx = `${prefix}-clearkey-`;
+  const id1 = document.getElementById(`${pfx}id1`);
+  const key1 = document.getElementById(`${pfx}key1`);
+
+  if (!id1 || !key1) return;
+
+  const syncToMain = () => {
+    const combined = getCombinedDrmValue(prefix);
+    if (mainInput) {
+      mainInput.value = combined;
+    }
+  };
+
+  id1.addEventListener('input', syncToMain);
+  key1.addEventListener('input', syncToMain);
+
+  if (mainInput) {
+    mainInput.addEventListener('input', () => {
+      const val = mainInput.value.trim();
+      if (val) {
+        populateClearKeyBoxes(val, prefix);
+      }
+    });
+  }
+}
+
+function initClearKeySync() {
+  bindClearKeySync('match', 'match-drm-license-url');
+  bindClearKeySync('stream', 'stream-drm-license-url');
+  bindClearKeySync('direct', 'direct-drm-kidkey');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initClock();
   initNav();
   initInputs();
   initPipedUrlListeners();
+  initClearKeySync();
   checkAuthAndInit();
 });
 
-// --- AUTHENTICATION GATE & LOCK SCREEN ---
+// --- ADMIN AUTHENTICATION & LOCK SCREEN ---
 function checkAuthAndInit() {
+  const token = localStorage.getItem('hd_stream_auth_token');
   const overlay = document.getElementById('auth-lock-overlay');
-  const isLoggedIn = sessionStorage.getItem('hd_admin_logged_in') === 'true';
 
-  if (isLoggedIn) {
+  if (token) {
     if (overlay) overlay.classList.add('hidden');
+    state.adminKey = token;
     fetchAllData();
     setInterval(fetchDashboardStats, 30000);
   } else {
-    if (overlay) overlay.classList.remove('hidden');
-    const pwdInput = document.getElementById('auth-password');
-    if (pwdInput) pwdInput.focus();
+    if (overlay) {
+      overlay.classList.remove('hidden');
+      const userInput = document.getElementById('login-username');
+      if (userInput && !userInput.value) {
+        userInput.value = 'shaikhabutlha506@gmail.com';
+      }
+      setTimeout(() => {
+        const passInput = document.getElementById('login-password');
+        if (passInput) passInput.focus();
+      }, 150);
+    }
   }
 }
 
 async function handleAdminLogin(e) {
-  e.preventDefault();
-  const user = document.getElementById('auth-username').value.trim();
-  const pass = document.getElementById('auth-password').value.trim();
-  const errorBox = document.getElementById('auth-error-msg');
-  const errorText = document.getElementById('auth-error-text');
-  const submitBtn = document.getElementById('btn-auth-submit');
+  if (e) e.preventDefault();
+  const userInput = document.getElementById('login-username');
+  const passInput = document.getElementById('login-password');
+  const errorEl = document.getElementById('login-error-msg');
+  const submitBtn = document.getElementById('btn-login-submit');
 
-  if (errorBox) errorBox.classList.add('hidden');
-  if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+  const username = (userInput?.value || '').trim();
+  const password = (passInput?.value || '').trim();
+
+  if (!username || !password) {
+    if (errorEl) {
+      errorEl.textContent = 'Username aur Password dono enter karein.';
+      errorEl.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Unlocking...';
+  }
+  if (errorEl) errorEl.classList.add('hidden');
 
   try {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: user, password: pass })
-    });
-    const data = await res.json();
-
-    if (res.ok && data.success) {
-      sessionStorage.setItem('hd_admin_logged_in', 'true');
-      state.adminKey = data.token || pass;
-      localStorage.setItem('hd_stream_admin_key', state.adminKey);
+    const res = await apiRequest('/api/auth/login', 'POST', { username, password });
+    if (res && res.success) {
+      localStorage.setItem('hd_stream_auth_token', res.token || 'authenticated');
+      localStorage.setItem('hd_stream_auth_user', res.username || username);
+      state.adminKey = res.token || 'authenticated';
 
       const overlay = document.getElementById('auth-lock-overlay');
-      if (overlay) {
-        overlay.classList.add('opacity-0', 'pointer-events-none');
-        setTimeout(() => overlay.classList.add('hidden'), 300);
-      }
-      showToast('Welcome to HD STREAM Admin Portal!', 'success');
+      if (overlay) overlay.classList.add('hidden');
+
+      showToast('Admin panel unlocked successfully!', 'success');
       fetchAllData();
       setInterval(fetchDashboardStats, 30000);
     } else {
-      if (errorBox && errorText) {
-        errorText.textContent = data.message || 'Invalid username or password';
-        errorBox.classList.remove('hidden');
+      if (errorEl) {
+        errorEl.textContent = res?.message || 'Galat username ya password! Kripya dobara check karein.';
+        errorEl.classList.remove('hidden');
       }
     }
   } catch (err) {
-    if (errorBox && errorText) {
-      errorText.textContent = 'Server connection error: ' + err.message;
-      errorBox.classList.remove('hidden');
+    if (errorEl) {
+      errorEl.textContent = 'Galat username ya password! Kripya dobara check karein.';
+      errorEl.classList.remove('hidden');
     }
   } finally {
-    if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-lock-open"></i> Unlock Dashboard';
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket"></i> Unlock Admin Panel';
+    }
   }
 }
 
 function handleAdminLogout() {
-  sessionStorage.removeItem('hd_admin_logged_in');
+  localStorage.removeItem('hd_stream_auth_token');
+  localStorage.removeItem('hd_stream_auth_user');
   const overlay = document.getElementById('auth-lock-overlay');
   if (overlay) {
-    overlay.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
-    const pwdInput = document.getElementById('auth-password');
-    if (pwdInput) {
-      pwdInput.value = '';
-      pwdInput.focus();
-    }
+    overlay.classList.remove('hidden');
+    const passInput = document.getElementById('login-password');
+    if (passInput) passInput.value = '';
+    const errorEl = document.getElementById('login-error-msg');
+    if (errorEl) errorEl.classList.add('hidden');
   }
-  showToast('Admin session locked.', 'info');
+  showToast('Logged out. Please login again.', 'info');
 }
 
 function initClock() {
@@ -246,9 +389,9 @@ const defaultSampleData = {
     }
   ],
   settings: {
-    announcement: '🌐 WEBSITE UPDATED! 🔄 Bookmark our new website 📌 sktech.live',
+    announcement: '🔥 Welcome to HD Stream Live TV! Join our Telegram: @livetvofficialapp',
     appVersion: '2.0.0',
-    apkDownloadUrl: 'http://10.129.81.207:8080/HD-STREAM.apk',
+    apkDownloadUrl: 'https://stream-admin-backend.vercel.app/HD-STREAM-v2-NEW.apk',
     maintenanceMode: false
   }
 };
@@ -317,6 +460,88 @@ function updateStatsUI(stats) {
   setElemText('stat-drm-count', stats.drmStreamsCount || 0);
   setElemText('stat-vod-count', stats.vodShowsCount || 0);
   setElemText('stat-episodes-count', stats.totalEpisodes || 0);
+
+  // App User Analytics Counters (100% Balanced Math)
+  const analytics = stats.analytics || {};
+  setElemText('stat-installs-count', stats.totalInstalls != null ? stats.totalInstalls : (analytics.totalInstalls || 0));
+  setElemText('stat-active-now', stats.activeNow != null ? stats.activeNow : (analytics.activeNow || 0));
+  setElemText('stat-dau-count', stats.dau != null ? stats.dau : (analytics.dau || 0));
+  setElemText('stat-uninstalled-count', stats.uninstalled != null ? stats.uninstalled : (analytics.uninstalled || 0));
+  setElemText('stat-retention-rate', stats.retentionRate || analytics.retentionRate || '100%');
+}
+
+let devicesViewOpen = false;
+function toggleDevicesView() {
+  devicesViewOpen = !devicesViewOpen;
+  const panel = document.getElementById('devices-view-panel');
+  const btnText = document.getElementById('toggle-devices-btn-text');
+  if (panel) {
+    if (devicesViewOpen) {
+      panel.classList.remove('hidden');
+      if (btnText) btnText.textContent = 'Hide Devices';
+      fetchDevicesList();
+    } else {
+      panel.classList.add('hidden');
+      if (btnText) btnText.textContent = 'View Connected Devices';
+    }
+  }
+}
+
+async function fetchDevicesList() {
+  const container = document.getElementById('devices-list-container');
+  const countSpan = document.getElementById('devices-list-count');
+  if (!container) return;
+  try {
+    const res = await apiRequest('/api/devices');
+    if (res && res.success && Array.isArray(res.data)) {
+      if (countSpan) countSpan.textContent = res.data.length;
+      if (res.data.length === 0) {
+        container.innerHTML = '<div class="p-4 text-center text-slate-500">No active devices recorded yet.</div>';
+        return;
+      }
+      container.innerHTML = res.data.map((dev, idx) => {
+        const statusBadge = dev.isOnline
+          ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">🟢 Online Now</span>'
+          : '<span class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px] font-medium">⚪ Offline</span>';
+
+        const lastSeenAgo = getTimeAgo(dev.lastSeen);
+        return `
+          <div class="p-3 flex items-center justify-between hover:bg-slate-900/60 transition gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="text-slate-600 font-mono text-[11px] w-5 text-right">${idx + 1}.</span>
+              <div class="min-w-0">
+                <div class="text-white font-semibold truncate text-xs flex items-center gap-2">
+                  <span>${dev.deviceModel || 'Android Device'}</span>
+                  ${statusBadge}
+                </div>
+                <div class="text-[11px] text-slate-400 truncate mt-0.5 font-mono">
+                  IP: ${dev.ip || 'Unknown'} &bull; ${dev.requestsCount || 1} requests
+                </div>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="text-[11px] text-slate-400">${lastSeenAgo}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  } catch (e) {
+    if (container) container.innerHTML = '<div class="p-4 text-center text-red-400">Failed to load devices</div>';
+  }
+}
+
+function getTimeAgo(dateStr) {
+  if (!dateStr) return 'Unknown';
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  if (diffSec < 60) return 'Just now';
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+  const diffDays = Math.floor(diffHr / 24);
+  return `${diffDays}d ago`;
 }
 
 async function fetchMatches() {
@@ -340,7 +565,7 @@ async function fetchCategories(forceRefresh = false) {
     const res = await apiRequest(url);
     if (res && res.success) {
       state.categories = res.data;
-      if (forceRefresh) showToast('Categories refreshed from Google Drive!', 'success');
+      if (forceRefresh) showToast('Categories refreshed from Admin Panel Database!', 'success');
     } else {
       state.categories = defaultSampleData.categories;
     }
@@ -389,7 +614,7 @@ function renderOverviewLiveList() {
 
   if (liveMatches.length === 0) {
     container.innerHTML = `
-      <div class="col-span-2 p-8 text-center bg-slate-900/40 rounded-xl border border-slate-800">
+      <div class="col-span-2 p-8 text-center bg-slate-900/40 rounded-2xl border border-slate-800">
         <i class="fa-solid fa-satellite text-3xl text-slate-500 mb-2"></i>
         <h4 class="font-bold text-slate-300">No matches are streaming live right now</h4>
         <p class="text-xs text-slate-400 mt-1">Click "Add Live Event" to create a match and start streaming.</p>
@@ -400,21 +625,62 @@ function renderOverviewLiveList() {
 
   container.innerHTML = liveMatches.map(m => {
     const streamsCount = m.streams?.length || 0;
+    const defaultBanner = 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=80';
+    const banner = (m.bannerUrl && m.bannerUrl.trim().length > 5) ? m.bannerUrl.trim() : defaultBanner;
+    const t1Flag = m.team1?.flag || (m.team1?.name?.toLowerCase().includes('india') ? '🇮🇳' : (m.team1?.name?.toLowerCase().includes('pak') ? '🇵🇰' : '🏏'));
+    const t2Flag = m.team2?.flag || (m.team2?.name?.toLowerCase().includes('pak') ? '🇵🇰' : (m.team2?.name?.toLowerCase().includes('india') ? '🇮🇳' : '🏏'));
+
     return `
-      <div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 hover:border-emerald-500/40 transition">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">${m.category}</span>
-          <div class="live-indicator"><span class="live-dot"></span> LIVE</div>
-        </div>
-        <h4 class="font-bold text-white text-base">${m.title}</h4>
-        <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80 text-xs">
-          <div class="text-slate-300 font-medium flex items-center gap-2">
-            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold">${m.team1?.name || 'Live Broadcast'}</span>
-            ${m.team2?.name ? `<span class="text-slate-500 font-bold">vs</span><span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-semibold">${m.team2.name}</span>` : ''}
+      <div class="rounded-2xl overflow-hidden bg-slate-900/90 border border-slate-800 hover:border-orange-500/50 transition-all duration-300 shadow-xl group flex flex-col">
+        <!-- Full-Bleed Top Banner Photo -->
+        <div class="w-full h-48 relative overflow-hidden bg-slate-950">
+          <img src="${banner}" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='${defaultBanner}'">
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-black/30"></div>
+          
+          <!-- Top Floating Badges -->
+          <div class="absolute top-3 left-3 right-3 flex items-center justify-between">
+            <span class="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-orange-500/40 text-[11px] font-black text-amber-300 tracking-wider flex items-center gap-1.5 shadow-md">
+              <i class="fa-solid fa-trophy text-amber-400"></i> ${m.category || 'LIVE EVENT'} • ${m.matchFormat || 'T20'}
+            </span>
+            <span class="px-2.5 py-1 rounded-full bg-red-600 text-white text-[10px] font-black tracking-widest uppercase flex items-center gap-1.5 shadow-lg shadow-red-600/40 animate-pulse">
+              <span class="w-2 h-2 rounded-full bg-white"></span> LIVE NOW
+            </span>
           </div>
-          <button onclick="openStreamsModal('${m._id}')" class="text-emerald-400 hover:underline font-semibold flex items-center gap-1">
-            <i class="fa-solid fa-server"></i> ${streamsCount} Streams &rarr;
-          </button>
+
+          <!-- Bottom Banner Title & Time -->
+          <div class="absolute bottom-3 left-3 right-3">
+            <h4 class="font-black text-white text-base md:text-lg tracking-tight leading-tight drop-shadow-md truncate">${m.title}</h4>
+            <p class="text-[11px] text-slate-300 font-medium flex items-center gap-1.5 mt-0.5">
+              <i class="fa-regular fa-clock text-orange-400"></i> ${m.startTime || 'Streaming Live'}
+            </p>
+          </div>
+        </div>
+
+        <!-- Teams Arena & Stream Actions -->
+        <div class="p-4 space-y-3 flex-1 flex flex-col justify-between">
+          <!-- Teams Row -->
+          <div class="bg-slate-950/70 rounded-xl p-2.5 border border-slate-800/80 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2 font-bold text-white min-w-0 flex-1 truncate">
+              <span class="text-base">${t1Flag}</span>
+              <span class="truncate">${m.team1?.name || 'Team 1'}</span>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30 font-black text-[10px] shrink-0 mx-2">VS</span>
+            <div class="flex items-center gap-2 font-bold text-white min-w-0 flex-1 justify-end truncate">
+              <span class="truncate">${m.team2?.name || 'Live Broadcast'}</span>
+              <span class="text-base">${t2Flag}</span>
+            </div>
+          </div>
+
+          <!-- Footer Actions -->
+          <div class="flex items-center justify-between pt-2 border-t border-slate-800/80 text-xs">
+            <span class="text-slate-400 font-medium flex items-center gap-1.5">
+              <i class="fa-solid fa-server text-emerald-400"></i>
+              <strong class="text-white">${streamsCount}</strong> Servers Available
+            </span>
+            <button onclick="openStreamsModal('${m._id}')" class="px-3 py-1.5 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500 hover:text-slate-950 font-bold text-xs flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-play"></i> Watch / Manage Streams
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -457,11 +723,11 @@ async function triggerGdriveSync() {
   if (btn1) { btn1.disabled = true; btn1.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing Channels...'; }
   if (btn2) { btn2.disabled = true; btn2.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing...'; }
 
-  showToast('Connecting to Google Drive and syncing all channels across categories...', 'info');
+  showToast('Syncing all channels across categories in Database...', 'info');
 
   try {
     const res = await apiRequest('/api/sync/gdrive', 'POST');
-    showToast(res.message || 'Google Drive channels synced successfully!', 'success');
+    showToast(res.message || 'Channels synced successfully!', 'success');
     await fetchCategories();
     await fetchMatches();
     await fetchDashboardStats();
@@ -577,91 +843,125 @@ function renderMatchesList() {
 
   container.innerHTML = pageItems.map(m => {
     const isLive = m.status === 'LIVE';
-    const statusColor = isLive ? 'bg-red-500/20 text-red-400 border-red-500/30' : (m.status === 'UPCOMING' ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30' : 'bg-slate-700/30 text-slate-400 border-slate-700');
+    const statusColor = isLive
+      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30 animate-pulse'
+      : (m.status === 'UPCOMING' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'bg-slate-800 text-slate-400 border border-slate-700');
+    
     const streams = m.streams || [];
+    const defaultBanner = 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=80';
+    const banner = (m.bannerUrl && m.bannerUrl.trim().length > 5) ? m.bannerUrl.trim() : defaultBanner;
+    const t1Flag = m.team1?.flag || (m.team1?.name?.toLowerCase().includes('india') ? '🇮🇳' : (m.team1?.name?.toLowerCase().includes('pak') ? '🇵🇰' : '🏏'));
+    const t2Flag = m.team2?.flag || (m.team2?.name?.toLowerCase().includes('pak') ? '🇵🇰' : (m.team2?.name?.toLowerCase().includes('india') ? '🇮🇳' : '🏏'));
 
     return `
-      <div class="glass-panel p-5 space-y-4 relative overflow-hidden group">
-        <!-- Card Top Bar -->
-        <div class="flex items-center justify-between">
-          <label class="flex items-center gap-2.5 cursor-pointer select-none">
-            <input type="checkbox" class="match-select-checkbox w-4 h-4 rounded accent-emerald-500 cursor-pointer" value="${m._id}" onchange="updateSelectedMatchesCount()">
-            <span class="text-xs font-bold text-slate-400">${m.category}</span>
-            ${m.isPinned ? '<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30"><i class="fa-solid fa-thumbtack"></i> PINNED</span>' : ''}
-          </label>
-          <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${statusColor} flex items-center gap-1">
-            ${isLive ? '<span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>' : ''}
-            ${m.status}
-          </span>
-        </div>
+      <div class="rounded-3xl overflow-hidden bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 hover:border-orange-500/50 transition-all duration-300 shadow-2xl space-y-0 group">
+        
+        <!-- FULL-BLEED HERO MATCH BANNER PHOTO -->
+        <div class="w-full h-52 sm:h-60 relative overflow-hidden bg-slate-950">
+          <img src="${banner}" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" onerror="this.src='${defaultBanner}'">
+          
+          <!-- Cinema Vignette Gradient -->
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-black/40"></div>
+          
+          <!-- Top Controls Overlay -->
+          <div class="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between">
+            <label class="flex items-center gap-2 cursor-pointer select-none bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 shadow-md">
+              <input type="checkbox" class="match-select-checkbox w-4 h-4 rounded accent-orange-500 cursor-pointer" value="${m._id}" onchange="updateSelectedMatchesCount()">
+              <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-trophy text-amber-400"></i> ${m.category || 'Live Event'}
+              </span>
+              ${m.isPinned ? '<span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-amber-500 text-black">PINNED</span>' : ''}
+            </label>
 
-        <!-- Full-Width Banner Image -->
-        ${m.bannerUrl ? `
-          <div class="w-full h-44 rounded-xl overflow-hidden relative border border-slate-800 shadow-lg">
-            <img src="${m.bannerUrl}" alt="${m.title}" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
-          </div>
-        ` : ''}
-
-        <!-- Title & Format -->
-        <div>
-          <h4 class="text-lg font-extrabold text-white group-hover:text-emerald-400 transition leading-snug">${m.title}</h4>
-          <p class="text-xs text-slate-400 mt-0.5 font-medium">${m.matchFormat || 'T20'} • ${m.startTime || 'Scheduled'}</p>
-        </div>
-
-        <!-- Teams / Participants Box (Clean - No Scoreboard) -->
-        <div class="bg-slate-900/90 rounded-xl p-3 border border-slate-800 flex items-center justify-between text-xs">
-          <span class="font-bold text-slate-200 flex items-center gap-1.5">
-            <span>${m.team1?.flag || '📺'}</span> ${m.team1?.name || 'Channel / Team 1'}
-          </span>
-          ${m.team2?.name ? `
-            <span class="text-slate-500 font-bold px-2">VS</span>
-            <span class="font-bold text-slate-200 flex items-center gap-1.5">
-              <span>${m.team2?.flag || '🔴'}</span> ${m.team2?.name}
+            <span class="text-[11px] font-black px-3 py-1 rounded-full ${statusColor} uppercase tracking-wider flex items-center gap-1.5">
+              ${isLive ? '<span class="w-2 h-2 rounded-full bg-white"></span>' : ''}
+              ${m.status}
             </span>
-          ` : ''}
-        </div>
-
-        <!-- Streams Accordion Summary -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between text-xs font-bold text-slate-400">
-            <span>Streaming Servers (${streams.length})</span>
-            <button onclick="openStreamsModal('${m._id}')" class="text-emerald-400 hover:underline">
-              <i class="fa-solid fa-plus-circle"></i> Add / Edit Streams
-            </button>
           </div>
 
-          <div class="flex flex-wrap gap-1.5">
-            ${streams.length === 0 ? '<span class="text-xs text-slate-500 italic">No streaming links added yet.</span>' :
-        streams.map(s => `
-                <div class="stream-badge text-xs">
-                  <span class="w-2 h-2 rounded-full ${s.isActive ? 'bg-emerald-400' : 'bg-slate-600'}"></span>
-                  <span class="font-semibold text-slate-200">${s.title}</span>
-                  ${s.drm?.enabled ? '<span class="drm-pill">DRM</span>' : ''}
-                  <button onclick="previewStream('${s.streamUrl}', '${s.streamType}')" title="Preview Stream" class="ml-1 text-emerald-400 hover:text-white">
-                    <i class="fa-solid fa-play"></i>
-                  </button>
-                </div>
-              `).join('')
-      }
+          <!-- Bottom Title & Match Meta -->
+          <div class="absolute bottom-3.5 left-3.5 right-3.5">
+            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight drop-shadow-md leading-tight">${m.title}</h3>
+            <div class="flex items-center gap-3 text-xs text-slate-300 font-medium mt-1">
+              <span class="px-2 py-0.5 rounded-md bg-white/15 backdrop-blur-md text-amber-300 font-bold border border-white/10">${m.matchFormat || 'T20 Match'}</span>
+              <span>•</span>
+              <span class="flex items-center gap-1"><i class="fa-regular fa-clock text-orange-400"></i> ${m.startTime || 'Live'}</span>
+            </div>
           </div>
         </div>
 
-        <!-- Card Action Footer -->
-        <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
-          <div class="flex items-center gap-1.5">
-            <button onclick="quickToggleStatus('${m._id}', '${isLive ? 'FINISHED' : 'LIVE'}')" class="btn-ghost text-xs py-1 px-2.5">
-              ${isLive ? '<i class="fa-solid fa-stop text-red-400"></i> Finish' : '<i class="fa-solid fa-play text-emerald-400"></i> Go Live'}
-            </button>
+        <!-- TEAMS ARENA (India vs Pakistan Style) -->
+        <div class="p-5 space-y-4">
+          <div class="bg-slate-950/90 rounded-2xl p-3.5 border border-slate-800/90 flex items-center justify-between shadow-inner">
+            <!-- Team 1 -->
+            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+              <span class="text-2xl drop-shadow">${t1Flag}</span>
+              <div class="min-w-0 truncate">
+                <h5 class="text-sm font-black text-white truncate">${m.team1?.name || 'Team 1'}</h5>
+                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Home / Team A</span>
+              </div>
+            </div>
+
+            <!-- VS Badge -->
+            <div class="px-3 py-1 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-black text-xs shrink-0 mx-3 shadow-md shadow-orange-500/30">
+              VS
+            </div>
+
+            <!-- Team 2 -->
+            <div class="flex items-center gap-2.5 min-w-0 flex-1 justify-end text-right">
+              <div class="min-w-0 truncate">
+                <h5 class="text-sm font-black text-white truncate">${m.team2?.name || 'Live Broadcast'}</h5>
+                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Away / Team B</span>
+              </div>
+              <span class="text-2xl drop-shadow">${t2Flag}</span>
+            </div>
           </div>
 
-          <div class="flex items-center gap-1">
-            <button onclick="editMatch('${m._id}')" class="btn-ghost text-xs p-2" title="Edit Event Details">
-              <i class="fa-solid fa-pen-to-square text-cyan-400"></i>
+          <!-- Streaming Servers & ClearKey DRM Chips -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-300">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-server text-orange-400"></i> Streaming Servers (${streams.length})
+              </span>
+              <button onclick="openStreamsModal('${m._id}')" class="text-orange-400 hover:text-orange-300 text-xs font-bold flex items-center gap-1">
+                <i class="fa-solid fa-plus-circle"></i> Add / Edit Streams
+              </button>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              ${streams.length === 0 ? '<span class="text-xs text-slate-500 italic p-2 rounded-lg bg-slate-950/50 border border-slate-800 w-full block">No stream links added yet. Click above to add streaming servers.</span>' :
+                streams.map(s => `
+                  <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-xs hover:border-orange-500/40 transition">
+                    <span class="w-2 h-2 rounded-full ${s.isActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}"></span>
+                    <span class="font-bold text-slate-200">${s.title}</span>
+                    <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">${s.streamType || 'HLS'}</span>
+                    ${s.drm?.enabled ? '<span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 text-[10px] font-bold border border-amber-500/30">DRM</span>' : ''}
+                    <button onclick="previewStream('${s.streamUrl}', '${s.streamType}')" title="Preview Stream" class="ml-1 text-orange-400 hover:text-white transition">
+                      <i class="fa-solid fa-circle-play text-sm"></i>
+                    </button>
+                  </div>
+                `).join('')
+              }
+            </div>
+          </div>
+
+          <!-- Card Action Footer -->
+          <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+            <button onclick="quickToggleStatus('${m._id}', '${isLive ? 'FINISHED' : 'LIVE'}')" class="px-3.5 py-1.5 rounded-xl ${isLive ? 'bg-rose-950/60 text-rose-400 border border-rose-800 hover:bg-rose-900' : 'bg-emerald-950/60 text-emerald-400 border border-emerald-800 hover:bg-emerald-900'} text-xs font-bold flex items-center gap-1.5 transition">
+              ${isLive ? '<i class="fa-solid fa-stop"></i> End Broadcast' : '<i class="fa-solid fa-play"></i> Set Live Now'}
             </button>
-            <button onclick="deleteMatch('${m._id}')" class="btn-ghost text-xs p-2 hover:bg-red-500/20" title="Delete Event">
-              <i class="fa-solid fa-trash text-red-400"></i>
-            </button>
+
+            <div class="flex items-center gap-1.5">
+              <button onclick="openStreamsModal('${m._id}')" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 transition" title="Manage Streams">
+                <i class="fa-solid fa-sliders text-orange-400"></i> Streams
+              </button>
+              <button onclick="editMatch('${m._id}')" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 transition" title="Edit Match">
+                <i class="fa-solid fa-pen-to-square text-cyan-400"></i> Edit
+              </button>
+              <button onclick="deleteMatch('${m._id}')" class="px-3 py-1.5 rounded-xl bg-rose-950/40 hover:bg-rose-900 text-rose-400 hover:text-white border border-rose-800 text-xs font-bold transition" title="Delete Match">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -740,7 +1040,7 @@ function renderCategoriesTable() {
   if (!tbody) return;
 
   if (!state.categories || state.categories.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">Loading categories from Google Drive feed...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500">Loading categories from Admin Database...</td></tr>`;
     return;
   }
 
@@ -777,12 +1077,18 @@ function renderCategoriesTable() {
         </span>
       </td>
       <td class="p-4 text-right">
-        <div class="flex items-center justify-end gap-2">
+        <div class="flex items-center justify-end gap-1.5">
           ${c.m3uLink ? `
-            <a href="${c.m3uLink}" target="_blank" class="px-3 py-1.5 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
-              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i> Test Link
+            <a href="${c.m3uLink}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 border border-cyan-500/30 text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Test M3U Stream">
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
             </a>
           ` : ''}
+          <button onclick="openEditCategoryModal('${c._id || c.id}')" class="px-2.5 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 border border-blue-500/30 text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Edit Category">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+          <button onclick="deleteCategory('${c._id || c.id}')" class="px-2.5 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Delete Category">
+            <i class="fa-solid fa-trash"></i>
+          </button>
         </div>
       </td>
     </tr>
@@ -858,6 +1164,8 @@ function populateCategoryDropdowns() {
 
 function populateSettingsInputs(settings) {
   setInputValue('setting-announcement', settings.announcement || '');
+  const annEnabled = document.getElementById('setting-announcement-enabled');
+  if (annEnabled) annEnabled.checked = settings.announcementEnabled !== false;
   setInputValue('setting-app-version', settings.appVersion || '2.0.0');
   setInputValue('setting-apk-url', settings.apkDownloadUrl || '');
   const maint = document.getElementById('setting-maintenance');
@@ -946,17 +1254,67 @@ function closeModal(id) {
   if (m) m.classList.remove('active');
 }
 
+function updateModalBannerPreview(url) {
+  const box = document.getElementById('modal-banner-preview-box');
+  const img = document.getElementById('modal-banner-preview-img');
+  if (!box || !img) return;
+  const cleanUrl = (url || '').trim();
+  if (cleanUrl && (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://'))) {
+    img.src = cleanUrl;
+    box.classList.remove('hidden');
+  } else {
+    box.classList.add('hidden');
+    img.src = '';
+  }
+}
+
+function updateTeamLogoPreview(teamNum, val) {
+  const box = document.getElementById(`team${teamNum}-logo-preview-box`);
+  if (!box) return;
+  const cleanVal = (val || '').trim();
+  if (cleanVal.startsWith('http://') || cleanVal.startsWith('https://')) {
+    box.innerHTML = `<img src="${cleanVal}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<span class=\\'text-xs\\'>T${teamNum}</span>'">`;
+  } else if (cleanVal) {
+    box.innerHTML = `<span class="text-sm font-bold">${cleanVal}</span>`;
+  } else {
+    box.innerHTML = `<span class="text-xs text-slate-400">T${teamNum}</span>`;
+  }
+}
+
+function applyIndiaVsPakistanPreset() {
+  setInputValue('match-title', 'India vs Pakistan - ICC Champions Trophy 2025');
+  setInputValue('match-status', 'LIVE');
+  setInputValue('match-format', 'ODI Live • 1080p HD');
+  setInputValue('match-team1-name', 'India');
+  setInputValue('match-team1-logo', 'https://flagcdn.com/w160/in.png');
+  updateTeamLogoPreview('1', 'https://flagcdn.com/w160/in.png');
+  setInputValue('match-team2-name', 'Pakistan');
+  setInputValue('match-team2-logo', 'https://flagcdn.com/w160/pk.png');
+  updateTeamLogoPreview('2', 'https://flagcdn.com/w160/pk.png');
+  setInputValue('match-start-time', 'LIVE NOW • 2nd Inning');
+  const indiaVsPakBanner = 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200&auto=format&fit=crop';
+  setInputValue('match-banner', indiaVsPakBanner);
+  updateModalBannerPreview(indiaVsPakBanner);
+  showToast('🇮🇳 vs 🇵🇰 India vs Pakistan preset applied with team photos!', 'info');
+}
+
 function openNewMatchModal() {
   document.getElementById('match-modal-title').textContent = 'Add New Live Event';
   document.getElementById('form-match').reset();
   document.getElementById('match-edit-id').value = '';
+  setInputValue('match-team1-logo', '');
+  updateTeamLogoPreview('1', '');
+  setInputValue('match-team2-logo', '');
+  updateTeamLogoPreview('2', '');
   setInputValue('match-stream-url', '');
   setInputValue('match-cookie-value', '');
   setInputValue('match-referer-value', '');
   setInputValue('match-origin-value', '');
   setInputValue('match-drm-license-url', '');
+  populateClearKeyBoxes('', 'match');
   setInputValue('match-user-agent', 'Default');
   setInputValue('match-drm-scheme', 'clearkey');
+  updateModalBannerPreview('');
   openModal('modal-match');
 }
 
@@ -971,9 +1329,16 @@ function editMatch(id) {
   setInputValue('match-status', m.status);
   setInputValue('match-format', m.matchFormat);
   setInputValue('match-start-time', m.startTime);
-  setInputValue('match-banner', m.bannerUrl);
+  setInputValue('match-banner', m.bannerUrl || '');
+  updateModalBannerPreview(m.bannerUrl || '');
   setInputValue('match-team1-name', m.team1?.name || '');
+  const t1Logo = m.team1?.logo || m.team1?.flag || '';
+  setInputValue('match-team1-logo', t1Logo);
+  updateTeamLogoPreview('1', t1Logo);
   setInputValue('match-team2-name', m.team2?.name || '');
+  const t2Logo = m.team2?.logo || m.team2?.flag || '';
+  setInputValue('match-team2-logo', t2Logo);
+  updateTeamLogoPreview('2', t2Logo);
 
   const pinned = document.getElementById('match-pinned');
   if (pinned) pinned.checked = Boolean(m.isPinned);
@@ -986,6 +1351,7 @@ function editMatch(id) {
     setInputValue('match-origin-value', firstStream.headers?.origin || '');
     const drmLic = firstStream.drm?.licenseUrl || firstStream.drm?.key || (firstStream.drm?.keyId ? `${firstStream.drm.keyId}:${firstStream.drm.key}` : '');
     setInputValue('match-drm-license-url', drmLic);
+    populateClearKeyBoxes(drmLic, 'match');
     const ua = firstStream.headers?.userAgent || '';
     setInputValue('match-user-agent', ua.includes('Hotstar') ? 'Hotstar' : (ua.includes('Jio') ? 'JioCinema' : (ua.includes('Exo') ? 'ExoPlayer' : (ua.includes('Chrome') || ua.includes('Mozilla') ? 'Chrome' : 'Default'))));
     setInputValue('match-drm-scheme', firstStream.drm?.scheme || (firstStream.drm?.enabled ? 'clearkey' : 'none'));
@@ -1006,20 +1372,27 @@ async function handleSaveMatch(e) {
   e.preventDefault();
   const id = document.getElementById('match-edit-id').value;
 
+  const bannerVal = document.getElementById('match-banner').value.trim();
+  const defaultSportsBanner = 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200&auto=format&fit=crop';
+
   const payload = {
     title: document.getElementById('match-title').value.trim(),
     category: document.getElementById('match-category').value,
     status: document.getElementById('match-status').value,
     matchFormat: document.getElementById('match-format').value.trim() || 'T20',
     startTime: document.getElementById('match-start-time').value.trim() || new Date().toISOString(),
-    bannerUrl: document.getElementById('match-banner').value.trim(),
+    bannerUrl: bannerVal || defaultSportsBanner,
     isPinned: document.getElementById('match-pinned')?.checked || false,
     team1: {
       name: document.getElementById('match-team1-name')?.value.trim() || 'Team 1',
+      flag: document.getElementById('match-team1-logo')?.value.trim() || '',
+      logo: document.getElementById('match-team1-logo')?.value.trim() || '',
       score: ''
     },
     team2: {
       name: document.getElementById('match-team2-name')?.value.trim() || '',
+      flag: document.getElementById('match-team2-logo')?.value.trim() || '',
+      logo: document.getElementById('match-team2-logo')?.value.trim() || '',
       score: ''
     }
   };
@@ -1029,9 +1402,23 @@ async function handleSaveMatch(e) {
     const cookieVal = document.getElementById('match-cookie-value')?.value.trim() || '';
     const refererVal = document.getElementById('match-referer-value')?.value.trim() || '';
     const originVal = document.getElementById('match-origin-value')?.value.trim() || '';
-    const drmLicUrl = document.getElementById('match-drm-license-url')?.value.trim() || '';
+    let drmLicUrl = document.getElementById('match-drm-license-url')?.value.trim() || '';
+    const mKeyId1 = document.getElementById('match-clearkey-id1')?.value.trim() || '';
+    const mKeyVal1 = document.getElementById('match-clearkey-key1')?.value.trim() || '';
+    const mKeyId2 = document.getElementById('match-clearkey-id2')?.value.trim() || '';
+    const mKeyVal2 = document.getElementById('match-clearkey-key2')?.value.trim() || '';
+
+    // Auto-combine separate ClearKey boxes into KeyID:Key format
+    const combinedMatchDrm = combineClearKeys(drmLicUrl, mKeyId1, mKeyVal1, mKeyId2, mKeyVal2);
+    if (combinedMatchDrm) {
+      drmLicUrl = combinedMatchDrm;
+    }
+
     const userAgentVal = document.getElementById('match-user-agent')?.value || 'Default';
-    const drmSchemeVal = document.getElementById('match-drm-scheme')?.value || 'clearkey';
+    let drmSchemeVal = document.getElementById('match-drm-scheme')?.value || 'clearkey';
+    if ((mKeyId1 && mKeyVal1) || (mKeyId2 && mKeyVal2) || mKeyId1) {
+      if (drmSchemeVal === 'none') drmSchemeVal = 'clearkey';
+    }
 
     let finalUa = '';
     if (userAgentVal === 'Hotstar') finalUa = 'HotstarMobile/12.5.0 (Android 14; Mobile)';
@@ -1040,27 +1427,38 @@ async function handleSaveMatch(e) {
     else if (userAgentVal === 'Chrome') finalUa = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0';
     else if (userAgentVal !== 'Default') finalUa = userAgentVal;
 
-    let isDrm = Boolean(drmLicUrl && drmSchemeVal !== 'none');
+    let isDrm = Boolean((drmLicUrl || mKeyId1 || mKeyVal1) && drmSchemeVal !== 'none');
     let keyId = '';
     let key = '';
     let licenseUrl = '';
     if (drmLicUrl) {
-      // Format: KID:KEY hex pair (e.g. "abc123:def456") - only if NOT a URL
       if (!drmLicUrl.startsWith('http') && drmLicUrl.includes(':')) {
         const colonIdx = drmLicUrl.indexOf(':');
         keyId = drmLicUrl.substring(0, colonIdx).trim();
         key = drmLicUrl.substring(colonIdx + 1).trim();
+        licenseUrl = drmLicUrl.trim();
       } else {
-        // It's a license URL (Widevine / ClearKey endpoint)
-        licenseUrl = drmLicUrl;
-        key = drmLicUrl;
+        licenseUrl = drmLicUrl.trim();
+        key = drmLicUrl.trim();
+        keyId = drmLicUrl.trim();
       }
+    } else if (mKeyId1 && mKeyVal1) {
+      keyId = mKeyId1.trim();
+      key = mKeyVal1.trim();
+      licenseUrl = `${keyId}:${key}`;
+    } else if (mKeyId1) {
+      keyId = mKeyId1.trim();
+      key = mKeyId1.trim();
+      licenseUrl = mKeyId1.trim();
     }
+
+    const lowerStreamUrl = streamUrlInput.toLowerCase();
+    const detectedStreamType = (lowerStreamUrl.includes('.mpd') || lowerStreamUrl.includes('/dash/')) ? 'MPD' : (lowerStreamUrl.includes('.mp4') ? 'MP4' : 'M3U8');
 
     const streamObj = {
       id: 'str_' + Math.random().toString(36).substr(2, 9),
       title: payload.title || 'Live Stream Server',
-      streamType: streamUrlInput.includes('.mpd') ? 'MPD' : 'M3U8',
+      streamType: detectedStreamType,
       streamUrl: streamUrlInput,
       quality: '1080p HD',
       headers: {
@@ -1153,6 +1551,7 @@ function openStreamsModal(matchId) {
   document.getElementById('stream-modal-match-title').textContent = match.title;
 
   renderStreamsModalList(match);
+  populateClearKeyBoxes('', 'stream');
   openModal('modal-streams');
 }
 
@@ -1246,9 +1645,23 @@ async function handleSaveStream(e) {
   const cookieVal = document.getElementById('stream-cookie')?.value.trim() || '';
   const refererVal = document.getElementById('stream-referer')?.value.trim() || '';
   const originVal = document.getElementById('stream-origin')?.value.trim() || '';
-  const drmLicUrl = document.getElementById('stream-drm-license-url')?.value.trim() || '';
+  let drmLicUrl = document.getElementById('stream-drm-license-url')?.value.trim() || '';
+  const sKeyId1 = document.getElementById('stream-clearkey-id1')?.value.trim() || '';
+  const sKeyVal1 = document.getElementById('stream-clearkey-key1')?.value.trim() || '';
+  const sKeyId2 = document.getElementById('stream-clearkey-id2')?.value.trim() || '';
+  const sKeyVal2 = document.getElementById('stream-clearkey-key2')?.value.trim() || '';
+
+  // Auto-combine separate ClearKey boxes into KeyID:Key format
+  const combinedStreamDrm = combineClearKeys(drmLicUrl, sKeyId1, sKeyVal1, sKeyId2, sKeyVal2);
+  if (combinedStreamDrm) {
+    drmLicUrl = combinedStreamDrm;
+  }
+
   const userAgentVal = document.getElementById('stream-user-agent')?.value || 'Default';
-  const drmSchemeVal = document.getElementById('stream-drm-scheme')?.value || 'clearkey';
+  let drmSchemeVal = document.getElementById('stream-drm-scheme')?.value || 'clearkey';
+  if ((sKeyId1 && sKeyVal1) || (sKeyId2 && sKeyVal2) || sKeyId1) {
+    if (drmSchemeVal === 'none') drmSchemeVal = 'clearkey';
+  }
 
   let finalUa = '';
   if (userAgentVal === 'Hotstar') finalUa = 'HotstarMobile/12.5.0 (Android 14; Mobile)';
@@ -1257,7 +1670,7 @@ async function handleSaveStream(e) {
   else if (userAgentVal === 'Chrome') finalUa = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0';
   else if (userAgentVal !== 'Default') finalUa = userAgentVal;
 
-  let isDrm = Boolean(drmLicUrl && drmSchemeVal !== 'none');
+  let isDrm = Boolean((drmLicUrl || sKeyId1 || sKeyVal1) && drmSchemeVal !== 'none');
   let keyId = '';
   let key = '';
   let licenseUrl = '';
@@ -1266,15 +1679,28 @@ async function handleSaveStream(e) {
       const parts = drmLicUrl.split(':');
       keyId = parts[0].trim();
       key = parts[1].trim();
+      licenseUrl = drmLicUrl.trim();
     } else {
-      licenseUrl = drmLicUrl;
-      key = drmLicUrl;
+      licenseUrl = drmLicUrl.trim();
+      key = drmLicUrl.trim();
+      keyId = drmLicUrl.trim();
     }
+  } else if (sKeyId1 && sKeyVal1) {
+    keyId = sKeyId1.trim();
+    key = sKeyVal1.trim();
+    licenseUrl = `${keyId}:${key}`;
+  } else if (sKeyId1) {
+    keyId = sKeyId1.trim();
+    key = sKeyId1.trim();
+    licenseUrl = sKeyId1.trim();
   }
+
+  const lowerRaw = rawStreamUrl.toLowerCase();
+  const detectedType = document.getElementById('stream-type')?.value || ((lowerRaw.includes('.mpd') || lowerRaw.includes('/dash/')) ? 'MPD' : 'M3U8');
 
   const payload = {
     title: document.getElementById('stream-title')?.value.trim() || 'Live Stream Server',
-    streamType: document.getElementById('stream-type')?.value || (rawStreamUrl.includes('.mpd') ? 'MPD' : 'M3U8'),
+    streamType: detectedType,
     streamUrl: rawStreamUrl,
     quality: '1080p HD',
     headers: {
@@ -1296,6 +1722,7 @@ async function handleSaveStream(e) {
     const res = await apiRequest(`/api/matches/${matchId}/streams`, 'POST', payload);
     showToast('Streaming server added successfully!', 'success');
     document.getElementById('form-stream').reset();
+    populateClearKeyBoxes('', 'stream');
 
     await fetchMatches();
     await fetchDashboardStats();
@@ -1337,7 +1764,7 @@ async function loadUserGoogleDriveM3u() {
   const gdriveUrl = 'https://drive.google.com/uc?export=download&id=1KxcfPpIjkeRaHWyrN53otPBci5s6FMMO';
   const urlInput = document.getElementById('import-m3u-url');
   if (urlInput) urlInput.value = gdriveUrl;
-  showToast('Loading Google Drive M3U playlists...', 'info');
+  showToast('Loading M3U playlists...', 'info');
 
   try {
     const res = await apiRequest('/api/import/m3u', 'POST', { m3uUrl: gdriveUrl });
@@ -1438,22 +1865,60 @@ function previewStream(url, type) {
 
 // --- CATEGORIES ---
 
+function openNewCategoryModal() {
+  document.getElementById('cat-modal-title').textContent = 'Add New Category';
+  document.getElementById('cat-id').value = '';
+  document.getElementById('cat-name').value = '';
+  document.getElementById('cat-slug').value = '';
+  document.getElementById('cat-m3u').value = '';
+  document.getElementById('cat-image').value = '';
+  document.getElementById('cat-icon').value = 'fas fa-tv';
+  document.getElementById('cat-order').value = (state.categories.length + 1).toString();
+  document.getElementById('cat-submit-btn').textContent = 'Save Category';
+  openModal('modal-category');
+}
+
 function openCategoryModal() {
-  document.getElementById('form-category').reset();
+  openNewCategoryModal();
+}
+
+function openEditCategoryModal(id) {
+  const cat = state.categories.find(c => String(c._id) === String(id) || String(c.id) === String(id));
+  if (!cat) return;
+
+  document.getElementById('cat-modal-title').textContent = 'Edit Category: ' + (cat.name || '');
+  document.getElementById('cat-id').value = cat._id || cat.id || '';
+  document.getElementById('cat-name').value = cat.name || '';
+  document.getElementById('cat-slug').value = cat.slug || '';
+  document.getElementById('cat-m3u').value = cat.m3uLink || '';
+  document.getElementById('cat-image').value = cat.imageUrl || '';
+  document.getElementById('cat-icon').value = cat.icon || 'fas fa-tv';
+  document.getElementById('cat-order').value = (cat.order || 1).toString();
+  document.getElementById('cat-submit-btn').textContent = 'Update Category';
   openModal('modal-category');
 }
 
 async function handleSaveCategory(e) {
   e.preventDefault();
+  const id = document.getElementById('cat-id').value.trim();
   const payload = {
     name: document.getElementById('cat-name').value.trim(),
     slug: document.getElementById('cat-slug').value.trim(),
-    icon: document.getElementById('cat-icon').value.trim()
+    m3uLink: document.getElementById('cat-m3u').value.trim(),
+    imageUrl: document.getElementById('cat-image').value.trim(),
+    icon: document.getElementById('cat-icon').value.trim(),
+    order: parseInt(document.getElementById('cat-order').value) || 1,
+    isActive: true
   };
 
   try {
-    await apiRequest('/api/categories', 'POST', payload);
-    showToast('Category created!', 'success');
+    if (id) {
+      await apiRequest(`/api/categories/${id}`, 'PUT', payload);
+      showToast('Category updated successfully!', 'success');
+    } else {
+      await apiRequest('/api/categories', 'POST', payload);
+      showToast('Category created successfully!', 'success');
+    }
     closeModal('modal-category');
     await fetchCategories();
   } catch (err) {
@@ -1565,8 +2030,11 @@ function saveAdminKey() {
 }
 
 async function saveAppSettings() {
+  const annElem = document.getElementById('setting-announcement');
+  const annEnabledElem = document.getElementById('setting-announcement-enabled');
   const payload = {
-    announcement: document.getElementById('setting-announcement').value.trim(),
+    announcement: annElem ? annElem.value.trim() : '',
+    announcementEnabled: annEnabledElem ? annEnabledElem.checked : true,
     appVersion: document.getElementById('setting-app-version').value.trim(),
     apkDownloadUrl: document.getElementById('setting-apk-url').value.trim(),
     maintenanceMode: document.getElementById('setting-maintenance').checked
@@ -1578,6 +2046,37 @@ async function saveAppSettings() {
     Object.assign(state.settings, payload);
     updateApkQrCode(payload.apkDownloadUrl, payload.appVersion);
     showToast('App settings saved & live in mobile feed!', 'success');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function broadcastNotification(enable) {
+  const annElem = document.getElementById('setting-announcement');
+  const annEnabledElem = document.getElementById('setting-announcement-enabled');
+  if (annEnabledElem) annEnabledElem.checked = enable;
+
+  const msg = annElem ? annElem.value.trim() : '';
+  if (enable && !msg) {
+    showToast('Please enter a notification message first!', 'error');
+    if (annElem) annElem.focus();
+    return;
+  }
+
+  const payload = {
+    announcement: msg,
+    announcementEnabled: enable
+  };
+
+  try {
+    await apiRequest('/api/settings', 'PUT', payload);
+    if (!state.settings) state.settings = {};
+    Object.assign(state.settings, payload);
+    if (enable) {
+      showToast('🚀 Instant Notification Sent to APK! Users will see the alert popup.', 'success');
+    } else {
+      showToast('In-app alert popup turned off for mobile APK.', 'info');
+    }
   } catch (err) {
     showToast(err.message, 'error');
   }
@@ -1631,6 +2130,7 @@ function setInputValue(id, val) {
 function openDirectChannelModal() {
   const form = document.getElementById('form-direct-channel');
   if (form) form.reset();
+  populateClearKeyBoxes('', 'direct');
   const select = document.getElementById('direct-channel-category');
   if (select && state.categories && state.categories.length > 0) {
     select.innerHTML = state.categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
@@ -1684,7 +2184,17 @@ async function handleDirectChannelSave(e) {
   const bannerUrl = document.getElementById('direct-channel-banner').value.trim();
   const drmEnabled = document.getElementById('direct-drm-enable').checked;
   const drmScheme = document.getElementById('direct-drm-scheme').value;
-  const kidKey = document.getElementById('direct-drm-kidkey').value.trim();
+  let kidKey = document.getElementById('direct-drm-kidkey').value.trim();
+  const dKeyId1 = document.getElementById('direct-clearkey-id1')?.value.trim() || '';
+  const dKeyVal1 = document.getElementById('direct-clearkey-key1')?.value.trim() || '';
+  const dKeyId2 = document.getElementById('direct-clearkey-id2')?.value.trim() || '';
+  const dKeyVal2 = document.getElementById('direct-clearkey-key2')?.value.trim() || '';
+
+  // Auto-combine separate ClearKey boxes into KeyID:Key format
+  const combinedDirectDrm = combineClearKeys(kidKey, dKeyId1, dKeyVal1, dKeyId2, dKeyVal2);
+  if (combinedDirectDrm) {
+    kidKey = combinedDirectDrm;
+  }
   const licenseUrl = document.getElementById('direct-drm-license-url').value.trim();
 
   let drm = { enabled: false };

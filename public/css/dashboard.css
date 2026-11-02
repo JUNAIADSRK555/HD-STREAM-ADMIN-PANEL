@@ -415,3 +415,63 @@ h1, h2, h3, h4, h5, h6 {
   color: #ffffff;
 }
 
+/* ========================================================
+   USER PHOTO STYLE: ClearKey DRM Keys (Hex / kid:key) Card
+   ======================================================== */
+.clearkey-drm-card {
+  background-color: #110d1f !important;
+  border: 1.5px solid #6b21a8 !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+  margin-top: 10px !important;
+  box-shadow: 0 4px 20px rgba(107, 33, 168, 0.15) !important;
+}
+
+.clearkey-drm-card-title {
+  color: #c084fc !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 12px !important;
+  letter-spacing: 0.2px !important;
+}
+
+.clearkey-drm-card-title .emoji {
+  font-size: 15px !important;
+}
+
+.clearkey-drm-card-inputs {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+}
+
+.clearkey-drm-input {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 12px 14px !important;
+  background-color: #171324 !important;
+  color: #ffffff !important;
+  border: 1.5px solid #4a4563 !important;
+  border-radius: 10px !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 13px !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.clearkey-drm-input::placeholder {
+  color: #71717a !important;
+  font-size: 12.5px !important;
+  opacity: 0.9 !important;
+}
+
+.clearkey-drm-input:focus {
+  border-color: #a855f7 !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25) !important;
+  background-color: #1c172d !important;
+}
+
+

@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
 const { connectDB } = require('./config/db');
+const Store = require('./services/store');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,8 +33,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Direct APK Download Endpoints (No-Cache so phone always gets the fresh new APK)
 app.get(['/HD-STREAM.apk', '/HD-STREAM-v2-NEW.apk', '/HD-STREAM-release.apk'], (req, res) => {
-  const reqFile = req.path.replace('/', '') || 'HD-STREAM.apk';
-  const apkPath = path.join(__dirname, 'public', reqFile);
+  // Track download event
+  const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '';
+  const userAgent = req.headers['user-agent'] || '';
+  Store.trackApkDownload().catch(() => {});
+  Store.trackDevice(clientIp, userAgent).catch(() => {});
+
+  const reqFile = 'HD-STREAM.apk';
+  const apkPath = path.join(__dirname, 'public', 'HD-STREAM.apk');
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');

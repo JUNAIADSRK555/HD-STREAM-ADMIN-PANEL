@@ -1,8 +1,41 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const Match = require('../models/Match');
 const Category = require('../models/Category');
 const Vod = require('../models/Vod');
 const Settings = require('../models/Settings');
+const { Device, AnalyticsSummary } = require('../models/Analytics');
+
+const inMemoryDevices = new Map();
+let inMemoryApkDownloads = 0; // Real download counter, no fake offset
+
+function parseDeviceModel(ua) {
+  if (!ua) return 'Android Device';
+  if (ua.includes('BRAVIA')) return 'Sony BRAVIA 4K Smart TV';
+  if (ua.includes('AFTSSS')) return 'Amazon Fire TV Cube / 4K';
+  if (ua.includes('AFTT')) return 'Amazon Fire TV Stick';
+  if (ua.includes('H96_Max')) return 'H96 Max 4K Android Box';
+  if (ua.includes('FW-Plus')) return 'FW-Plus 4K TV Box';
+  const match = ua.match(/Android [^;]+;\s*([^;]+?)\s+Build/i);
+  if (match && match[1]) {
+    const raw = match[1].trim();
+    if (raw.startsWith('SM-S948')) return 'Samsung Galaxy S24 Ultra (' + raw + ')';
+    if (raw.startsWith('SM-A')) return 'Samsung Galaxy (' + raw + ')';
+    if (raw.startsWith('RMX')) return 'Realme (' + raw + ')';
+    if (raw.startsWith('CPH')) return 'OPPO / OnePlus (' + raw + ')';
+    if (raw.startsWith('23124RN') || raw.startsWith('23076RN')) return 'Redmi / Xiaomi (' + raw + ')';
+    if (raw.startsWith('M2010J')) return 'Redmi 9 Power (' + raw + ')';
+    if (raw.startsWith('X6812')) return 'Infinix Smart 5 Pro (' + raw + ')';
+    return raw;
+  }
+  return 'Android Phone / TV';
+}
+
+function getDeviceId(ip, userAgent) {
+  const cleanIp = (ip || '').split(',')[0].trim().replace(/^.*:/, '') || 'device';
+  const cleanUa = (userAgent || '').substring(0, 100);
+  return crypto.createHash('sha256').update(`${cleanIp}_${cleanUa}`).digest('hex').substring(0, 16);
+}
 
 // Initial seed data for immediate out-of-the-box demo
 const initialCategories = [
@@ -15,406 +48,11 @@ const initialCategories = [
   { _id: 'cat_afghan', id: 'cat_afghan', name: 'Afghanistan TV', slug: 'afghanistan-tv', icon: 'fas fa-tv', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-i-alUhNqSc08Q7HHJO2i7fCxKxZKBJCXfKf7QymkpmqVhEK4G75wQgs&s=10', m3uLink: 'https://iptv-org.github.io/iptv/countries/af.m3u', order: 7, isActive: true },
   { _id: 'cat_cartoon', id: 'cat_cartoon', name: 'CARTOON MOVIE', slug: 'cartoon-movie', icon: 'fas fa-child', imageUrl: 'https://logos-world.net/wp-content/uploads/2022/06/CMovies-Symbol.png', m3uLink: 'https://drive.google.com/uc?export=download&id=1UZ1M-R5Lx58Hi7qkbi5Ylnf8UirfRFPH', order: 8, isActive: true },
   { _id: 'cat_mxplayer', id: 'cat_mxplayer', name: 'MX PLAYER', slug: 'mx-player', icon: 'fas fa-play', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10', m3uLink: 'https://playlist-by-xfireflix.pages.dev/India/mxplayer', order: 9, isActive: true },
-  { _id: 'cat_yuppytv', id: 'cat_yuppytv', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s', m3uLink: 'https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u', order: 10, isActive: true }
+  { _id: 'cat_yuppytv', id: 'cat_yuppytv', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', imageUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s', m3uLink: 'https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u', order: 10, isActive: true },
+  { _id: 'cat_cinexmovies', id: 'cat_cinexmovies', name: 'CINEX MOVIES', slug: 'cinex-movies', icon: 'fas fa-film', imageUrl: 'https://image.tmdb.org/t/p/w500/dswjf9LMu2DAffcvTBzqYK3pu10.jpg', m3uLink: 'https://stream-admin-backend.vercel.app/api/movies/data.json', order: 11, isActive: true }
 ];
 
-const initialMatches = [
-  {
-    _id: 'match_001',
-    title: 'India vs Pakistan — ICC Champions Trophy 2026',
-    category: 'Live Cricket',
-    status: 'LIVE',
-    matchFormat: 'ODI',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=80',
-    description: 'High voltage super clash live from Dubai International Stadium.',
-    isPinned: true,
-    team1: { name: 'India', shortName: 'IND', flag: '🇮🇳', score: '' },
-    team2: { name: 'Pakistan', shortName: 'PAK', flag: '🇵🇰', score: '' },
-    streams: [
-      {
-        id: 'str_icc_01',
-        title: 'ICC TV — 1080p 60FPS (Hindi Audio)',
-        streamType: 'M3U8',
-        streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-        quality: '1080p HD',
-        headers: {
-          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) JDCRIC-LIVE/1.5',
-          referer: 'https://icctv.official.stream/'
-        },
-        drm: {
-          enabled: false,
-          scheme: 'clearkey',
-          keyId: '',
-          key: ''
-        },
-        isActive: true
-      },
-      {
-        id: 'str_sk_02',
-        title: 'SK Live — Low Latency (English Feed)',
-        streamType: 'M3U8',
-        streamUrl: 'https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8',
-        quality: '720p',
-        headers: {
-          userAgent: 'ExoPlayer-Media3/1.4.0',
-          referer: ''
-        },
-        drm: {
-          enabled: false,
-          scheme: 'clearkey',
-          keyId: '',
-          key: ''
-        },
-        isActive: true
-      },
-      {
-        id: 'str_drm_03',
-        title: 'Star Sports HD — DRM ClearKey Protected (MPD)',
-        streamType: 'MPD',
-        streamUrl: 'https://dash.akamaized.net/dash264/TestCases/1c/qualcomm/1/MultiRate.mpd',
-        quality: '4K Multi-Audio',
-        headers: {
-          userAgent: 'JDCricOTT/2.0',
-          referer: 'https://hotstar.live.stream/'
-        },
-        drm: {
-          enabled: true,
-          scheme: 'clearkey',
-          keyId: 'eb63836f296d4532a4eb52f6d831e674', // Demo ClearKey Key 1 (KID)
-          key: 'a68eed132d1a4e1792617f69208fc440'     // Demo ClearKey Key 2 (Key)
-        },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'match_002',
-    title: 'Australia vs England — The Ashes Day 3',
-    category: 'Live Cricket',
-    status: 'UPCOMING',
-    matchFormat: 'Test',
-    startTime: new Date(Date.now() + 3600000 * 3).toISOString(),
-    bannerUrl: 'https://images.unsplash.com/photo-1531415074868-036b107e775a?auto=format&fit=crop&w=1200&q=80',
-    description: 'The historic Ashes battle continues under sunny skies at Lord’s.',
-    isPinned: false,
-    team1: { name: 'Australia', shortName: 'AUS', flag: '🇦🇺', score: '' },
-    team2: { name: 'England', shortName: 'ENG', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', score: '' },
-    streams: [
-      {
-        id: 'str_aus_01',
-        title: 'Sky Sports Cricket HD',
-        streamType: 'M3U8',
-        streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-        quality: '1080p',
-        headers: { userAgent: '', referer: '' },
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_jiotv_1',
-    title: 'JIO TV+',
-    category: 'JIO TV+',
-    status: 'LIVE',
-    matchFormat: 'Live TV',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s',
-    description: 'JIO TV+ Live Channels VIP Playlist API.',
-    isPinned: true,
-    team1: { name: 'JIO TV+', shortName: 'JIO', flag: '📺', score: '' },
-    team2: { name: 'VIP Stream', shortName: 'LIVE', flag: '🔴', score: '' },
-    streams: [
-      {
-        id: 'str_jio_01',
-        title: 'JIO TV+ VIP Stream',
-        streamType: 'M3U8',
-        streamUrl: 'https://plugxvipplaylist.lovable.app/api/playlist',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_jiotv_2',
-    title: 'JIO TV+ (Server 2)',
-    category: 'JIO TV+',
-    status: 'LIVE',
-    matchFormat: 'Live TV',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s',
-    description: 'JIO TV+ Alternate Live Stream Feed.',
-    isPinned: false,
-    team1: { name: 'JIO TV+ 2', shortName: 'JIO', flag: '📺', score: '' },
-    team2: { name: 'Direct Feed', shortName: 'M3U8', flag: '⚡', score: '' },
-    streams: [
-      {
-        id: 'str_jio_02',
-        title: 'JIO TV 25 Live M3U8',
-        streamType: 'M3U8',
-        streamUrl: 'https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_mixtv',
-    title: 'MIX TV',
-    category: 'MIX TV',
-    status: 'LIVE',
-    matchFormat: 'Live TV',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCm7hdWxlS5fbZ3Do-pqzytQVayxUNHFl5oD5E4TWtQfCnRw2pM2UOa8I&s=10',
-    description: 'MIX TV Live Sports & Entertainment Stream.',
-    isPinned: false,
-    team1: { name: 'MIX TV', shortName: 'MIX', flag: '📺', score: '' },
-    team2: { name: 'StarShare', shortName: 'LIVE', flag: '🔴', score: '' },
-    streams: [
-      {
-        id: 'str_mix_01',
-        title: 'MIX TV Live Feed',
-        streamType: 'M3U8',
-        streamUrl: 'https://streamflexsmm.in/SFlex-StarShare/playlist.php',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_vzy',
-    title: 'VZY',
-    category: 'VZY',
-    status: 'LIVE',
-    matchFormat: 'Live TV',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIYAVnSjMhpKILSGSOyqeLnackwGjeolKPRVv4Yh0UW8RJI-hYBKQbO319&s=10',
-    description: 'VZY Channels Playlist Feed.',
-    isPinned: false,
-    team1: { name: 'VZY', shortName: 'VZY', flag: '📺', score: '' },
-    team2: { name: 'Live', shortName: 'LIVE', flag: '🔴', score: '' },
-    streams: [
-      {
-        id: 'str_vzy_01',
-        title: 'VZY M3U Raw Feed',
-        streamType: 'M3U8',
-        streamUrl: 'https://pastyx.pages.dev/api/paste/vzy-playlist-m3u/raw',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_pakistantv',
-    title: 'PAKISTAN TV',
-    category: 'PAKISTAN TV',
-    status: 'LIVE',
-    matchFormat: 'Live TV',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10',
-    description: 'Pakistan Live News, Sports & Entertainment channels.',
-    isPinned: false,
-    team1: { name: 'PAKISTAN TV', shortName: 'PAK', flag: '🇵🇰', score: '' },
-    team2: { name: 'Live All', shortName: 'IPTV', flag: '🔴', score: '' },
-    streams: [
-      {
-        id: 'str_pak_01',
-        title: 'Pakistan IPTV M3U Playlist',
-        streamType: 'M3U8',
-        streamUrl: 'https://iptv-org.github.io/iptv/countries/pk.m3u',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_toffee',
-    title: 'TOFFEE',
-    category: 'TOFFEE',
-    status: 'LIVE',
-    matchFormat: 'Live TV',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLjYG2Yb4mLqygUe_GDkKu5Rw73jqEQmxeXddimkUpE2NrKsvXfaMf-LMQ&s=10',
-    description: 'Toffee Hindi Language Channels & Entertainment.',
-    isPinned: false,
-    team1: { name: 'TOFFEE', shortName: 'TOF', flag: '📺', score: '' },
-    team2: { name: 'Hindi Channels', shortName: 'HIN', flag: '🔴', score: '' },
-    streams: [
-      {
-        id: 'str_tof_01',
-        title: 'Toffee Hindi IPTV Feed',
-        streamType: 'M3U8',
-        streamUrl: 'https://iptv-org.github.io/iptv/languages/hin.m3u',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_irantv',
-    title: 'IRAN TV',
-    category: 'IRAN TV',
-    status: 'LIVE',
-    matchFormat: 'Live TV',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdoOQ3JwH-PctWnHvCiXlG-Og7Vmav3MQANQ&s',
-    description: 'Iran National and Regional Television Channels.',
-    isPinned: false,
-    team1: { name: 'IRAN TV', shortName: 'IRN', flag: '🇮🇷', score: '' },
-    team2: { name: 'Live Broadcast', shortName: 'LIVE', flag: '🔴', score: '' },
-    streams: [
-      {
-        id: 'str_irn_01',
-        title: 'Iran IPTV M3U Playlist',
-        streamType: 'M3U8',
-        streamUrl: 'https://iptv-org.github.io/iptv/countries/ir.m3u',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_afghantv',
-    title: 'Afghanistan TV',
-    category: 'Afghanistan TV',
-    status: 'LIVE',
-    matchFormat: 'Live TV',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-i-alUhNqSc08Q7HHJO2i7fCxKxZKBJCXfKf7QymkpmqVhEK4G75wQgs&s=10',
-    description: 'Afghanistan Live TV Channels Stream.',
-    isPinned: false,
-    team1: { name: 'Afghanistan TV', shortName: 'AFG', flag: '🇦🇫', score: '' },
-    team2: { name: 'Live Stream', shortName: 'LIVE', flag: '🔴', score: '' },
-    streams: [
-      {
-        id: 'str_afg_01',
-        title: 'Afghanistan IPTV M3U',
-        streamType: 'M3U8',
-        streamUrl: 'https://iptv-org.github.io/iptv/countries/af.m3u',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_cartoonmovie',
-    title: 'CARTOON MOVIE',
-    category: 'CARTOON MOVIE',
-    status: 'LIVE',
-    matchFormat: 'Movies',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://logos-world.net/wp-content/uploads/2022/06/CMovies-Symbol.png',
-    description: 'Cartoon Movies and Kids Animation playlist.',
-    isPinned: false,
-    team1: { name: 'CARTOON MOVIE', shortName: 'KIDS', flag: '🎬', score: '' },
-    team2: { name: 'HD Animation', shortName: 'ANIM', flag: '⭐', score: '' },
-    streams: [
-      {
-        id: 'str_cart_01',
-        title: 'Cartoon Movie M3U Playlist',
-        streamType: 'M3U8',
-        streamUrl: 'https://drive.google.com/uc?export=download&id=1UZ1M-R5Lx58Hi7qkbi5Ylnf8UirfRFPH',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_mxplayer',
-    title: 'MX PLAYER',
-    category: 'MX PLAYER',
-    status: 'LIVE',
-    matchFormat: 'OTT Live',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10',
-    description: 'MX Player India Channels Stream Playlist.',
-    isPinned: false,
-    team1: { name: 'MX PLAYER', shortName: 'MXP', flag: '📺', score: '' },
-    team2: { name: 'India Live', shortName: 'IND', flag: '🔴', score: '' },
-    streams: [
-      {
-        id: 'str_mxp_01',
-        title: 'MX Player India Playlist',
-        streamType: 'M3U8',
-        streamUrl: 'https://playlist-by-xfireflix.pages.dev/India/mxplayer',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  {
-    _id: 'ch_yuppytv',
-    title: 'YUPPY TV',
-    category: 'YUPPY TV',
-    status: 'LIVE',
-    matchFormat: 'Live TV',
-    startTime: new Date().toISOString(),
-    bannerUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s',
-    description: 'YuppTV Live Channels and Entertainment M3U.',
-    isPinned: false,
-    team1: { name: 'YUPPY TV', shortName: 'YUP', flag: '📺', score: '' },
-    team2: { name: 'Global Channels', shortName: 'TV', flag: '🔴', score: '' },
-    streams: [
-      {
-        id: 'str_yup_01',
-        title: 'YuppTV Live M3U',
-        streamType: 'M3U8',
-        streamUrl: 'https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u',
-        quality: '1080p HD',
-        headers: {},
-        drm: { enabled: false, scheme: 'clearkey', keyId: '', key: '' },
-        isActive: true
-      }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-];
+const initialMatches = [];
 
 const initialVods = [
   {
@@ -788,14 +426,16 @@ let inMemoryState = {
   vods: [...initialVods],
   settings: {
     appName: 'HD STREAM',
-    announcement: '🔴 New HD STREAM v2.0 is LIVE! Please update APK for all live streams and channels.',
+    announcement: '🔴 HD STREAM v3.1.5 is LIVE! ⚡ Clean Live Events feed directly synced with Admin Panel!',
     announcementEnabled: true,
-    appVersion: '2.0.0',
-    minVersion: '2.0.0',
+    appVersion: '3.1.5',
+    minVersion: '3.1.5',
     apkDownloadUrl: 'https://stream-admin-backend.vercel.app/HD-STREAM.apk',
     maintenanceMode: false,
-    telegramLink: 'https://t.me/hdstream_official',
+    telegramLink: 'https://t.me/livetvofficialapp',
     supportEmail: 'support@hdstream.live',
+    adminUsername: 'shaikhabutlha506@gmail.com',
+    adminPassword: 'Junaidsrk555',
     updatedAt: new Date()
   }
 };
@@ -1001,57 +641,30 @@ const Store = {
     return match;
   },
 
-  // --- CATEGORIES (LOADED DIRECTLY FROM GOOGLE DRIVE LINK) ---
+  // --- CATEGORIES (LOADED DIRECTLY FROM MONGODB / ADMIN PANEL - NO GOOGLE DRIVE) ---
   async getCategories(forceRefresh = false) {
-    const GDRIVE_URL = 'https://drive.google.com/uc?export=download&id=1KxcfPpIjkeRaHWyrN53otPBci5s6FMMO';
-
-    if (!forceRefresh && this._gdriveCache && (Date.now() - (this._gdriveCacheTime || 0) < 60000)) {
-      return this._gdriveCache;
-    }
-
-    const unescapeHtml = (s) => String(s || '')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .trim();
-
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 6000);
-      const res = await fetch(GDRIVE_URL, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
-        signal: controller.signal
-      });
-      clearTimeout(timeout);
-
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          const cats = data.map((item, idx) => {
-            const rawTitle = item.title || item.name || 'Category';
-            return {
-              _id: 'gcat_' + (idx + 1),
-              id: 'gcat_' + (idx + 1),
-              name: unescapeHtml(rawTitle),
-              slug: rawTitle.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-              icon: 'fas fa-tv',
-              imageUrl: unescapeHtml(item.imageUrl),
-              m3uLink: unescapeHtml(item.m3uLink),
-              order: idx + 1,
-              isActive: true
-            };
-          });
-          this._gdriveCache = cats;
-          this._gdriveCacheTime = Date.now();
-          return cats;
+    if (isMongoConnected()) {
+      try {
+        const cats = await Category.find({ isActive: true }).sort({ order: 1, createdAt: 1 });
+        if (cats && cats.length > 0) {
+          return cats.map((c, idx) => ({
+            _id: String(c._id),
+            id: String(c._id),
+            name: (c.name || 'Category').trim(),
+            slug: c.slug || c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+            icon: c.icon || 'fas fa-tv',
+            imageUrl: c.imageUrl || '',
+            m3uLink: c.m3uLink || '',
+            order: c.order !== undefined ? c.order : (idx + 1),
+            isActive: c.isActive !== false
+          }));
         }
+      } catch (err) {
+        console.warn('MongoDB categories query error:', err.message);
       }
-    } catch (err) {
-      console.warn('Google Drive categories fetch warning:', err.message);
     }
 
-    return this._gdriveCache || initialCategories;
+    return inMemoryState.categories.filter(c => c.isActive !== false);
   },
 
   async ensureCategory(name) {
@@ -1093,6 +706,16 @@ const Store = {
     };
     inMemoryState.categories.push(newCat);
     return newCat;
+  },
+
+  async updateCategory(id, data) {
+    if (isMongoConnected()) {
+      return await Category.findByIdAndUpdate(id, data, { new: true });
+    }
+    const idx = inMemoryState.categories.findIndex(c => String(c._id) === String(id) || c.id === id);
+    if (idx === -1) return null;
+    inMemoryState.categories[idx] = { ...inMemoryState.categories[idx], ...data, updatedAt: new Date() };
+    return inMemoryState.categories[idx];
   },
 
   async deleteCategory(id) {
@@ -1216,22 +839,22 @@ const Store = {
       if (!settings) {
         settings = await Settings.create({
           ...inMemoryState.settings,
-          appVersion: '2.0.0',
-          minVersion: '2.0.0',
+          appVersion: '3.0.6',
+          minVersion: '3.0.6',
           apkDownloadUrl: defaultApkUrl
         });
       }
       if (!settings.apkDownloadUrl || settings.apkDownloadUrl.includes('example.com') || settings.apkDownloadUrl.includes('10.129') || settings.apkDownloadUrl.endsWith('.app')) {
         settings.apkDownloadUrl = defaultApkUrl;
       }
-      settings.appVersion = '2.0.0';
-      settings.minVersion = '2.0.0';
+      settings.appVersion = '3.0.6';
+      settings.minVersion = '3.0.6';
       await settings.save();
       return settings;
     }
     inMemoryState.settings.apkDownloadUrl = defaultApkUrl;
-    inMemoryState.settings.appVersion = '2.0.0';
-    inMemoryState.settings.minVersion = '2.0.0';
+    inMemoryState.settings.appVersion = '3.0.6';
+    inMemoryState.settings.minVersion = '3.0.6';
     return inMemoryState.settings;
   },
 
@@ -1249,11 +872,242 @@ const Store = {
     return inMemoryState.settings;
   },
 
+  // --- PERSISTENT ADMIN CREDENTIALS (IN DB & MEMORY) ---
+  async getAdminCredentials() {
+    const defaultUsername = process.env.ADMIN_USER || 'shaikhabutlha506@gmail.com';
+    const defaultPassword = process.env.ADMIN_API_KEY || 'Junaidsrk555';
+
+    if (isMongoConnected()) {
+      try {
+        let settings = await Settings.findOne();
+        if (settings && settings.adminPassword && settings.adminPassword.trim().length > 0) {
+          return {
+            username: settings.adminUsername || defaultUsername,
+            password: settings.adminPassword.trim()
+          };
+        }
+      } catch (err) {
+        console.error('Error fetching admin credentials from DB:', err.message);
+      }
+    }
+
+    if (inMemoryState.settings && inMemoryState.settings.adminPassword && inMemoryState.settings.adminPassword.trim().length > 0) {
+      return {
+        username: inMemoryState.settings.adminUsername || defaultUsername,
+        password: inMemoryState.settings.adminPassword.trim()
+      };
+    }
+
+    return {
+      username: defaultUsername,
+      password: defaultPassword
+    };
+  },
+
+  async updateAdminCredentials(newUsername, newPassword) {
+    const cleanUser = (newUsername || 'admin').trim();
+    const cleanPass = (newPassword || '').trim();
+
+    if (isMongoConnected()) {
+      try {
+        let settings = await Settings.findOne();
+        if (!settings) {
+          settings = await Settings.create({
+            ...inMemoryState.settings,
+            adminUsername: cleanUser,
+            adminPassword: cleanPass
+          });
+        } else {
+          settings.adminUsername = cleanUser;
+          settings.adminPassword = cleanPass;
+          settings.updatedAt = new Date();
+          await settings.save();
+        }
+      } catch (err) {
+        console.error('Error saving admin credentials to DB:', err.message);
+      }
+    }
+
+    inMemoryState.settings.adminUsername = cleanUser;
+    inMemoryState.settings.adminPassword = cleanPass;
+    inMemoryState.settings.updatedAt = new Date();
+
+    return {
+      username: cleanUser,
+      password: cleanPass
+    };
+  },
+
+  // --- DEVICE & APP USAGE ANALYTICS ---
+  async trackDevice(ip, userAgent) {
+    if (!ip && !userAgent) return;
+    const cleanIp = (ip || '').split(',')[0].trim().replace(/^.*:/, '');
+    const cleanUa = (userAgent || '').substring(0, 200);
+    const deviceId = getDeviceId(cleanIp, cleanUa);
+    const now = new Date();
+
+    // In-memory track
+    const existing = inMemoryDevices.get(deviceId);
+    if (!existing) {
+      inMemoryDevices.set(deviceId, {
+        deviceId,
+        ip: cleanIp,
+        userAgent: cleanUa,
+        firstSeen: now,
+        lastSeen: now,
+        requestsCount: 1
+      });
+    } else {
+      existing.lastSeen = now;
+      existing.requestsCount = (existing.requestsCount || 1) + 1;
+    }
+
+    // Persist to MongoDB if connected
+    if (isMongoConnected()) {
+      try {
+        await Device.findOneAndUpdate(
+          { deviceId },
+          {
+            $set: {
+              ip: cleanIp,
+              userAgent: cleanUa,
+              lastSeen: now
+            },
+            $setOnInsert: { firstSeen: now },
+            $inc: { requestsCount: 1 }
+          },
+          { upsert: true, new: true }
+        );
+      } catch (err) {
+        // non-blocking
+      }
+    }
+  },
+
+  async trackApkDownload() {
+    inMemoryApkDownloads++;
+    if (isMongoConnected()) {
+      try {
+        await AnalyticsSummary.findOneAndUpdate(
+          { key: 'global' },
+          { $inc: { totalApkDownloads: 1 }, $set: { updatedAt: new Date() } },
+          { upsert: true }
+        );
+      } catch (err) {
+        // non-blocking
+      }
+    }
+  },
+
+  async getAnalytics() {
+    const now = Date.now();
+    const fifteenMinsAgo = new Date(now - 15 * 60 * 1000);
+    const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000);
+
+    let activeNow = 0;
+    let dau = 0;
+    let totalDevices = 0;
+    let apkDownloads = 0;
+
+    if (isMongoConnected()) {
+      try {
+        const [
+          dbActiveNow,
+          dbDau,
+          dbTotal,
+          summary
+        ] = await Promise.all([
+          Device.countDocuments({ lastSeen: { $gte: fifteenMinsAgo } }),
+          Device.countDocuments({ lastSeen: { $gte: oneDayAgo } }),
+          Device.countDocuments(),
+          AnalyticsSummary.findOne({ key: 'global' })
+        ]);
+
+        activeNow = dbActiveNow;
+        dau = dbDau;
+        totalDevices = dbTotal;
+        if (summary?.totalApkDownloads) {
+          apkDownloads = summary.totalApkDownloads;
+        }
+      } catch (err) {
+        // Fallback to in-memory
+      }
+    }
+
+    // Merge in-memory active devices
+    for (const [id, dev] of inMemoryDevices.entries()) {
+      const last = new Date(dev.lastSeen).getTime();
+      if (last >= now - 15 * 60 * 1000) activeNow = Math.max(activeNow, 1);
+      if (last >= now - 24 * 60 * 60 * 1000) dau = Math.max(dau, 1);
+    }
+    totalDevices = Math.max(totalDevices, inMemoryDevices.size);
+
+    activeNow = Math.max(activeNow, 0);
+    dau = Math.max(dau, activeNow);
+
+    // Total Installs: Real unique devices registered (or apk downloads if higher)
+    const totalInstalls = Math.max(totalDevices, apkDownloads);
+
+    // Uninstalled / Inactive devices: Devices that have closed the app or are offline
+    const uninstalled = Math.max(0, totalInstalls - activeNow);
+
+    // Retention Rate: DAU / Total Installs
+    const retentionRate = totalInstalls > 0 ? Math.min(100, Math.round((dau / totalInstalls) * 100)) : 100;
+
+    return {
+      totalInstalls,
+      apkDownloads,
+      activeNow,
+      dau,
+      uninstalled,
+      retentionRate: `${retentionRate}%`
+    };
+  },
+
+  async getDevicesList(limit = 100) {
+    const now = Date.now();
+    const fifteenMinsAgo = new Date(now - 15 * 60 * 1000);
+
+    if (isMongoConnected()) {
+      try {
+        const devices = await Device.find()
+          .sort({ lastSeen: -1 })
+          .limit(limit)
+          .lean();
+
+        return devices.map(d => ({
+          deviceId: d.deviceId,
+          ip: d.ip,
+          userAgent: d.userAgent,
+          deviceModel: parseDeviceModel(d.userAgent),
+          isOnline: new Date(d.lastSeen) >= fifteenMinsAgo,
+          firstSeen: d.firstSeen,
+          lastSeen: d.lastSeen,
+          requestsCount: d.requestsCount || 1
+        }));
+      } catch (err) {
+        // Fallback to in-memory
+      }
+    }
+
+    return Array.from(inMemoryDevices.values()).map(d => ({
+      deviceId: d.deviceId,
+      ip: d.ip,
+      userAgent: d.userAgent,
+      deviceModel: parseDeviceModel(d.userAgent),
+      isOnline: new Date(d.lastSeen) >= fifteenMinsAgo,
+      firstSeen: d.firstSeen,
+      lastSeen: d.lastSeen,
+      requestsCount: d.requestsCount || 1
+    }));
+  },
+
   // --- SYSTEM STATS SUMMARY ---
   async getStats() {
     const matches = await this.getMatches();
     const categories = await this.getCategories();
     const vods = await this.getVods();
+    const analytics = await this.getAnalytics();
 
     const liveCount = matches.filter(m => m.status === 'LIVE').length;
     const upcomingCount = matches.filter(m => m.status === 'UPCOMING').length;
@@ -1272,160 +1126,25 @@ const Store = {
       totalEpisodes,
       totalStreams,
       drmStreamsCount,
-      databaseMode: isMongoConnected() ? 'MongoDB Atlas (Cloud)' : 'Local / In-Memory (Active)'
+      databaseMode: isMongoConnected() ? 'MongoDB Atlas (Cloud)' : 'Local / In-Memory (Active)',
+      analytics,
+      totalInstalls: analytics.totalInstalls,
+      activeNow: analytics.activeNow,
+      dau: analytics.dau,
+      uninstalled: analytics.uninstalled,
+      retentionRate: analytics.retentionRate
     };
   },
 
-  // --- SYNC CHANNELS & CATEGORIES FROM GOOGLE DRIVE ---
+  // --- SYNC / REFRESH CHANNELS & CATEGORIES (DIRECT FROM MONGODB & ADMIN PANEL) ---
   async syncGdrive() {
-    const GDRIVE_JSON_URL = "https://drive.google.com/uc?export=download&id=1KxcfPpIjkeRaHWyrN53otPBci5s6FMMO";
-    const res = await fetch(GDRIVE_JSON_URL, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }
-    });
-    const sources = await res.json();
-    if (!Array.isArray(sources) || sources.length === 0) {
-      throw new Error("No categories found in Google Drive link");
-    }
-
-    const userCatNames = [...new Set(sources.map(s => s.title.trim()))];
-    if (isMongoConnected()) {
-      await Category.deleteMany({ name: { $nin: userCatNames } });
-      let orderIndex = 1;
-      for (const catName of userCatNames) {
-        const slug = catName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-        await Category.findOneAndUpdate(
-          { name: catName },
-          { name: catName, slug, icon: 'fas fa-tv', order: orderIndex++, isActive: true },
-          { upsert: true, new: true }
-        );
-      }
-      await Match.deleteMany({});
-    }
-
-    const allMatches = [];
-
-    function parseSimpleM3u(content, defaultCat, defaultLogo, maxLimit = 500) {
-      const lines = content.split(/\r?\n/);
-      const items = [];
-      let currentTitle = null;
-      let currentLogo = defaultLogo || '';
-
-      for (let i = 0; i < lines.length; i++) {
-        if (items.length >= maxLimit) break;
-        const line = lines[i].trim();
-        if (!line) continue;
-
-        if (line.startsWith('#EXTINF:')) {
-          const commaIdx = line.lastIndexOf(',');
-          currentTitle = commaIdx !== -1 ? line.substring(commaIdx + 1).trim() : 'Live Stream';
-          const logoMatch = line.match(/tvg-logo="([^"]+)"/i);
-          if (logoMatch && logoMatch[1]) currentLogo = logoMatch[1];
-        } else if (!line.startsWith('#') && (line.startsWith('http://') || line.startsWith('https://'))) {
-          const streamUrl = line;
-          const title = currentTitle || `${defaultCat} Channel`;
-          items.push({
-            title,
-            category: defaultCat,
-            status: 'LIVE',
-            matchFormat: 'HD',
-            bannerUrl: currentLogo || defaultLogo || '',
-            description: `${defaultCat} Live: ${title}`,
-            isPinned: false,
-            team1: { name: title.split(' vs ')[0] || title, shortName: '', flag: '📺', score: '' },
-            team2: { name: title.split(' vs ')[1] || '', shortName: '', flag: '🔴', score: '' },
-            streams: [
-              {
-                id: 'str_' + Math.random().toString(36).substr(2, 9),
-                title,
-                streamType: streamUrl.includes('.mpd') ? 'MPD' : 'M3U8',
-                streamUrl,
-                quality: '1080p HD',
-                headers: {},
-                drm: { enabled: false },
-                isActive: true
-              }
-            ]
-          });
-          currentTitle = null;
-          currentLogo = defaultLogo || '';
-        }
-      }
-      return items;
-    }
-
-    for (const s of sources) {
-      const catName = s.title.trim();
-      const logo = s.imageUrl || '';
-      const m3uUrl = s.m3uLink ? s.m3uLink.trim() : '';
-
-      let playlistText = '';
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 8000);
-        let fetchUrl = m3uUrl;
-        if (fetchUrl.includes('drive.google.com/file/d/')) {
-          const fileIdMatch = fetchUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-          if (fileIdMatch) {
-            fetchUrl = `https://drive.google.com/uc?export=download&id=${fileIdMatch[1]}`;
-          }
-        }
-        const resp = await fetch(fetchUrl, {
-          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
-          redirect: 'follow',
-          signal: controller.signal
-        });
-        clearTimeout(timer);
-        if (resp.ok) playlistText = await resp.text();
-      } catch (_) {}
-
-      const maxLimit = (catName === 'MIX TV' || catName === 'JIO TV+') ? 150 : 500;
-      if (playlistText && (playlistText.includes('#EXTM3U') || playlistText.includes('#EXTINF') || playlistText.includes('http'))) {
-        const items = parseSimpleM3u(playlistText, catName, logo, maxLimit);
-        if (items.length > 0) {
-          allMatches.push(...items);
-          continue;
-        }
-      }
-
-      allMatches.push({
-        title: catName,
-        category: catName,
-        status: 'LIVE',
-        matchFormat: 'HD',
-        bannerUrl: logo,
-        description: `Live Stream: ${catName}`,
-        isPinned: false,
-        team1: { name: catName, shortName: '', flag: '📺', score: '' },
-        team2: { name: '', shortName: '', flag: '🔴', score: '' },
-        streams: [
-          {
-            id: 'str_' + Math.random().toString(36).substr(2, 9),
-            title: `${catName} - Live`,
-            streamType: m3uUrl.includes('.mpd') ? 'MPD' : 'M3U8',
-            streamUrl: m3uUrl,
-            quality: '1080p HD',
-            headers: {},
-            drm: { enabled: false },
-            isActive: true
-          }
-        ]
-      });
-    }
-
-    if (isMongoConnected()) {
-      const chunkSize = 500;
-      for (let i = 0; i < allMatches.length; i += chunkSize) {
-        const chunk = allMatches.slice(i, i + chunkSize);
-        await Match.insertMany(chunk, { ordered: false });
-      }
-    } else {
-      inMemoryState.matches = allMatches;
-    }
-
+    const cats = await this.getCategories(true);
+    const totalMatches = isMongoConnected() ? await Match.countDocuments() : inMemoryState.matches.length;
     return {
       success: true,
-      totalChannels: allMatches.length,
-      categoriesCount: userCatNames.length
+      totalChannels: totalMatches,
+      categoriesCount: cats.length,
+      channels: []
     };
   }
 };

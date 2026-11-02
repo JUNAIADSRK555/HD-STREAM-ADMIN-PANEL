@@ -38,12 +38,14 @@ const MatchSchema = new mongoose.Schema({
     name: { type: String, default: 'Team A' },
     shortName: { type: String, default: 'T1' },
     flag: { type: String, default: '' },
+    logo: { type: String, default: '' },
     score: { type: String, default: '' }
   },
   team2: {
     name: { type: String, default: 'Team B' },
     shortName: { type: String, default: 'T2' },
     flag: { type: String, default: '' },
+    logo: { type: String, default: '' },
     score: { type: String, default: '' }
   },
   streams: [StreamSchema],
