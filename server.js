@@ -18,9 +18,19 @@ app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Fast health check & 24/7 Keep-Alive route (Zero database overhead)
+app.get(['/api/ping', '/ping', '/healthz'], (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'HD STREAM 24/7 Server Active',
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Serverless auto-connect for Vercel before routing
 app.use(async (req, res, next) => {
-  if (req.path.startsWith('/api')) {
+  if (req.path.startsWith('/api') && req.path !== '/api/ping') {
     try {
       await connectDB();
     } catch (_) {}

@@ -1,0 +1,18 @@
+name: Render 24/7 Keep Alive (Anti-Sleep)
+
+on:
+  schedule:
+    # Runs automatically every 10 minutes (Render sleep timeout is 15 mins)
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    name: Ping Render 24/7
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send HTTP Ping to Render
+        run: |
+          echo "Pinging HD STREAM Backend on Render..."
+          curl -s -f -m 20 "https://hd-stream-backend.onrender.com/api/ping" || curl -s -m 20 "https://hd-stream-backend.onrender.com/" || true
+          echo "Ping successful! Render server is awake and active."
