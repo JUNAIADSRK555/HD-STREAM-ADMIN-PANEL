@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const Store = require('../services/store');
+const GDriveFeed = require('../services/gdriveFeed');
 const { getDbStatus } = require('../config/db');
 
 // Movies & VOD Feed Endpoint (Serves Full Cinex Movies JSON with 160+ Titles)
@@ -255,17 +256,21 @@ router.get('/devices', async (req, res) => {
   }
 });
 
-// 3. Match / Live Event Endpoints
+// 3. Match / Live Event Endpoints (Directly synced from Google Drive)
 router.get('/matches', async (req, res) => {
   try {
-    const { status, category, search } = req.query;
-    const filter = {};
-    if (status) filter.status = status;
-    if (category) filter.category = category;
-    if (search) filter.search = search;
-
-    const matches = await Store.getMatches(filter);
-    res.json({ success: true, count: matches.length, data: matches });
+    const isForceRefresh = req.query.refresh === 'true';
+    const events = await GDriveFeed.getDriveEvents(isForceRefresh);
+    const all = [...(events.liveEvents || []), ...(events.upcomingEvents || []), ...(events.recentEvents || [])];
+    const { status, search } = req.query;
+    let filtered = all;
+    if (status) {
+      filtered = filtered.filter(m => m.status.toUpperCase() === status.toUpperCase());
+    }
+    if (search) {
+      filtered = filtered.filter(m => m.title.toLowerCase().includes(search.toLowerCase()));
+    }
+    res.json({ success: true, count: filtered.length, source: 'Google Drive', data: filtered });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -274,11 +279,20 @@ router.get('/matches', async (req, res) => {
 // Sync from Google Drive (One-click)
 router.all('/sync/gdrive', requireAdmin, async (req, res) => {
   try {
-    const result = await Store.syncGdrive();
+    const [cats, events] = await Promise.all([
+      GDriveFeed.getDriveCategories(true),
+      GDriveFeed.getDriveEvents(true)
+    ]);
     res.json({
       success: true,
-      message: `Successfully synced ${result.totalChannels} channels across ${result.categoriesCount} categories!`,
-      data: result
+      message: `Successfully synced ${cats.length} categories and ${events.liveEvents.length + events.upcomingEvents.length} events directly from Google Drive!`,
+      source: {
+        categoryUrl: GDriveFeed.CATEGORY_DRIVE_URL,
+        liveEventsUrl: GDriveFeed.LIVE_EVENTS_DRIVE_URL
+      },
+      categoriesCount: cats.length,
+      liveCount: events.liveEvents.length,
+      upcomingCount: events.upcomingEvents.length
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -383,8 +397,8 @@ router.delete('/matches/:id/streams/:streamId', requireAdmin, async (req, res) =
 router.get('/categories', async (req, res) => {
   try {
     const forceRefresh = req.query.refresh === 'true';
-    const categories = await Store.getCategories(forceRefresh);
-    res.json({ success: true, data: categories });
+    const categories = await GDriveFeed.getDriveCategories(forceRefresh);
+    res.json({ success: true, count: categories.length, source: 'Google Drive', data: categories });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
