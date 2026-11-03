@@ -52,7 +52,7 @@ router.get(['/mobile', '/app-data'], async (req, res) => {
         announcementEnabled: settings.announcementEnabled,
         appVersion: settings.appVersion,
         minVersion: settings.minVersion,
-        apkDownloadUrl: settings.apkDownloadUrl || 'https://struck-christ-memories-amend.trycloudflare.com/HD-STREAM.apk',
+        apkDownloadUrl: settings.apkDownloadUrl || 'https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/HD-STREAM.apk',
         maintenanceMode: settings.maintenanceMode,
         telegramLink: settings.telegramLink || 'https://t.me/livetvofficialapp',
         supportEmail: settings.supportEmail || 'shaikhabutlha506@gmail.com',
