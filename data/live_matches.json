@@ -1,6 +1,8 @@
 {
   "announcement": "🔴 HD STREAM is LIVE! ⚡ 24/7 Live Sports & Channels!",
   "announcementEnabled": true,
+  "minVersion": "1.0.0",
+  "appVersion": "3.2.2",
   "liveMatches": [
     {
       "match_name": "Live Cricket || India vs New Zealand",
