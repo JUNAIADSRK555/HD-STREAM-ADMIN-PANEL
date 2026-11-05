@@ -1,0 +1,79 @@
+{
+  "heading": "HD STREAM Official Live TV",
+  "category": "Live Sports & Entertainment",
+  "channels": [
+    {
+      "id": "star-sports-1-hindi-hd",
+      "name": "Star Sports 1 Hindi HD",
+      "title": "Star Sports 1 Hindi HD",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzR70tN-h-362Z6o2z4bE7PqZ8U0O9M7P9oA&s=10",
+      "streamUrl": "https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8"
+    },
+    {
+      "id": "sony-sports-ten-1-hd",
+      "name": "Sony Sports Ten 1 HD",
+      "title": "Sony Sports Ten 1 HD",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10",
+      "streamUrl": "https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8"
+    },
+    {
+      "id": "star-sports-select-1-hd",
+      "name": "Star Sports Select 1 HD",
+      "title": "Star Sports Select 1 HD",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzR70tN-h-362Z6o2z4bE7PqZ8U0O9M7P9oA&s=10",
+      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+    },
+    {
+      "id": "willow-cricket-hd",
+      "name": "Willow Cricket HD",
+      "title": "Willow Cricket HD",
+      "category": "Live Cricket",
+      "streamType": "M3U8",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/MX_Player_Logo.png/512px-MX_Player_Logo.png",
+      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
+    },
+    {
+      "id": "sky-sports-cricket",
+      "name": "Sky Sports Cricket HD",
+      "title": "Sky Sports Cricket HD",
+      "category": "Live Cricket",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+    },
+    {
+      "id": "ptv-sports-hd",
+      "name": "PTV Sports HD",
+      "title": "PTV Sports HD",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10",
+      "streamUrl": "https://iptv-org.github.io/iptv/countries/pk.m3u"
+    },
+    {
+      "id": "a-sports-hd",
+      "name": "A Sports HD",
+      "title": "A Sports HD",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10",
+      "streamUrl": "https://iptv-org.github.io/iptv/countries/pk.m3u"
+    },
+    {
+      "id": "ten-sports-hd",
+      "name": "Ten Sports HD",
+      "title": "Ten Sports HD",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10",
+      "streamUrl": "https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8"
+    }
+  ]
+}
+

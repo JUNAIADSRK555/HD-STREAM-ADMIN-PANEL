@@ -1,16 +1,16 @@
 [
   {
+    "id": "gcat_0",
+    "name": "HD STREAM",
+    "slug": "hd-stream",
+    "icon": "fas fa-bolt",
+    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+    "m3uLink": "https://cinexcricket.com/api/tv/data.json"
+  },
+  {
     "id": "gcat_1",
     "name": "JIO TV+",
     "slug": "jio-tv",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/jiotv.png",
-    "m3uLink": "https://plugxvipplaylist.lovable.app/api/playlist"
-  },
-  {
-    "id": "gcat_2",
-    "name": "JIO TV+ (JTV25)",
-    "slug": "jio-tv-jtv25",
     "icon": "fas fa-tv",
     "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/jiotv.png",
     "m3uLink": "https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8"
