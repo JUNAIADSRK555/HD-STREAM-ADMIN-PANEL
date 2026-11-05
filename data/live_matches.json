@@ -1,11 +1,15 @@
 {
   "announcement": "",
   "announcementEnabled": false,
+  "announcement_enabled": false,
   "minVersion": "1.0.0",
+  "min_version": "1.0.0",
   "appVersion": "3.2.2",
+  "app_version": "3.2.2",
   "liveMatches": [
     {
       "match_name": "Live Cricket || India vs New Zealand",
+      "title": "Live Cricket || India vs New Zealand",
       "category": "Live Cricket",
       "status": "LIVE",
       "time": "7:00 AM",
@@ -14,6 +18,7 @@
       "team1": {
         "name": "India",
         "logo": "https://flagcdn.com/w160/in.png",
+        "flag": "https://flagcdn.com/w160/in.png",
         "score": ""
       },
       "team2_name": "New Zealand",
@@ -21,6 +26,44 @@
       "team2": {
         "name": "New Zealand",
         "logo": "https://flagcdn.com/w160/nz.png",
+        "flag": "https://flagcdn.com/w160/nz.png",
+        "score": ""
+      },
+      "streams": [
+        {
+          "title": "Server 1 - Hindi 1080p HD",
+          "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+          "type": "HLS"
+        },
+        {
+          "title": "Server 2 - English 4K 60FPS",
+          "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+          "type": "HLS"
+        }
+      ]
+    }
+  ],
+  "live_matches": [
+    {
+      "match_name": "Live Cricket || India vs New Zealand",
+      "title": "Live Cricket || India vs New Zealand",
+      "category": "Live Cricket",
+      "status": "LIVE",
+      "time": "7:00 AM",
+      "team1_name": "India",
+      "team1_logo": "https://flagcdn.com/w160/in.png",
+      "team1": {
+        "name": "India",
+        "logo": "https://flagcdn.com/w160/in.png",
+        "flag": "https://flagcdn.com/w160/in.png",
+        "score": ""
+      },
+      "team2_name": "New Zealand",
+      "team2_logo": "https://flagcdn.com/w160/nz.png",
+      "team2": {
+        "name": "New Zealand",
+        "logo": "https://flagcdn.com/w160/nz.png",
+        "flag": "https://flagcdn.com/w160/nz.png",
         "score": ""
       },
       "streams": [
@@ -40,6 +83,7 @@
   "upcomingMatches": [
     {
       "match_name": "Live Cricket || Australia vs England",
+      "title": "Live Cricket || Australia vs England",
       "category": "Live Cricket",
       "status": "UPCOMING",
       "time": "1:30 PM",
@@ -48,6 +92,7 @@
       "team1": {
         "name": "Australia",
         "logo": "https://flagcdn.com/w160/au.png",
+        "flag": "https://flagcdn.com/w160/au.png",
         "score": ""
       },
       "team2_name": "England",
@@ -55,6 +100,7 @@
       "team2": {
         "name": "England",
         "logo": "https://flagcdn.com/w160/gb-eng.png",
+        "flag": "https://flagcdn.com/w160/gb-eng.png",
         "score": ""
       },
       "streams": [
@@ -66,5 +112,38 @@
       ]
     }
   ],
-  "finishedMatches": []
+  "upcoming_matches": [
+    {
+      "match_name": "Live Cricket || Australia vs England",
+      "title": "Live Cricket || Australia vs England",
+      "category": "Live Cricket",
+      "status": "UPCOMING",
+      "time": "1:30 PM",
+      "team1_name": "Australia",
+      "team1_logo": "https://flagcdn.com/w160/au.png",
+      "team1": {
+        "name": "Australia",
+        "logo": "https://flagcdn.com/w160/au.png",
+        "flag": "https://flagcdn.com/w160/au.png",
+        "score": ""
+      },
+      "team2_name": "England",
+      "team2_logo": "https://flagcdn.com/w160/gb-eng.png",
+      "team2": {
+        "name": "England",
+        "logo": "https://flagcdn.com/w160/gb-eng.png",
+        "flag": "https://flagcdn.com/w160/gb-eng.png",
+        "score": ""
+      },
+      "streams": [
+        {
+          "title": "Server 1 - HD Stream",
+          "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+          "type": "HLS"
+        }
+      ]
+    }
+  ],
+  "finishedMatches": [],
+  "finished_matches": []
 }
