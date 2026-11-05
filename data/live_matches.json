@@ -1,6 +1,6 @@
 {
-  "announcement": "🔴 HD STREAM is LIVE! ⚡ 24/7 Live Sports & Channels!",
-  "announcementEnabled": true,
+  "announcement": "",
+  "announcementEnabled": false,
   "minVersion": "1.0.0",
   "appVersion": "3.2.2",
   "liveMatches": [
@@ -9,14 +9,18 @@
       "category": "Live Cricket",
       "status": "LIVE",
       "time": "7:00 AM",
+      "team1_name": "India",
+      "team1_logo": "https://flagcdn.com/w160/in.png",
       "team1": {
         "name": "India",
-        "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/4/41/Flag_of_India.svg/320px-Flag_of_India.svg.png",
+        "logo": "https://flagcdn.com/w160/in.png",
         "score": ""
       },
+      "team2_name": "New Zealand",
+      "team2_logo": "https://flagcdn.com/w160/nz.png",
       "team2": {
         "name": "New Zealand",
-        "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Flag_of_New_Zealand.svg/320px-Flag_of_New_Zealand.svg.png",
+        "logo": "https://flagcdn.com/w160/nz.png",
         "score": ""
       },
       "streams": [
@@ -39,14 +43,18 @@
       "category": "Live Cricket",
       "status": "UPCOMING",
       "time": "1:30 PM",
+      "team1_name": "Australia",
+      "team1_logo": "https://flagcdn.com/w160/au.png",
       "team1": {
         "name": "Australia",
-        "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Flag_of_Australia_%28converted%29.svg/320px-Flag_of_Australia_%28converted%29.svg.png",
+        "logo": "https://flagcdn.com/w160/au.png",
         "score": ""
       },
+      "team2_name": "England",
+      "team2_logo": "https://flagcdn.com/w160/gb-eng.png",
       "team2": {
         "name": "England",
-        "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/b/be/Flag_of_England.svg/320px-Flag_of_England.svg.png",
+        "logo": "https://flagcdn.com/w160/gb-eng.png",
         "score": ""
       },
       "streams": [
@@ -60,4 +68,3 @@
   ],
   "finishedMatches": []
 }
-
