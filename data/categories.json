@@ -4,7 +4,7 @@
     "name": "JIO TV+",
     "slug": "jio-tv",
     "icon": "fas fa-tv",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s",
+    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/jiotv.png",
     "m3uLink": "https://plugxvipplaylist.lovable.app/api/playlist"
   },
   {
@@ -12,7 +12,7 @@
     "name": "JIO TV+ (JTV25)",
     "slug": "jio-tv-jtv25",
     "icon": "fas fa-tv",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s",
+    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/jiotv.png",
     "m3uLink": "https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8"
   },
   {
@@ -52,7 +52,7 @@
     "name": "IRAN TV",
     "slug": "iran-tv",
     "icon": "fas fa-tv",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdoOQ3JwH-PctWnHvCiXlG-Og7Vmav3MQANQ&s",
+    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/iran.png",
     "m3uLink": "https://iptv-org.github.io/iptv/countries/ir.m3u"
   },
   {
@@ -68,7 +68,7 @@
     "name": "CARTOON MOVIE",
     "slug": "cartoon-movie",
     "icon": "fas fa-film",
-    "imageUrl": "https://logos-world.net/wp-content/uploads/2022/06/CMovies-Symbol.png",
+    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/cartoon.png",
     "m3uLink": "https://drive.google.com/uc?export=download&id=1UZ1M-R5Lx58Hi7qkbi5Ylnf8UirfRFPH"
   },
   {
