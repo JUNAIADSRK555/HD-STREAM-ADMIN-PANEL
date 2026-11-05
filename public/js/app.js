@@ -373,21 +373,7 @@ const defaultSampleData = {
     { _id: 'c_mxp', name: 'MX PLAYER', slug: 'mx-player', icon: 'fas fa-play', imageUrl: '', m3uLink: '', order: 9 },
     { _id: 'c_yup', name: 'YUPPY TV', slug: 'yuppy-tv', icon: 'fas fa-broadcast-tower', imageUrl: '', m3uLink: '', order: 10 }
   ],
-  vods: [
-    {
-      _id: 'vod_1',
-      title: 'Family Full House With Rohit Sharma',
-      category: 'House With Rohit',
-      totalEpisodes: 5,
-      episodes: [
-        { id: 'e1', episodeNumber: 1, title: 'Episode 1', duration: '45m', streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
-        { id: 'e2', episodeNumber: 2, title: 'Episode 2', duration: '50m', streamUrl: 'https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8' },
-        { id: 'e3', episodeNumber: 3, title: 'Episode 3', duration: '48m', streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' },
-        { id: 'e4', episodeNumber: 4, title: 'Episode 4', duration: '52m', streamUrl: 'https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8' },
-        { id: 'e5', episodeNumber: 5, title: 'Episode 5', duration: '55m', streamUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' }
-      ]
-    }
-  ],
+  vods: [],
   settings: {
     announcement: '🔥 Welcome to HD Stream Live TV! Join our Telegram: @livetvofficialapp',
     appVersion: '2.0.0',

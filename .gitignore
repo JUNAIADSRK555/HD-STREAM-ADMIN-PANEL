@@ -3,5 +3,5 @@ node_modules
 .DS_Store
 *.log
 .vercel
-
-.vercel
+*.zip
+public/*.zip

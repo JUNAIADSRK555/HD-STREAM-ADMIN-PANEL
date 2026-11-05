@@ -203,9 +203,8 @@ function formatDriveMatch(m, defaultStatus = 'LIVE', index = 0) {
   // Parse streams
   const streams = (m.streams || []).map((s, sIdx) => {
     let url = (s.url || s.streamUrl || '').trim();
-    // Default fallback if user has placeholder "yahan_link_daalein"
     if (!url || !url.startsWith('http')) {
-      url = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+      return null;
     }
 
     const isMpd = (s.type || '').toLowerCase() === 'mpd' || url.includes('.mpd');
@@ -276,8 +275,8 @@ function formatDriveMatch(m, defaultStatus = 'LIVE', index = 0) {
       logo: m.team2?.logo || m.team2?.flag || '',
       score: m.team2?.score || ''
     },
-    totalStreams: streams.length,
-    streams: streams
+    totalStreams: streams.filter(Boolean).length,
+    streams: streams.filter(Boolean)
   };
 }
 

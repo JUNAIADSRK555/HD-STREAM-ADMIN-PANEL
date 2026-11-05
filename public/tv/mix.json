@@ -1,127 +1,106 @@
 {
   "heading": "MIX TV Channels",
-  "totalChannels": 12,
+  "totalChannels": 10,
   "category": "Mix Entertainment & Music",
   "channels": [
     {
-      "id": "mix-star-plus",
-      "name": "Star Plus HD",
-      "title": "Star Plus HD",
+      "id": "mix-bol-ent",
+      "name": "Bol Entertainment HD",
+      "title": "Bol Entertainment HD",
       "category": "Entertainment",
       "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      "logo": "https://i.imgur.com/eajSRFo.png",
+      "streamUrl": "https://vodzong.mjunoon.tv:8087/streamtest/Channel5-159-4/playlist.m3u8",
+      "url": "https://vodzong.mjunoon.tv:8087/streamtest/Channel5-159-4/playlist.m3u8"
     },
     {
-      "id": "mix-sony-ent",
-      "name": "Sony TV HD",
-      "title": "Sony TV HD",
-      "category": "Entertainment",
-      "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
-      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
-    },
-    {
-      "id": "mix-colors-tv",
-      "name": "Colors HD",
-      "title": "Colors HD",
-      "category": "Entertainment",
-      "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-    },
-    {
-      "id": "mix-zee-tv",
-      "name": "Zee TV HD",
-      "title": "Zee TV HD",
-      "category": "Entertainment",
-      "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
-      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
-    },
-    {
-      "id": "mix-sony-sab",
-      "name": "Sony SAB HD",
-      "title": "Sony SAB HD",
-      "category": "Comedy & Family",
-      "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-    },
-    {
-      "id": "mix-star-bharat",
-      "name": "Star Bharat HD",
-      "title": "Star Bharat HD",
-      "category": "Entertainment",
-      "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
-      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
-    },
-    {
-      "id": "mix-star-gold",
-      "name": "Star Gold HD",
-      "title": "Star Gold HD",
-      "category": "Movies",
-      "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
-      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
-    },
-    {
-      "id": "mix-sony-max",
-      "name": "Sony MAX HD",
-      "title": "Sony MAX HD",
-      "category": "Movies",
-      "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-    },
-    {
-      "id": "mix-zee-cinema",
-      "name": "Zee Cinema HD",
-      "title": "Zee Cinema HD",
-      "category": "Movies",
-      "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
-      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
-    },
-    {
-      "id": "mix-9xm",
-      "name": "9xM Music",
-      "title": "9xM Music",
+      "id": "mix-sangeet-bangla",
+      "name": "Sangeet Bangla",
+      "title": "Sangeet Bangla",
       "category": "Music",
       "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+      "logo": "https://imagesv2.dsp1.ott.kaltura.com/Service.svc/GetImage/p/5093/entry_id/ebd2edebccb641a58ae57956dd4ccfb8/version/0",
+      "streamUrl": "https://d2o8pibksxtln6.cloudfront.net/live/media/Sangeet_Bangla/hls_fta/Sangeet_Bangla.m3u8",
+      "url": "https://d2o8pibksxtln6.cloudfront.net/live/media/Sangeet_Bangla/hls_fta/Sangeet_Bangla.m3u8"
     },
     {
-      "id": "mix-mtv",
-      "name": "MTV India HD",
-      "title": "MTV India HD",
-      "category": "Music",
-      "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
-      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
-    },
-    {
-      "id": "mix-aajtak",
-      "name": "Aaj Tak HD",
-      "title": "Aaj Tak HD",
+      "id": "mix-zee-news",
+      "name": "Zee News",
+      "title": "Zee News",
       "category": "News",
       "streamType": "M3U8",
-      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
-      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
+      "logo": "https://imagesv2.dsp1.ott.kaltura.com/Service.svc/GetImage/p/5093/entry_id/087a098c826c480796c1e9ac0ade0d82/version/0",
+      "streamUrl": "https://d2o8pibksxtln6.cloudfront.net/live/media/Zee_News/hls_fta/Zee_News.m3u8",
+      "url": "https://d2o8pibksxtln6.cloudfront.net/live/media/Zee_News/hls_fta/Zee_News.m3u8"
+    },
+    {
+      "id": "mix-8xm",
+      "name": "8XM Music",
+      "title": "8XM Music",
+      "category": "Music",
+      "streamType": "M3U8",
+      "logo": "https://i.ibb.co/Kc0xHyBb/8XM-Logo.png",
+      "streamUrl": "https://cdn4.mjunoon.tv:8087/streamtest/131M/chunks.m3u8",
+      "url": "https://cdn4.mjunoon.tv:8087/streamtest/131M/chunks.m3u8"
+    },
+    {
+      "id": "mix-ary-musik",
+      "name": "ARY Musik",
+      "title": "ARY Musik",
+      "category": "Music",
+      "streamType": "M3U8",
+      "logo": "https://upload.wikimedia.org/wikipedia/en/b/bb/ARY_Musik_logo.png",
+      "streamUrl": "https://arymusik.aryzap.com/3fd38b2c62d0c3bbd74aedabb533c03a/6459fa78/v1/01847ac7a4930b8ed5aa6ed04aba/01847ac8f5f70b8ed5aa6ed04abd/main.m3u8",
+      "url": "https://arymusik.aryzap.com/3fd38b2c62d0c3bbd74aedabb533c03a/6459fa78/v1/01847ac7a4930b8ed5aa6ed04aba/01847ac8f5f70b8ed5aa6ed04abd/main.m3u8"
+    },
+    {
+      "id": "mix-republic",
+      "name": "Republic TV",
+      "title": "Republic TV",
+      "category": "News",
+      "streamType": "M3U8",
+      "logo": "https://d229kpbsb5jevy.cloudfront.net/yuppfast/content/common/channel/logos/usnsgu.png",
+      "streamUrl": "https://vg-republictvlive.akamaized.net/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/575d72be-86b2-4bb7-bd33-419fdff282e7/playlist.m3u8",
+      "url": "https://vg-republictvlive.akamaized.net/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/575d72be-86b2-4bb7-bd33-419fdff282e7/playlist.m3u8"
+    },
+    {
+      "id": "mix-india-today",
+      "name": "India Today",
+      "title": "India Today",
+      "category": "News",
+      "streamType": "M3U8",
+      "logo": "https://d229kpbsb5jevy.cloudfront.net/yuppfast/content/common/channel/logos/fkszrn.png",
+      "streamUrl": "https://vglivessai.akamaized.net/sg/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/8343296c-5b01-4047-aae9-92749ff4268b/master.m3u8",
+      "url": "https://vglivessai.akamaized.net/sg/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/8343296c-5b01-4047-aae9-92749ff4268b/master.m3u8"
+    },
+    {
+      "id": "mix-wion",
+      "name": "WION News HD",
+      "title": "WION News HD",
+      "category": "News",
+      "streamType": "M3U8",
+      "logo": "https://d229kpbsb5jevy.cloudfront.net/yuppfast/content/common/channel/logos/gyztbi.png",
+      "streamUrl": "https://zee-yupptv.vgcdn.net/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/20c3c0d9-0256-43fe-bca6-70fdd490b957/main.m3u8",
+      "url": "https://zee-yupptv.vgcdn.net/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/20c3c0d9-0256-43fe-bca6-70fdd490b957/main.m3u8"
+    },
+    {
+      "id": "mix-sansad-tv",
+      "name": "Sansad TV HD",
+      "title": "Sansad TV HD",
+      "logo": "https://imagesv2.dsp1.ott.kaltura.com/Service.svc/GetImage/p/5093/entry_id/f6ace40e05bd435184b232ca5d67fc62/version/0",
+      "streamType": "M3U8",
+      "streamUrl": "https://d2o8pibksxtln6.cloudfront.net/live/media/Sansad_TV_HD/hls_fta/Sansad_TV_HD.m3u8",
+      "url": "https://d2o8pibksxtln6.cloudfront.net/live/media/Sansad_TV_HD/hls_fta/Sansad_TV_HD.m3u8"
+    },
+    {
+      "id": "mix-dd-sports",
+      "name": "DD Sports HD",
+      "title": "DD Sports HD",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "logo": "https://dtil.tmsimg.com/assets/s158255_ld_h15_aa.png?lock=720x540",
+      "streamUrl": "https://cdn.pishow.tv/ott/live/1161/master.m3u8",
+      "url": "https://cdn.pishow.tv/ott/live/1161/master.m3u8"
     }
   ]
 }
