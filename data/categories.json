@@ -21,7 +21,7 @@
     "slug": "mix-tv",
     "icon": "fas fa-tv",
     "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCm7hdWxlS5fbZ3Do-pqzytQVayxUNHFl5oD5E4TWtQfCnRw2pM2UOa8I&s=10",
-    "m3uLink": "https://streamflexsmm.in/SFlex-StarShare/playlist.php"
+    "m3uLink": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/tv/mix.json"
   },
   {
     "id": "gcat_4",

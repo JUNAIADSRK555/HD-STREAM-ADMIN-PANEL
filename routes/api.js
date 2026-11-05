@@ -30,6 +30,38 @@ router.get('/movies/data.json', (req, res) => {
   }
 });
 
+// HD STREAM TV Channels Endpoint (Zero Jio TV Links, Live Cricket & Sports)
+router.get('/tv/data.json', (req, res) => {
+  try {
+    const filePath = path.join(__dirname, '../public/tv/data.json');
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf8');
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      return res.send(data);
+    }
+    return res.status(404).json({ success: false, message: 'TV data not found' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// MIX TV Channels Endpoint (Zero Jio TV Links, Dedicated Mix Channels)
+router.get('/tv/mix.json', (req, res) => {
+  try {
+    const filePath = path.join(__dirname, '../public/tv/mix.json');
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, 'utf8');
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      return res.send(data);
+    }
+    return res.status(404).json({ success: false, message: 'Mix TV data not found' });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 router.get('/movies', (req, res) => {
   try {
     const filePath = path.join(__dirname, '../data/cinex_movies.json');

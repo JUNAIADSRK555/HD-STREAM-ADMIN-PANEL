@@ -1,0 +1,127 @@
+{
+  "heading": "MIX TV Channels",
+  "totalChannels": 12,
+  "category": "Mix Entertainment & Music",
+  "channels": [
+    {
+      "id": "mix-star-plus",
+      "name": "Star Plus HD",
+      "title": "Star Plus HD",
+      "category": "Entertainment",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+    },
+    {
+      "id": "mix-sony-ent",
+      "name": "Sony TV HD",
+      "title": "Sony TV HD",
+      "category": "Entertainment",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
+      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
+    },
+    {
+      "id": "mix-colors-tv",
+      "name": "Colors HD",
+      "title": "Colors HD",
+      "category": "Entertainment",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+    },
+    {
+      "id": "mix-zee-tv",
+      "name": "Zee TV HD",
+      "title": "Zee TV HD",
+      "category": "Entertainment",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
+      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
+    },
+    {
+      "id": "mix-sony-sab",
+      "name": "Sony SAB HD",
+      "title": "Sony SAB HD",
+      "category": "Comedy & Family",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+    },
+    {
+      "id": "mix-star-bharat",
+      "name": "Star Bharat HD",
+      "title": "Star Bharat HD",
+      "category": "Entertainment",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
+      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
+    },
+    {
+      "id": "mix-star-gold",
+      "name": "Star Gold HD",
+      "title": "Star Gold HD",
+      "category": "Movies",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
+      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
+    },
+    {
+      "id": "mix-sony-max",
+      "name": "Sony MAX HD",
+      "title": "Sony MAX HD",
+      "category": "Movies",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+    },
+    {
+      "id": "mix-zee-cinema",
+      "name": "Zee Cinema HD",
+      "title": "Zee Cinema HD",
+      "category": "Movies",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
+      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
+    },
+    {
+      "id": "mix-9xm",
+      "name": "9xM Music",
+      "title": "9xM Music",
+      "category": "Music",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+      "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+    },
+    {
+      "id": "mix-mtv",
+      "name": "MTV India HD",
+      "title": "MTV India HD",
+      "category": "Music",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
+      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
+    },
+    {
+      "id": "mix-aajtak",
+      "name": "Aaj Tak HD",
+      "title": "Aaj Tak HD",
+      "category": "News",
+      "streamType": "M3U8",
+      "logo": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
+      "streamUrl": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8",
+      "url": "https://cph-p2p-msl.akamaized.net/hls/live/200034/test/master.m3u8"
+    }
+  ]
+}
