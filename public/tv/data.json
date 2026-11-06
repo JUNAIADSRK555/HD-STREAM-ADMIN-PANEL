@@ -1,6 +1,6 @@
 {
   "heading": "HD STREAM Live TV Channels",
-  "totalChannels": 28,
+  "totalChannels": 25,
   "category": "Live Sports & Entertainment",
   "channels": [
     {
@@ -34,144 +34,74 @@
       "url": "https://drk6xq0vhn.gpcdn.net/live/euro_sports_hd_abr/index.m3u8"
     },
     {
-      "id": "sony-sports-ten-1-hd",
-      "name": "Sony Sports Ten 1 HD",
-      "title": "Sony Sports Ten 1 HD",
-      "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_SONY_SPORTS_TEN_1/images/LOGO_HD/image.png",
-      "category": "Live Sports",
-      "streamType": "M3U8",
-      "streamUrl": "http://103.185.24.134:3001/SonyTenSports1/index.m3u8",
-      "url": "http://103.185.24.134:3001/SonyTenSports1/index.m3u8"
-    },
-    {
-      "id": "star-sports-2-hd",
-      "name": "Star Sports 2 HD",
-      "title": "Star Sports 2 HD",
-      "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_STAR_SPORTS_2/images/LOGO_HD/image.png",
-      "category": "Live Cricket",
-      "streamType": "M3U8",
-      "streamUrl": "http://tvsen5.aynascope.net/cXPB2LKkErN9/index.m3u8",
-      "url": "http://tvsen5.aynascope.net/cXPB2LKkErN9/index.m3u8"
-    },
-    {
-      "id": "star-sports-select-1-hd",
-      "name": "Star Sports Select 1 HD",
-      "title": "Star Sports Select 1 HD",
-      "logo": "https://i.imgur.com/Mh9tKPx.png",
-      "category": "Live Cricket",
-      "streamType": "M3U8",
-      "streamUrl": "http://103.151.60.162:2122/play/a026/index.m3u8?hls",
-      "url": "http://103.151.60.162:2122/play/a026/index.m3u8?hls"
-    },
-    {
-      "id": "star-sports-select-2-hd",
-      "name": "Star Sports Select 2 HD",
-      "title": "Star Sports Select 2 HD",
-      "logo": "https://i.imgur.com/FtRT73R.png",
-      "category": "Live Cricket",
-      "streamType": "M3U8",
-      "streamUrl": "http://103.151.60.162:2122/play/a027/index.m3u8?hls",
-      "url": "http://103.151.60.162:2122/play/a027/index.m3u8?hls"
-    },
-    {
-      "id": "sony-sports-ten-1",
-      "name": "Sony Sports Ten 1",
-      "title": "Sony Sports Ten 1",
-      "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_SONY_SPORTS_TEN_1/images/LOGO_HD/image.png",
-      "category": "Live Sports",
-      "streamType": "M3U8",
-      "streamUrl": "http://103.151.60.162:2122/play/a01c/index.m3u8?hls",
-      "url": "http://103.151.60.162:2122/play/a01c/index.m3u8?hls"
-    },
-    {
-      "id": "sony-sports-ten-2",
-      "name": "Sony Sports Ten 2",
-      "title": "Sony Sports Ten 2",
-      "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_SONY_SPORTS_TEN_2/images/LOGO_HD/image.png",
-      "category": "Live Sports",
-      "streamType": "M3U8",
-      "streamUrl": "http://103.151.60.162:2122/play/a01b/index.m3u8?hls",
-      "url": "http://103.151.60.162:2122/play/a01b/index.m3u8?hls"
-    },
-    {
-      "id": "sony-sports-ten-3-hindi",
-      "name": "Sony Sports Ten 3 Hindi",
-      "title": "Sony Sports Ten 3 Hindi",
-      "logo": "https://dtil.tmsimg.com/assets/GNLZZGG0025TCMR.png?lock=720x540",
-      "category": "Live Sports",
-      "streamType": "M3U8",
-      "streamUrl": "http://103.151.60.162:2122/play/a01t/index.m3u8?hls",
-      "url": "http://103.151.60.162:2122/play/a01t/index.m3u8?hls"
-    },
-    {
-      "id": "sony-sports-ten-5",
-      "name": "Sony Sports Ten 5",
-      "title": "Sony Sports Ten 5",
-      "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_SONY_SPORTS_TEN_5/images/LOGO_HD/image.png",
-      "category": "Live Sports",
-      "streamType": "M3U8",
-      "streamUrl": "http://103.151.60.162:2122/play/a028/index.m3u8?hls",
-      "url": "http://103.151.60.162:2122/play/a028/index.m3u8?hls"
-    },
-    {
-      "id": "ten-cricket",
-      "name": "Ten Cricket",
-      "title": "Ten Cricket",
-      "logo": "https://i.imgur.com/K5XIFuW.png",
-      "category": "Live Cricket",
-      "streamType": "M3U8",
-      "streamUrl": "http://103.151.60.162:2122/play/a0fj/index.m3u8?hls",
-      "url": "http://103.151.60.162:2122/play/a0fj/index.m3u8?hls"
-    },
-    {
-      "id": "ptv-sports-hd",
-      "name": "PTV Sports HD",
-      "title": "PTV Sports HD",
-      "logo": "https://i.imgur.com/CPm6GHA.png",
-      "category": "Live Sports",
-      "streamType": "M3U8",
-      "streamUrl": "http://103.250.28.74:8000/play/a019/index.m3u8",
-      "url": "http://103.250.28.74:8000/play/a019/index.m3u8"
-    },
-    {
-      "id": "ten-sports-pakistan",
-      "name": "Ten Sports Pakistan",
-      "title": "Ten Sports Pakistan",
-      "logo": "https://i.imgur.com/7qS6TcE.png",
-      "category": "Live Sports",
-      "streamType": "M3U8",
-      "streamUrl": "http://121.91.61.106:8000/play/a04h/index.m3u8",
-      "url": "http://121.91.61.106:8000/play/a04h/index.m3u8"
-    },
-    {
       "id": "m-sports",
       "name": "M Sports HD",
       "title": "M Sports HD",
-      "logo": "https://msports.pk/wp-content/uploads/2026/02/m-sports-300.png",
+      "logo": "https://i.imgur.com/G5Z58z5.png",
       "category": "Live Sports",
       "streamType": "M3U8",
-      "streamUrl": "https://cdn.rabta.stream/M-Sports/index.m3u8",
-      "url": "https://cdn.rabta.stream/M-Sports/index.m3u8"
-    },
-    {
-      "id": "pk-sports-hd",
-      "name": "PK Sports HD",
-      "title": "PK Sports HD",
-      "logo": "https://i.imgur.com/qtbSnrY.png",
-      "category": "Live Sports",
-      "streamType": "M3U8",
-      "streamUrl": "https://lbgo.bozztv.com/ssh101/ssh101/pksportshd/playlist.m3u8",
-      "url": "https://lbgo.bozztv.com/ssh101/ssh101/pksportshd/playlist.m3u8"
+      "streamUrl": "https://d35j504z0x2vu2.cloudfront.net/v1/manifest/0414e727-4c07-427f-94ad-737750734a74/09c7eb46-3bb8-410a-b33c-367b8d4bc405/6/0.m3u8",
+      "url": "https://d35j504z0x2vu2.cloudfront.net/v1/manifest/0414e727-4c07-427f-94ad-737750734a74/09c7eb46-3bb8-410a-b33c-367b8d4bc405/6/0.m3u8"
     },
     {
       "id": "kabaddi-24x7",
-      "name": "Kabaddi 24x7",
-      "title": "Kabaddi 24x7",
-      "logo": "https://papaji.freetvindia.com/media/kabaddi_24x7.png",
+      "name": "Kabaddi 24x7 Live",
+      "title": "Kabaddi 24x7 Live",
+      "logo": "https://dtil.tmsimg.com/assets/s158255_ld_h15_aa.png?lock=720x540",
       "category": "Live Sports",
       "streamType": "M3U8",
-      "streamUrl": "https://samitaorigin.tangotv.in/KABADDI24X7/SAMITAORIGIN/index.m3u8",
-      "url": "https://samitaorigin.tangotv.in/KABADDI24X7/SAMITAORIGIN/index.m3u8"
+      "streamUrl": "https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/9a410313f8374a27bc19a3fafe22f28b/index.m3u8",
+      "url": "https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/9a410313f8374a27bc19a3fafe22f28b/index.m3u8"
+    },
+    {
+      "id": "redbull-tv",
+      "name": "Red Bull TV Sports",
+      "title": "Red Bull TV Sports",
+      "logo": "https://resources.redbull.com/logos/redbulltv/v3/redbulltv-logo.png",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "streamUrl": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8",
+      "url": "https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8"
+    },
+    {
+      "id": "fight-sports-hd",
+      "name": "Fight Sports HD",
+      "title": "Fight Sports HD",
+      "logo": "https://i.imgur.com/G5Z58z5.png",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "streamUrl": "https://fightsports-samsungau.amagi.tv/playlist.m3u8",
+      "url": "https://fightsports-samsungau.amagi.tv/playlist.m3u8"
+    },
+    {
+      "id": "motorvision-tv",
+      "name": "Motorvision TV",
+      "title": "Motorvision TV",
+      "logo": "https://i.imgur.com/Mh9tKPx.png",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "streamUrl": "https://motorvision-rakuten.amagi.tv/playlist.m3u8",
+      "url": "https://motorvision-rakuten.amagi.tv/playlist.m3u8"
+    },
+    {
+      "id": "sportsgrid-live",
+      "name": "SportsGrid Live",
+      "title": "SportsGrid Live",
+      "logo": "https://i.imgur.com/FtRT73R.png",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "streamUrl": "https://sportsgrid-klowdtv.amagi.tv/playlist.m3u8",
+      "url": "https://sportsgrid-klowdtv.amagi.tv/playlist.m3u8"
+    },
+    {
+      "id": "horizon-sports",
+      "name": "Horizon Sports HD",
+      "title": "Horizon Sports HD",
+      "logo": "https://i.imgur.com/G5Z58z5.png",
+      "category": "Live Sports",
+      "streamType": "M3U8",
+      "streamUrl": "https://horizonsports-distro.amagi.tv/playlist.m3u8",
+      "url": "https://horizonsports-distro.amagi.tv/playlist.m3u8"
     },
     {
       "id": "republic-tv",
@@ -185,8 +115,8 @@
     },
     {
       "id": "india-today",
-      "name": "India Today",
-      "title": "India Today",
+      "name": "India Today HD",
+      "title": "India Today HD",
       "logo": "https://d229kpbsb5jevy.cloudfront.net/yuppfast/content/common/channel/logos/fkszrn.png",
       "category": "News",
       "streamType": "M3U8",
@@ -244,26 +174,6 @@
       "url": "https://vodzong.mjunoon.tv:8087/streamtest/Channel5-159-4/playlist.m3u8"
     },
     {
-      "id": "ary-news",
-      "name": "ARY News",
-      "title": "ARY News",
-      "logo": "https://i.imgur.com/R4KtTbJ.jpg",
-      "category": "News",
-      "streamType": "M3U8",
-      "streamUrl": "https://cdn07lhr.tamashaweb.com:8087/jazzauth/vsat-arynews-abr/live/vsat-arynews-H/chunks_dvr_timeshift-0-3600.m3u8",
-      "url": "https://cdn07lhr.tamashaweb.com:8087/jazzauth/vsat-arynews-abr/live/vsat-arynews-H/chunks_dvr_timeshift-0-3600.m3u8"
-    },
-    {
-      "id": "ary-musik",
-      "name": "ARY Musik",
-      "title": "ARY Musik",
-      "logo": "https://upload.wikimedia.org/wikipedia/en/b/bb/ARY_Musik_logo.png",
-      "category": "Music",
-      "streamType": "M3U8",
-      "streamUrl": "https://arymusik.aryzap.com/3fd38b2c62d0c3bbd74aedabb533c03a/6459fa78/v1/01847ac7a4930b8ed5aa6ed04aba/01847ac8f5f70b8ed5aa6ed04abd/main.m3u8",
-      "url": "https://arymusik.aryzap.com/3fd38b2c62d0c3bbd74aedabb533c03a/6459fa78/v1/01847ac7a4930b8ed5aa6ed04aba/01847ac8f5f70b8ed5aa6ed04abd/main.m3u8"
-    },
-    {
       "id": "8xm-music",
       "name": "8XM Music",
       "title": "8XM Music",
@@ -277,11 +187,11 @@
       "id": "24-news-hd",
       "name": "24 News HD",
       "title": "24 News HD",
-      "logo": "https://upload.wikimedia.org/wikipedia/en/9/93/24_News_HD_Logo.png",
+      "logo": "https://i.imgur.com/FtRT73R.png",
       "category": "News",
       "streamType": "M3U8",
-      "streamUrl": "https://cdn4.mjunoon.tv:8087/streamtest/146M/chunks.m3u8",
-      "url": "https://cdn4.mjunoon.tv:8087/streamtest/146M/chunks.m3u8"
+      "streamUrl": "https://cdn4.mjunoon.tv:8087/streamtest/Channel15-136-4/playlist.m3u8",
+      "url": "https://cdn4.mjunoon.tv:8087/streamtest/Channel15-136-4/playlist.m3u8"
     }
   ]
 }
