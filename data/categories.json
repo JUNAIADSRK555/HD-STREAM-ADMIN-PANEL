@@ -110,7 +110,7 @@
     "slug": "cinex-movies",
     "icon": "fas fa-film",
     "imageUrl": "https://image.tmdb.org/t/p/w500/dswjf9LMu2DAffcvTBzqYK3pu10.jpg",
-    "m3uLink": "https://stream-admin-backend.vercel.app/api/movies/data.json"
+    "m3uLink": "https://cinearena-movies-api.asifadmincinearena.workers.dev/"
   }
 ]
 
