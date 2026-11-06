@@ -4,29 +4,29 @@
   "announcement_enabled": false,
   "minVersion": "1.0.0",
   "min_version": "1.0.0",
-  "appVersion": "3.3.6",
-  "app_version": "3.3.6",
+  "appVersion": "3.3.9",
+  "app_version": "3.3.9",
   "liveMatches": [
     {
-      "match_name": "WBBL - Women's Big Bash League",
-      "title": "WBBL - Women's Big Bash League",
+      "match_name": "Sydney Sixers vs Brisbane Heat",
+      "title": "Sydney Sixers vs Brisbane Heat",
       "category": "Live Cricket",
       "status": "LIVE",
-      "date": "05/11/2026",
+      "date": "06/11/2026",
       "time": "1:30 PM",
       "banner_logo": "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200&auto=format&fit=crop",
-      "team1_name": "WBBL Team 1",
+      "team1_name": "Sydney Sixers",
       "team1_logo": "https://flagcdn.com/w160/au.png",
       "team1": {
-        "name": "WBBL Team 1",
+        "name": "Sydney Sixers",
         "logo": "https://flagcdn.com/w160/au.png",
         "flag": "https://flagcdn.com/w160/au.png",
         "score": ""
       },
-      "team2_name": "WBBL Team 2",
+      "team2_name": "Brisbane Heat",
       "team2_logo": "https://flagcdn.com/w160/au.png",
       "team2": {
-        "name": "WBBL Team 2",
+        "name": "Brisbane Heat",
         "logo": "https://flagcdn.com/w160/au.png",
         "flag": "https://flagcdn.com/w160/au.png",
         "score": ""
