@@ -42,23 +42,32 @@ async function getDriveCategories(forceRefresh = false) {
       throw new Error('Categories response is not an array');
     }
 
-    const formatted = rawList.map((c, idx) => {
-      const title = (c.title || c.name || `Channel ${idx + 1}`).trim();
-      const slug = (c.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-')).replace(/^-+|-+$/g, '');
-      return {
-        id: c.id || `gcat_${idx + 1}`,
-        name: title,
-        slug: slug || `cat-${idx + 1}`,
-        icon: c.icon || 'fas fa-tv',
-        imageUrl: (c.imageUrl || c.image || c.logo || '').trim(),
-        m3uLink: (c.m3uLink || c.url || '').trim(),
-        portal_url: (c.portal_url || '').trim(),
-        mac: (c.mac || '').trim(),
-        sn: (c.sn || '').trim(),
-        device_id_1: (c.device_id_1 || '').trim(),
-        device_id_2: (c.device_id_2 || '').trim()
-      };
-    });
+    const formatted = rawList
+      .filter(c => {
+        const title = (c.title || c.name || '').trim();
+        const slug = (c.slug || '').trim();
+        const combined = `${title} ${slug}`.toLowerCase();
+        return !/adult|18\+|porn|erotic|nsfw|xxx|brazzers|playboy|sensual/i.test(combined);
+      })
+      .map((c, idx) => {
+        const title = (c.title || c.name || `Channel ${idx + 1}`).trim();
+        const slug = (c.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-')).replace(/^-+|-+$/g, '');
+        const cleanM3u = (c.m3uLink || c.url || '').trim().replace(/^:\s*/, '');
+        const img = (c.imageUrl || c.image || c.logo || '').trim();
+        return {
+          id: c.id || `gcat_${idx + 1}`,
+          name: title,
+          slug: slug || `cat-${idx + 1}`,
+          icon: c.icon || (img ? img : 'fas fa-tv'),
+          imageUrl: img,
+          m3uLink: cleanM3u,
+          portal_url: (c.portal_url || '').trim(),
+          mac: (c.mac || '').trim(),
+          sn: (c.sn || '').trim(),
+          device_id_1: (c.device_id_1 || '').trim(),
+          device_id_2: (c.device_id_2 || '').trim()
+        };
+      });
 
     cachedCategories = formatted;
     lastCategoriesFetch = now;
@@ -211,17 +220,38 @@ function formatDriveMatch(m, defaultStatus = 'LIVE', index = 0) {
     const isHls = (s.type || '').toLowerCase() === 'hls' || url.includes('.m3u8');
     const streamType = s.streamType || (isMpd ? 'MPD' : isHls ? 'M3U8' : 'DIRECT');
 
+    let drm = s.drm || {};
+    if (!drm.keyId && url.includes('drmLicense=')) {
+      const match = url.match(/drmLicense=([0-9a-fA-F]{32}):([0-9a-fA-F]{32})/);
+      if (match) {
+        drm = {
+          enabled: true,
+          scheme: 'clearkey',
+          keyId: match[1],
+          key: match[2]
+        };
+      }
+    } else if (s.keys && Array.isArray(s.keys) && s.keys.length > 0) {
+      const k = s.keys[0];
+      drm = {
+        enabled: true,
+        scheme: s.drm_scheme || s.drmScheme || 'clearkey',
+        keyId: k.key_id || k.keyId,
+        key: k.key
+      };
+    }
+
     let clearKeyLicense = null;
-    if (s.drm?.enabled && s.drm.scheme === 'clearkey' && s.drm.keyId && s.drm.key) {
+    if (drm?.enabled && drm.scheme === 'clearkey' && drm.keyId && drm.key) {
       clearKeyLicense = {
-        keyIdHex: s.drm.keyId,
-        keyHex: s.drm.key,
+        keyIdHex: drm.keyId,
+        keyHex: drm.key,
         w3cFormat: {
           keys: [
             {
               kty: 'oct',
-              kid: hexToBase64Url(s.drm.keyId),
-              k: hexToBase64Url(s.drm.key)
+              kid: hexToBase64Url(drm.keyId),
+              k: hexToBase64Url(drm.key)
             }
           ]
         }
@@ -300,9 +330,17 @@ async function getDriveEvents(forceRefresh = false) {
     }
 
     const data = await res.json();
-    const liveMatches = (data.live_matches || []).map((m, idx) => formatDriveMatch(m, 'LIVE', idx));
-    const upcomingMatches = (data.upcoming_matches || []).map((m, idx) => formatDriveMatch(m, 'UPCOMING', idx));
-    const finishedMatches = (data.finished_matches || []).map((m, idx) => formatDriveMatch(m, 'FINISHED', idx));
+    const allRaw = [
+      ...(data.live_matches || []).map(m => ({ ...m, _defaultStatus: 'LIVE' })),
+      ...(data.upcoming_matches || []).map(m => ({ ...m, _defaultStatus: 'UPCOMING' })),
+      ...(data.finished_matches || []).map(m => ({ ...m, _defaultStatus: 'FINISHED' }))
+    ];
+
+    const formattedAll = allRaw.map((m, idx) => formatDriveMatch(m, m._defaultStatus, idx)).filter(Boolean);
+
+    const liveMatches = formattedAll.filter(m => m.status === 'LIVE');
+    const upcomingMatches = formattedAll.filter(m => m.status === 'UPCOMING');
+    const finishedMatches = formattedAll.filter(m => m.status === 'FINISHED' || m.status === 'ENDED');
 
     const result = {
       liveEvents: liveMatches,
