@@ -4,8 +4,116 @@
   "announcement_enabled": false,
   "minVersion": "1.0.0",
   "min_version": "1.0.0",
-  "appVersion": "3.4.8",
-  "app_version": "3.4.8",
-  "liveMatches": [],
-  "upcomingMatches": []
+  "appVersion": "3.4.3",
+  "app_version": "3.4.3",
+  "liveMatches": [
+    {
+      "match_name": "Sydney Sixers vs Brisbane Heat",
+      "title": "Sydney Sixers vs Brisbane Heat",
+      "category": "Live Cricket",
+      "status": "LIVE",
+      "date": "06/11/2026",
+      "time": "1:30 PM",
+      "banner_logo": "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200&auto=format&fit=crop",
+      "team1_name": "Sydney Sixers",
+      "team1_logo": "https://flagcdn.com/w160/au.png",
+      "team1": {
+        "name": "Sydney Sixers",
+        "logo": "https://flagcdn.com/w160/au.png",
+        "flag": "https://flagcdn.com/w160/au.png",
+        "score": ""
+      },
+      "team2_name": "Brisbane Heat",
+      "team2_logo": "https://flagcdn.com/w160/au.png",
+      "team2": {
+        "name": "Brisbane Heat",
+        "logo": "https://flagcdn.com/w160/au.png",
+        "flag": "https://flagcdn.com/w160/au.png",
+        "score": ""
+      },
+      "streams": [
+        {
+          "title": "FanCode English",
+          "url": "https://dai-fancode.pages.dev/mumbai/4250397_english_hls_6c8073e58c25460_1ta-di_h264/index.m3u8|User-Agent=ReactNativeVideo/9.3.0(Linux;Android13)AndroidXMedia3/1.6.1&Referer=https://fancode.com",
+          "type": "HLS"
+        }
+      ]
+    },
+    {
+      "match_name": "Afghanistan vs Zimbabwe",
+      "title": "Afghanistan vs Zimbabwe",
+      "category": "Live Cricket",
+      "status": "LIVE",
+      "date": "05/11/2026",
+      "time": "3:30 PM",
+      "banner_logo": "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200&auto=format&fit=crop",
+      "team1_name": "Afghanistan",
+      "team1_logo": "https://flagcdn.com/w160/af.png",
+      "team1": {
+        "name": "Afghanistan",
+        "logo": "https://flagcdn.com/w160/af.png",
+        "flag": "https://flagcdn.com/w160/af.png",
+        "score": ""
+      },
+      "team2_name": "Zimbabwe",
+      "team2_logo": "https://flagcdn.com/w160/zw.png",
+      "team2": {
+        "name": "Zimbabwe",
+        "logo": "https://flagcdn.com/w160/zw.png",
+        "flag": "https://flagcdn.com/w160/zw.png",
+        "score": ""
+      },
+      "streams": [
+        {
+          "title": "Willow",
+          "url": "https://otte.live.fly.ww.aiv-cdn.net/iad-nitro/live/clients/dash/enc/za98pktb6j/out/v1/c8454624a61142f3a61737e92cbf2b81/cenc.mpd?|drmScheme=clearkey&drmLicense=4a4c70f4416d322e37111794d0a396b6:d23a4f2e632c458e7e1981d3fe41d852",
+          "type": "HLS"
+        },
+        {
+          "title": "FANCODE IN",
+          "url": "https://dai-fancode.pages.dev/mumbai/4250527_english_hls_370c6945842186_1ta-di_h264/index.m3u8|User-Agent=ReactNativeVideo/9.11.1 (Linux;Android 13) AndroidXMedia3/1.6.1&Referer=https://fancode.com/",
+          "type": "HLS"
+        }
+      ]
+    }
+  ],
+  "upcomingMatches": [
+    {
+      "match_name": "India vs New Zealand",
+      "title": "India vs New Zealand",
+      "category": "Live Cricket",
+      "status": "UPCOMING",
+      "date": "07/11/2026",
+      "time": "7:00 AM",
+      "banner_logo": "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1200&auto=format&fit=crop",
+      "team1_name": "India",
+      "team1_logo": "https://flagcdn.com/w160/in.png",
+      "team1": {
+        "name": "India",
+        "logo": "https://flagcdn.com/w160/in.png",
+        "flag": "https://flagcdn.com/w160/in.png",
+        "score": ""
+      },
+      "team2_name": "New Zealand",
+      "team2_logo": "https://flagcdn.com/w160/nz.png",
+      "team2": {
+        "name": "New Zealand",
+        "logo": "https://flagcdn.com/w160/nz.png",
+        "flag": "https://flagcdn.com/w160/nz.png",
+        "score": ""
+      },
+      "streams": [
+        {
+          "title": "Stream 1 - TNT 2",
+          "url": "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/puehlftk5j/out/v1/f7f0da1ee112481ca0024e6d4dd97f4a/cenc.mpd?|drmScheme=clearkey&drmLicense=f3df7843080ae743bf865dc5fdf64c68:567c863bc12eb74788ea74888c042e1b",
+          "type": "HLS"
+        },
+        {
+          "title": "Sony LIV Hindi",
+          "url": "https://liveakmt-p-md.slivcdn.com/hls/live/2119921/cricodi_0311/HIN/master.m3u8?hdnea=exp=1793803740~acl=/*~id=43162315d479dce8217dd2ca1b1191fd-1793760539087~hmac=0acdf57ada50d3b1a2a324f4d8e3a3cad0bc0911b61e927f80404142272b0495",
+          "type": "HLS"
+        }
+      ]
+    }
+  ]
 }
