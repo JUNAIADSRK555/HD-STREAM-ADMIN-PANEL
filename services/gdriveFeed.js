@@ -46,6 +46,17 @@ function formatSportsDataMatch(m, index = 0) {
     const isMpd = url.includes('.mpd');
     const streamType = isMpd ? 'MPD' : 'M3U8';
     const referer = (s.referer || s.referrer || '').trim();
+    const kid = (s.kid || s.key_id || '').trim();
+    const key = (s.key || '').trim();
+    const hasDrm = !!(kid && key);
+    const drm = hasDrm ? {
+      enabled: true,
+      scheme: 'clearkey',
+      keyId: kid,
+      key: key
+    } : { enabled: false };
+
+    const ua = (s.user_agent || '').trim() || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36';
 
     return {
       id: `sports_str_${index}_${sIdx}`,
@@ -54,11 +65,11 @@ function formatSportsDataMatch(m, index = 0) {
       streamUrl: url,
       quality: '1080p HD',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0',
+        'User-Agent': ua,
         'Referer': referer,
         'Origin': referer ? new URL(referer).origin : ''
       },
-      drm: { enabled: false }
+      drm
     };
   }).filter(Boolean);
 
