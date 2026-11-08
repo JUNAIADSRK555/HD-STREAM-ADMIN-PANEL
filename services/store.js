@@ -1,4 +1,6 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const mongoose = require('mongoose');
 const Match = require('../models/Match');
 const Category = require('../models/Category');
@@ -354,9 +356,59 @@ const initialVods = [
   }
 ];
 
+function loadPersistedCategories() {
+  try {
+    const filePath = path.join(__dirname, '../data/categories.json');
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      if (Array.isArray(data) && data.length > 0) {
+        return data.map((c, idx) => ({
+          _id: c.id || c._id || `cat_${idx + 1}`,
+          id: c.id || c._id || `cat_${idx + 1}`,
+          name: c.name,
+          slug: c.slug || c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          icon: c.icon || 'fas fa-tv',
+          imageUrl: c.imageUrl || '',
+          m3uLink: c.m3uLink || '',
+          portal_url: c.portal_url || '',
+          mac: c.mac || '',
+          order: idx + 1,
+          isActive: true
+        }));
+      }
+    }
+  } catch (err) {
+    console.error('Error loading persisted categories:', err.message);
+  }
+  return [...initialCategories];
+}
+
+function loadPersistedMatches() {
+  try {
+    const filePath = path.join(__dirname, '../data/live_matches.json');
+    if (fs.existsSync(filePath)) {
+      const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+      const list = [...(data.liveMatches || []), ...(data.upcomingMatches || [])];
+      if (list.length > 0) {
+        return list.map((m, idx) => ({
+          _id: m._id || m.id || `match_persisted_${idx + 1}`,
+          id: m.id || m._id || `match_persisted_${idx + 1}`,
+          createdAt: m.createdAt || new Date(),
+          updatedAt: m.updatedAt || new Date(),
+          streams: [],
+          ...m
+        }));
+      }
+    }
+  } catch (err) {
+    console.error('Error loading persisted matches:', err.message);
+  }
+  return [...initialMatches];
+}
+
 let inMemoryState = {
-  categories: [...initialCategories],
-  matches: [...initialMatches],
+  categories: loadPersistedCategories(),
+  matches: loadPersistedMatches(),
   vods: [...initialVods],
   settings: {
     appName: 'HD STREAM',
@@ -416,54 +468,72 @@ const Store = {
   },
 
   async createMatch(data) {
+    let result = null;
     if (isMongoConnected()) {
       const match = new Match(data);
-      return await match.save();
+      result = await match.save();
+    } else {
+      const newMatch = {
+        _id: 'match_' + Date.now().toString(36),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        streams: [],
+        ...data
+      };
+      inMemoryState.matches.unshift(newMatch);
+      result = newMatch;
     }
-    const newMatch = {
-      _id: 'match_' + Date.now().toString(36),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      streams: [],
-      ...data
-    };
-    inMemoryState.matches.unshift(newMatch);
-    return newMatch;
+    this.persistState().catch(() => {});
+    return result;
   },
 
   async updateMatch(id, data) {
+    let result = null;
     if (isMongoConnected()) {
-      return await Match.findByIdAndUpdate(id, data, { new: true });
+      result = await Match.findByIdAndUpdate(id, data, { new: true });
+    } else {
+      const idx = inMemoryState.matches.findIndex(m => String(m._id) === String(id));
+      if (idx !== -1) {
+        inMemoryState.matches[idx] = {
+          ...inMemoryState.matches[idx],
+          ...data,
+          updatedAt: new Date()
+        };
+        result = inMemoryState.matches[idx];
+      }
     }
-    const idx = inMemoryState.matches.findIndex(m => String(m._id) === String(id));
-    if (idx === -1) return null;
-    inMemoryState.matches[idx] = {
-      ...inMemoryState.matches[idx],
-      ...data,
-      updatedAt: new Date()
-    };
-    return inMemoryState.matches[idx];
+    this.persistState().catch(() => {});
+    return result;
   },
 
   async deleteMatch(id) {
+    let result = null;
     if (isMongoConnected()) {
-      return await Match.findByIdAndDelete(id);
+      result = await Match.findByIdAndDelete(id);
+    } else {
+      const idx = inMemoryState.matches.findIndex(m => String(m._id) === String(id));
+      if (idx !== -1) {
+        const deleted = inMemoryState.matches.splice(idx, 1);
+        result = deleted[0];
+      }
     }
-    const idx = inMemoryState.matches.findIndex(m => String(m._id) === String(id));
-    if (idx === -1) return null;
-    const deleted = inMemoryState.matches.splice(idx, 1);
-    return deleted[0];
+    this.persistState().catch(() => {});
+    return result;
   },
 
   async deleteMultipleMatches(ids) {
     if (!Array.isArray(ids) || ids.length === 0) return 0;
+    let count = 0;
     if (isMongoConnected()) {
       const res = await Match.deleteMany({ _id: { $in: ids } });
-      return res.deletedCount || 0;
+      count = res.deletedCount || 0;
+    } else {
+      const initialLen = inMemoryState.matches.length;
+      inMemoryState.matches = inMemoryState.matches.filter(m => !ids.includes(String(m._id)));
+      count = initialLen - inMemoryState.matches.length;
     }
-    const initialLen = inMemoryState.matches.length;
-    inMemoryState.matches = inMemoryState.matches.filter(m => !ids.includes(String(m._id)));
-    return initialLen - inMemoryState.matches.length;
+    this.persistState().catch(() => {});
+    return count;
   },
 
   async deleteAllMatches() {
@@ -610,6 +680,7 @@ const Store = {
       if (!exists) {
         const slug = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
         await Category.create({ name: cleanName, slug, icon: 'fas fa-tv', order: 10, isActive: true });
+        this.persistState().catch(() => {});
       }
     } else {
       const exists = inMemoryState.categories.find(c => c.name.toLowerCase() === cleanName.toLowerCase());
@@ -622,43 +693,58 @@ const Store = {
           order: inMemoryState.categories.length + 1,
           isActive: true
         });
+        this.persistState().catch(() => {});
       }
     }
   },
 
   async createCategory(data) {
+    let result = null;
     if (isMongoConnected()) {
       const cat = new Category(data);
-      return await cat.save();
+      result = await cat.save();
+    } else {
+      const newCat = {
+        _id: 'cat_' + Date.now().toString(36),
+        createdAt: new Date(),
+        isActive: true,
+        order: inMemoryState.categories.length + 1,
+        ...data
+      };
+      inMemoryState.categories.push(newCat);
+      result = newCat;
     }
-    const newCat = {
-      _id: 'cat_' + Date.now().toString(36),
-      createdAt: new Date(),
-      isActive: true,
-      order: inMemoryState.categories.length + 1,
-      ...data
-    };
-    inMemoryState.categories.push(newCat);
-    return newCat;
+    this.persistState().catch(() => {});
+    return result;
   },
 
   async updateCategory(id, data) {
+    let result = null;
     if (isMongoConnected()) {
-      return await Category.findByIdAndUpdate(id, data, { new: true });
+      result = await Category.findByIdAndUpdate(id, data, { new: true });
+    } else {
+      const idx = inMemoryState.categories.findIndex(c => String(c._id) === String(id) || c.id === id);
+      if (idx !== -1) {
+        inMemoryState.categories[idx] = { ...inMemoryState.categories[idx], ...data, updatedAt: new Date() };
+        result = inMemoryState.categories[idx];
+      }
     }
-    const idx = inMemoryState.categories.findIndex(c => String(c._id) === String(id) || c.id === id);
-    if (idx === -1) return null;
-    inMemoryState.categories[idx] = { ...inMemoryState.categories[idx], ...data, updatedAt: new Date() };
-    return inMemoryState.categories[idx];
+    this.persistState().catch(() => {});
+    return result;
   },
 
   async deleteCategory(id) {
+    let result = null;
     if (isMongoConnected()) {
-      return await Category.findByIdAndDelete(id);
+      result = await Category.findByIdAndDelete(id);
+    } else {
+      const idx = inMemoryState.categories.findIndex(c => String(c._id) === String(id));
+      if (idx !== -1) {
+        result = inMemoryState.categories.splice(idx, 1)[0];
+      }
     }
-    const idx = inMemoryState.categories.findIndex(c => String(c._id) === String(id));
-    if (idx === -1) return null;
-    return inMemoryState.categories.splice(idx, 1)[0];
+    this.persistState().catch(() => {});
+    return result;
   },
 
   // --- VOD / SHOWS / EPISODES ---
@@ -1068,6 +1154,51 @@ const Store = {
       uninstalled: analytics.uninstalled,
       retentionRate: analytics.retentionRate
     };
+  },
+
+  // --- PERSIST STATE TO LOCAL DISK (data/live_matches.json & data/categories.json) ---
+  async persistState() {
+    try {
+      const matches = await this.getMatches();
+      const categories = await this.getCategories();
+
+      const liveMatchesPath = path.join(__dirname, '../data/live_matches.json');
+      const categoriesPath = path.join(__dirname, '../data/categories.json');
+
+      const live = matches.filter(m => (m.status || 'LIVE').toUpperCase() === 'LIVE');
+      const upcoming = matches.filter(m => (m.status || '').toUpperCase() === 'UPCOMING');
+
+      const liveMatchesData = {
+        announcement: "",
+        announcementEnabled: false,
+        announcement_enabled: false,
+        minVersion: "1.0.0",
+        min_version: "1.0.0",
+        appVersion: "3.4.10",
+        app_version: "3.4.10",
+        liveMatches: live,
+        upcomingMatches: upcoming
+      };
+
+      fs.writeFileSync(liveMatchesPath, JSON.stringify(liveMatchesData, null, 2), 'utf8');
+
+      const cleanCategories = categories.map((c, idx) => ({
+        id: c.id || c._id || `cat_${idx + 1}`,
+        name: c.name,
+        slug: c.slug || c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        icon: c.icon || 'fas fa-tv',
+        imageUrl: c.imageUrl || '',
+        m3uLink: c.m3uLink || '',
+        portal_url: c.portal_url || '',
+        mac: c.mac || ''
+      }));
+
+      fs.writeFileSync(categoriesPath, JSON.stringify(cleanCategories, null, 2), 'utf8');
+      console.log(`[Store] Successfully persisted ${matches.length} matches & ${cleanCategories.length} categories to disk.`);
+    } catch (err) {
+      // Safe fallback on read-only serverless filesystems
+      console.warn('[Store] Notice: persistState error:', err.message);
+    }
   },
 
   // --- SYNC / REFRESH CHANNELS & CATEGORIES (DIRECT FROM MONGODB & ADMIN PANEL) ---

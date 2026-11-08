@@ -744,6 +744,8 @@ router.post('/import/m3u', requireAdmin, async (req, res) => {
       importedCount++;
     }
 
+    await Store.persistState();
+
     res.json({ success: true, count: importedCount, message: `Successfully imported ${importedCount} channels from M3U playlist!` });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -776,29 +778,138 @@ router.post('/import/json', requireAdmin, async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid or missing JSON content' });
     }
 
-    const list = Array.isArray(data) ? data : (data.channels || data.streams || data.matches || data.liveEvents || []);
+    let list = [];
+    if (Array.isArray(data)) {
+      list = data;
+    } else if (Array.isArray(data.liveMatches) || Array.isArray(data.upcomingMatches)) {
+      list = [...(data.liveMatches || []), ...(data.upcomingMatches || [])];
+    } else if (Array.isArray(data.liveEvents) || Array.isArray(data.upcomingEvents)) {
+      list = [...(data.liveEvents || []), ...(data.upcomingEvents || [])];
+    } else if (Array.isArray(data.channels)) {
+      list = data.channels;
+    } else if (Array.isArray(data.streams)) {
+      list = data.streams;
+    } else if (Array.isArray(data.matches)) {
+      list = data.matches;
+    } else if (Array.isArray(data.data)) {
+      list = data.data;
+    } else if (Array.isArray(data.items)) {
+      list = data.items;
+    } else if (Array.isArray(data.categories)) {
+      for (const cat of data.categories) {
+        const catName = cat.name || cat.category || cat.title || defaultCategory || 'Live Sports';
+        const chs = cat.channels || cat.streams || cat.list || [];
+        chs.forEach(c => list.push({ ...c, category: c.category || catName }));
+      }
+    }
+
     let count = 0;
 
     for (const item of list) {
-      const title = (item.title || item.name || item.channelName || 'Live Stream').trim();
-      const url = (item.streamUrl || item.m3uLink || item.url || item.stream || item.link || item.m3u || '').trim();
-      if (!url) continue;
+      const title = (item.title || item.name || item.channelName || item.heading || 'Live Stream').trim();
+      const category = (item.category || item.group || defaultCategory || 'Live Sports').trim();
 
-      const streamType = url.includes('.mpd') ? 'MPD' : 'M3U8';
-      const category = (item.category || item.group || item.title || defaultCategory || 'Live Sports').trim();
-      const drm = item.drm || (item.keyId && item.key ? {
-        enabled: true,
-        scheme: item.scheme || 'clearkey',
-        keyId: item.keyId,
-        key: item.key,
-        licenseUrl: item.licenseUrl || ''
-      } : (item.licenseUrl ? {
-        enabled: true,
-        scheme: 'widevine',
-        keyId: '',
-        key: item.licenseUrl,
-        licenseUrl: item.licenseUrl
-      } : { enabled: false }));
+      // Skip adult content
+      if (/adult|18\+|porn|erotic|nsfw|xxx/i.test(`${title} ${category}`)) {
+        continue;
+      }
+
+      // 1. Check if item has multiple streams in item.streams array
+      let streams = [];
+      if (Array.isArray(item.streams) && item.streams.length > 0) {
+        streams = item.streams.map((s, sIdx) => {
+          const sUrl = (s.streamUrl || s.url || s.stream || s.link || '').trim();
+          if (!sUrl) return null;
+          const isMpd = sUrl.includes('.mpd') || (s.streamType || s.type || '').toUpperCase() === 'MPD';
+          const sType = (s.streamType || s.type || (isMpd ? 'MPD' : 'M3U8')).toUpperCase();
+          let sDrm = s.drm || (s.keyId && s.key ? {
+            enabled: true,
+            scheme: s.scheme || 'clearkey',
+            keyId: s.keyId,
+            key: s.key,
+            licenseUrl: s.licenseUrl || ''
+          } : { enabled: false });
+
+          if (sUrl.includes('drmLicense=')) {
+            const m = sUrl.match(/drmLicense=([0-9a-fA-F]{32}):([0-9a-fA-F]{32})/);
+            if (m) {
+              sDrm = { enabled: true, scheme: 'clearkey', keyId: m[1], key: m[2], licenseUrl: '' };
+            }
+          }
+
+          return {
+            id: s.id || `str_${Date.now().toString(36)}_${sIdx}`,
+            title: s.title || `Server ${sIdx + 1} HD`,
+            streamType: sType,
+            streamUrl: sUrl,
+            quality: s.quality || '1080p HD',
+            headers: s.headers || {},
+            drm: sDrm,
+            isActive: s.isActive !== false
+          };
+        }).filter(Boolean);
+      }
+
+      // 2. Fallback to single streamUrl
+      const singleUrl = (item.streamUrl || item.m3uLink || item.url || item.stream || item.link || item.m3u || item.playUrl || '').trim();
+      if (streams.length === 0 && singleUrl) {
+        const isMpd = singleUrl.includes('.mpd') || (item.streamType || item.type || '').toUpperCase() === 'MPD';
+        const sType = (item.streamType || item.type || (isMpd ? 'MPD' : 'M3U8')).toUpperCase();
+        let drm = item.drm || (item.keyId && item.key ? {
+          enabled: true,
+          scheme: item.scheme || 'clearkey',
+          keyId: item.keyId,
+          key: item.key,
+          licenseUrl: item.licenseUrl || ''
+        } : (item.licenseUrl ? {
+          enabled: true,
+          scheme: 'widevine',
+          keyId: '',
+          key: item.licenseUrl,
+          licenseUrl: item.licenseUrl
+        } : { enabled: false }));
+
+        if (singleUrl.includes('drmLicense=')) {
+          const m = singleUrl.match(/drmLicense=([0-9a-fA-F]{32}):([0-9a-fA-F]{32})/);
+          if (m) {
+            drm = { enabled: true, scheme: 'clearkey', keyId: m[1], key: m[2], licenseUrl: '' };
+          }
+        }
+
+        const headers = item.headers || {};
+        if (item.userAgent && !headers['User-Agent']) headers['User-Agent'] = item.userAgent;
+        if (item.referer && !headers['Referer']) headers['Referer'] = item.referer;
+        if (item.origin && !headers['Origin']) headers['Origin'] = item.origin;
+        if (item.cookie && !headers['Cookie']) headers['Cookie'] = item.cookie;
+
+        streams.push({
+          id: 'str_' + Math.random().toString(36).substr(2, 9),
+          title: item.streamTitle || title,
+          streamType: sType,
+          streamUrl: singleUrl,
+          quality: item.quality || '1080p HD',
+          headers,
+          drm,
+          isActive: true
+        });
+      }
+
+      // If category item has m3uLink / portal_url, also ensure in categories
+      if (item.m3uLink || item.isCategory || item.portal_url) {
+        await Store.createCategory({
+          name: title,
+          slug: (item.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-')),
+          icon: item.icon || 'fas fa-tv',
+          imageUrl: item.imageUrl || item.logo || '',
+          m3uLink: item.m3uLink || singleUrl,
+          portal_url: item.portal_url || '',
+          mac: item.mac || '',
+          order: 10,
+          isActive: true
+        });
+      }
+
+      if (streams.length === 0) continue;
 
       if (category) {
         await Store.ensureCategory(category);
@@ -807,28 +918,19 @@ router.post('/import/json', requireAdmin, async (req, res) => {
       await Store.createMatch({
         title,
         category,
-        status: item.status || 'LIVE',
-        matchFormat: item.format || 'T20',
+        status: (item.status || 'LIVE').toUpperCase(),
+        matchFormat: item.matchFormat || item.format || 'Live TV',
         bannerUrl: item.bannerUrl || item.imageUrl || item.logo || item.poster || item.image || '',
-        description: item.description || `Imported channel: ${title}`,
-        isPinned: false,
-        team1: { name: title.split(' vs ')[0] || title, shortName: '', flag: '📺', score: '' },
-        team2: { name: title.split(' vs ')[1] || '', shortName: '', flag: '🔴', score: '' },
-        streams: [
-          {
-            id: 'str_' + Math.random().toString(36).substr(2, 9),
-            title: item.streamTitle || title,
-            streamType,
-            streamUrl: url,
-            quality: item.quality || '1080p HD',
-            headers: item.headers || {},
-            drm,
-            isActive: true
-          }
-        ]
+        description: item.description || `Live stream: ${title}`,
+        isPinned: Boolean(item.isPinned),
+        team1: item.team1 || { name: title.split(' vs ')[0] || title, shortName: '', flag: '📺', score: '' },
+        team2: item.team2 || { name: title.split(' vs ')[1] || '', shortName: '', flag: '🔴', score: '' },
+        streams
       });
       count++;
     }
+
+    await Store.persistState();
 
     res.json({ success: true, count, message: `Successfully imported ${count} channels from JSON!` });
   } catch (error) {
