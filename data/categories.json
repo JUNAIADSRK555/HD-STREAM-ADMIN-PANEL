@@ -16,6 +16,14 @@
     "m3uLink": "https://raw.githubusercontent.com/sportlive18/Sonyliv-Playlist-Autoupdate/main/sony.m3u"
   },
   {
+    "id": "gcat_fancode",
+    "name": "FANCODE LIVE",
+    "slug": "fancode-live",
+    "icon": "fas fa-bolt",
+    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/fancode.png",
+    "m3uLink": "https://allinonereborn2.online/fctest/json/fancode_latest.json"
+  },
+  {
     "id": "gcat_3",
     "name": "MIX TV",
     "slug": "mix-tv",
