@@ -1,5 +1,97 @@
 const CATEGORY_DRIVE_URL = 'https://drive.google.com/uc?export=download&id=1KxcfPpIjkeRaHWyrN53otPBci5s6FMMO';
 const LIVE_EVENTS_DRIVE_URL = 'https://drive.google.com/uc?export=download&id=1f2YiLF71pHEPlmodEtLQ-NfT3opWRreu';
+const SPORTS_DATA_URL = 'https://raw.githubusercontent.com/sm-monirulislam/Upcoming-and-Live-Sports-Data/main/Sports_data.json';
+
+// Strict Cricket Filter Function
+function isCricketMatch(m) {
+  if (!m) return false;
+  const cat = String(m.Category || m.sport || m.category || '').trim().toLowerCase();
+  const title = String(m.event_name || m.eventName || m.title || '').trim().toLowerCase();
+  const league = String(m.league || (m.eventInfo && m.eventInfo.eventName) || '').trim().toLowerCase();
+  const fullText = `${cat} ${title} ${league}`;
+
+  if (cat === 'cricket') return true;
+
+  const cricketKeywords = [
+    'cricket', 't20', 'odi', 'test match', 'test series', 'ipl',
+    'bbl', 'psl', 'cpl', 'lpl', 'npl', 'bpl', 'abu dhabi',
+    'world test championship', 'u19', 'big bash', 'ranji',
+    'bcci', 'icc', 'stump', 'wicket', 'overs', 'bangladesh',
+    'west indies', 'pakistan', 'sri lanka', 'zimbabwe', 'afghanistan'
+  ];
+
+  for (const keyword of cricketKeywords) {
+    if (fullText.includes(keyword)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Format matches from Sports_data.json (for Football, American Football, Basketball, etc.)
+function formatSportsDataMatch(m, index = 0) {
+  const title = (m.event_name || (m.eventInfo && `${m.eventInfo.teamA} vs ${m.eventInfo.teamB}`) || `Sports Match ${index + 1}`).trim();
+  const status = (m.status || 'LIVE').toUpperCase();
+  const category = (m.Category || 'Football').trim();
+  const info = m.eventInfo || {};
+  const tournament = (info.eventName || category || 'Live Sports').trim();
+
+  const team1Name = (info.teamA || title.split(/\s+vs\s+/i)[0] || 'Team 1').trim();
+  const team2Name = (info.teamB || title.split(/\s+vs\s+/i)[1] || 'Team 2').trim();
+
+  const streams = (m.streams || []).map((s, sIdx) => {
+    let url = (s.stream_url || s.streamUrl || s.url || '').trim();
+    if (!url || !url.startsWith('http')) return null;
+
+    const isMpd = url.includes('.mpd');
+    const streamType = isMpd ? 'MPD' : 'M3U8';
+    const referer = (s.referer || s.referrer || '').trim();
+
+    return {
+      id: `sports_str_${index}_${sIdx}`,
+      title: s.channel_name || `Server ${sIdx + 1} HD`,
+      streamType,
+      streamUrl: url,
+      quality: '1080p HD',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0',
+        'Referer': referer,
+        'Origin': referer ? new URL(referer).origin : ''
+      },
+      drm: { enabled: false }
+    };
+  }).filter(Boolean);
+
+  if (streams.length === 0) return null;
+
+  return {
+    id: `sports_${index}_${Buffer.from(title).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 10)}`,
+    title,
+    category,
+    status,
+    format: tournament,
+    startTime: info.startTime || 'LIVE NOW',
+    bannerUrl: info.event_logo || info.teamAFlag || '',
+    description: `${tournament}: ${title}`,
+    isPinned: status === 'LIVE',
+    team1: {
+      name: team1Name,
+      shortName: team1Name.slice(0, 4).toUpperCase().trim(),
+      flag: info.teamAFlag || '⚽',
+      logo: info.teamAFlag || '',
+      score: ''
+    },
+    team2: {
+      name: team2Name,
+      shortName: team2Name.slice(0, 4).toUpperCase().trim(),
+      flag: info.teamBFlag || '🔴',
+      logo: info.teamBFlag || '',
+      score: ''
+    },
+    totalStreams: streams.length,
+    streams
+  };
+}
 
 // In-memory cache to prevent Google Drive rate-limits & provide sub-millisecond response times
 let cachedCategories = null;
@@ -311,7 +403,9 @@ function formatDriveMatch(m, defaultStatus = 'LIVE', index = 0) {
 }
 
 /**
- * Fetch and parse Live Events from Google Drive
+ * Fetch and parse Live Events:
+ * 1. Cricket from Google Drive (LIVE_EVENTS_DRIVE_URL)
+ * 2. Football & other sports from Sports_data.json (cricket strictly blocked with isCricketMatch)
  */
 async function getDriveEvents(forceRefresh = false) {
   const now = Date.now();
@@ -320,40 +414,70 @@ async function getDriveEvents(forceRefresh = false) {
   }
 
   try {
-    const res = await fetch(LIVE_EVENTS_DRIVE_URL, {
-      redirect: 'follow',
-      headers: { 'User-Agent': 'HDStream-Backend/3.2.0' }
-    });
+    // 1. Fetch Cricket from Google Drive & Non-Cricket from Sports_data.json in parallel
+    const [driveRes, sportsRes] = await Promise.all([
+      fetch(LIVE_EVENTS_DRIVE_URL, {
+        redirect: 'follow',
+        headers: { 'User-Agent': 'HDStream-Backend/3.2.0' }
+      }).catch(err => {
+        console.warn('Drive fetch error:', err.message);
+        return null;
+      }),
+      fetch(SPORTS_DATA_URL, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0' }
+      }).catch(err => {
+        console.warn('SportsData fetch error:', err.message);
+        return null;
+      })
+    ]);
 
-    if (!res.ok) {
-      throw new Error(`Google Drive returned HTTP ${res.status}`);
+    let cricketAll = [];
+    if (driveRes && driveRes.ok) {
+      try {
+        const driveData = await driveRes.json();
+        const allRaw = [
+          ...(driveData.live_matches || []).map(m => ({ ...m, _defaultStatus: 'LIVE' })),
+          ...(driveData.upcoming_matches || []).map(m => ({ ...m, _defaultStatus: 'UPCOMING' })),
+          ...(driveData.finished_matches || []).map(m => ({ ...m, _defaultStatus: 'FINISHED' }))
+        ];
+        cricketAll = allRaw.map((m, idx) => formatDriveMatch(m, m._defaultStatus, idx)).filter(Boolean);
+      } catch (err) {
+        console.error('Error parsing Drive Cricket data:', err.message);
+      }
     }
 
-    const data = await res.json();
-    const allRaw = [
-      ...(data.live_matches || []).map(m => ({ ...m, _defaultStatus: 'LIVE' })),
-      ...(data.upcoming_matches || []).map(m => ({ ...m, _defaultStatus: 'UPCOMING' })),
-      ...(data.finished_matches || []).map(m => ({ ...m, _defaultStatus: 'FINISHED' }))
-    ];
+    let otherSportsAll = [];
+    if (sportsRes && sportsRes.ok) {
+      try {
+        const sportsData = await sportsRes.json();
+        const sportsMatches = sportsData.matches || [];
+        // Strict Cricket Filter: Strip out any cricket from Sports_data.json
+        const nonCricketMatches = sportsMatches.filter(m => !isCricketMatch(m));
+        otherSportsAll = nonCricketMatches.map((m, idx) => formatSportsDataMatch(m, idx)).filter(Boolean);
+      } catch (err) {
+        console.error('Error parsing SportsData non-cricket data:', err.message);
+      }
+    }
 
-    const formattedAll = allRaw.map((m, idx) => formatDriveMatch(m, m._defaultStatus, idx)).filter(Boolean);
+    // Combine: Cricket from Drive + Other sports from Sports_data.json
+    const allFormatted = [...cricketAll, ...otherSportsAll];
 
-    const liveMatches = formattedAll.filter(m => m.status === 'LIVE');
-    const upcomingMatches = formattedAll.filter(m => m.status === 'UPCOMING');
-    const finishedMatches = formattedAll.filter(m => m.status === 'FINISHED' || m.status === 'ENDED');
+    const liveMatches = allFormatted.filter(m => m.status === 'LIVE');
+    const upcomingMatches = allFormatted.filter(m => m.status === 'UPCOMING');
+    const finishedMatches = allFormatted.filter(m => m.status === 'FINISHED' || m.status === 'ENDED');
 
     const result = {
       liveEvents: liveMatches,
       upcomingEvents: upcomingMatches,
       recentEvents: finishedMatches,
-      raw: data
+      raw: { cricketCount: cricketAll.length, otherSportsCount: otherSportsAll.length }
     };
 
     cachedEvents = result;
     lastEventsFetch = now;
     return result;
   } catch (error) {
-    console.error('Error fetching Google Drive live events:', error.message);
+    console.error('Error in getDriveEvents:', error.message);
     if (cachedEvents) {
       return cachedEvents;
     }
@@ -369,6 +493,8 @@ async function getDriveEvents(forceRefresh = false) {
 module.exports = {
   CATEGORY_DRIVE_URL,
   LIVE_EVENTS_DRIVE_URL,
+  SPORTS_DATA_URL,
+  isCricketMatch,
   getDriveCategories,
   getDriveEvents
 };

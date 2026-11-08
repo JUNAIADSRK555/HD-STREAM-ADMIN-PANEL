@@ -767,6 +767,57 @@ function updateCategoryFilterUI(categories, matches) {
   }
 }
 
+// 🛑 Strict Cricket Detection Function
+function isCricketMatch(m) {
+  if (!m) return false;
+  const cat = String(m.Category || m.category || m.sport || "").trim().toLowerCase();
+  const title = String(m.event_name || m.eventName || m.title || "").trim().toLowerCase();
+  const league = String(m.league || (m.eventInfo && m.eventInfo.eventName) || "").trim().toLowerCase();
+
+  // Sabhi text ko mila kar ek string bana lo taaki scanning pakki ho
+  const fullText = `${cat} ${title} ${league}`;
+
+  // 1. Agar category direct 'cricket' hai
+  if (cat === "cricket") return true;
+
+  // 2. Cricket ke saare keywords aur leagues ki strict blacklist
+  const cricketKeywords = [
+    "cricket", "t20", "odi", "test match", "test series", "ipl",
+    "bbl", "psl", "cpl", "lpl", "npl", "bpl", "abu dhabi",
+    "world test championship", "u19", "big bash", "ranji",
+    "bcci", "icc", "stump", "wicket", "overs", "bangladesh",
+    "west indies", "pakistan", "sri lanka", "zimbabwe", "afghanistan"
+  ];
+
+  // Check karo ki koi keyword match ho raha hai ya nahi
+  for (let keyword of cricketKeywords) {
+    if (fullText.includes(keyword)) {
+      return true; // Matlab yeh cricket hai!
+    }
+  }
+
+  return false; // Matlab yeh cricket nahi hai (Football, Kabaddi, Kho-Kho ho sakta hai)
+}
+
+function getFiltered() {
+  const q = (document.getElementById('search')?.value || state.searchQuery || "").trim().toLowerCase();
+  const activeStatus = state.activeFilter || "ALL";
+  const activeCategory = state.activeCategory || "ALL";
+
+  return (state.matches || []).filter((m) => {
+    // Agar Non-Cricket filter active hai aur yeh match cricket hai, toh reject kar do
+    if (state.filterNonCricketOnly && isCricketMatch(m)) {
+      return false;
+    }
+
+    const statusMatches = activeStatus === "ALL" || activeStatus === m.status;
+    const matchCat = activeCategory === "ALL" || (m.category || m.Category || "Other") === activeCategory;
+    const text = [m.title, m.event_name, m.team1?.name, m.team2?.name, m.category, m.Category].join(" ").toLowerCase();
+
+    return statusMatches && matchCat && text.includes(q);
+  });
+}
+
 function renderMatchesList() {
   const container = document.getElementById('matches-grid');
   if (!container) return;
