@@ -1,13 +1,5 @@
 [
   {
-    "id": "gcat_0",
-    "name": "HD STREAM",
-    "slug": "hd-stream",
-    "icon": "fas fa-bolt",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logo.png",
-    "m3uLink": "https://cinexcricket.com/api/tv/data.json"
-  },
-  {
     "id": "gcat_1",
     "name": "JIO TV+",
     "slug": "jio-tv",
@@ -103,14 +95,6 @@
     "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJ62IwtiCZ9E8fqeu8hDPhvjHqNrols3GnUddW3VszWA&s=10",
     "portal_url": "http://134.119.176.239/stalker_portal/c/",
     "mac": "00:1A:79:78:EE:AD"
-  },
-  {
-    "id": "gcat_13",
-    "name": "CINEX MOVIES",
-    "slug": "cinex-movies",
-    "icon": "fas fa-film",
-    "imageUrl": "https://image.tmdb.org/t/p/w500/dswjf9LMu2DAffcvTBzqYK3pu10.jpg",
-    "m3uLink": "https://cinearena-movies-api.asifadmincinearena.workers.dev/"
   }
 ]
 
