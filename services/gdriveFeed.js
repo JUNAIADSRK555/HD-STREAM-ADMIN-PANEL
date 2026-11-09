@@ -43,6 +43,11 @@ function formatSportsDataMatch(m, index = 0) {
     let url = (s.stream_url || s.streamUrl || s.url || '').trim();
     if (!url || !url.startsWith('http')) return null;
 
+    // Filter out known dead/offline IP servers
+    if (url.includes('chatgpt.hereisman.net') || url.includes('193.47.62.') || url.includes('fromthyheart.site') || url.includes('demonpvp.fun')) {
+      return null;
+    }
+
     const isMpd = url.includes('.mpd');
     const streamType = isMpd ? 'MPD' : 'M3U8';
     const referer = (s.referer || s.referrer || '').trim();
@@ -71,7 +76,18 @@ function formatSportsDataMatch(m, index = 0) {
       },
       drm
     };
-  }).filter(Boolean);
+  }).filter(Boolean).sort((a, b) => {
+    let scoreA = 0, scoreB = 0;
+    if (a.drm && a.drm.enabled) scoreA += 60;
+    if (b.drm && b.drm.enabled) scoreB += 60;
+    if (a.streamUrl.includes('aiv-cdn.net') || a.streamUrl.includes('pv-cdn.net')) scoreA += 40;
+    if (b.streamUrl.includes('aiv-cdn.net') || b.streamUrl.includes('pv-cdn.net')) scoreB += 40;
+    if (a.streamUrl.includes('slivcdn.com') || a.streamUrl.includes('akamaized.net')) scoreA += 30;
+    if (b.streamUrl.includes('slivcdn.com') || b.streamUrl.includes('akamaized.net')) scoreB += 30;
+    if (a.streamType === 'MPD') scoreA += 20;
+    if (b.streamType === 'MPD') scoreB += 20;
+    return scoreB - scoreA;
+  });
 
   if (streams.length === 0) return null;
 
