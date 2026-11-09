@@ -1,5 +1,13 @@
 [
   {
+    "id": "gcat_hdstream",
+    "name": "HD STREAM",
+    "slug": "hd-stream",
+    "icon": "fas fa-play-circle",
+    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/hdstream.png",
+    "m3uLink": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/tv/data.json"
+  },
+  {
     "id": "gcat_1",
     "name": "JIO TV+",
     "slug": "jio-tv",

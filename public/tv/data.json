@@ -7,9 +7,14 @@
       "logo": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyMAX.png",
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyMAX.png",
       "status": "Live",
-      "streamType": "hls",
-      "streamUrl": "https://allinonereborn2.online/sony-new/playlists/sony_max_hd.m3u8",
-      "drm": null
+      "streamType": "dash-cookies",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyMAX1_MOB/WDVLive/index.mpd",
+      "drm": {
+        "type": "clearkey",
+        "keyId": "16d62886f34551dcaeb971fce0d47225",
+        "key": "f3d4ef32236c9a35e16104bcbe03b414"
+      },
+      "cookie": "__hdnea__=st=1794169811~exp=1794256211~acl=/*~hmac=eae2d157781a0003b42adba312c4ab3028dd84d9a13681b8781cd6f3e639dc12"
     },
     {
       "id": "sony-max",
@@ -18,9 +23,14 @@
       "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Max_SD.png",
       "background": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Max_SD.png",
       "status": "Live",
-      "streamType": "hls",
-      "streamUrl": "https://allinonereborn2.online/sony-new/playlists/sony_max.m3u8",
-      "drm": null
+      "streamType": "dash-cookies",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyMAX1_MOB/WDVLive/index.mpd",
+      "drm": {
+        "type": "clearkey",
+        "keyId": "16d62886f34551dcaeb971fce0d47225",
+        "key": "f3d4ef32236c9a35e16104bcbe03b414"
+      },
+      "cookie": "__hdnea__=st=1794169811~exp=1794256211~acl=/*~hmac=eae2d157781a0003b42adba312c4ab3028dd84d9a13681b8781cd6f3e639dc12"
     },
     {
       "id": "zee-cinema",
@@ -60,9 +70,14 @@
       "logo": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyMAX2.png",
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyMAX2.png",
       "status": "Live",
-      "streamType": "hls",
-      "streamUrl": "https://allinonereborn2.online/sony-new/playlists/sony_max2.m3u8",
-      "drm": null
+      "streamType": "dash-cookies",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyMAX2_MOB/WDVLive/index.mpd",
+      "drm": {
+        "type": "clearkey",
+        "keyId": "43d4c38d38855cecb6c6d268d8efdfba",
+        "key": "a883e47514b8a21350a417088b9015f8"
+      },
+      "cookie": "__hdnea__=st=1794169811~exp=1794256211~acl=/*~hmac=eae2d157781a0003b42adba312c4ab3028dd84d9a13681b8781cd6f3e639dc12"
     },
     {
       "id": "sonypix",
@@ -71,9 +86,14 @@
       "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Pix_HD.png",
       "background": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Pix_HD.png",
       "status": "Live",
-      "streamType": "hls",
-      "streamUrl": "https://allinonereborn2.online/sony-new/playlists/sony_pix_hd.m3u8",
-      "drm": null
+      "streamType": "dash-cookies",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyPIX_MOB/WDVLive/index.mpd",
+      "drm": {
+        "type": "clearkey",
+        "keyId": "21e2e92c2dbd5bc28682121765c92c81",
+        "key": "6eb5bbad65bfa7075c2e2609c126d418"
+      },
+      "cookie": "__hdnea__=st=1794169811~exp=1794256211~acl=/*~hmac=eae2d157781a0003b42adba312c4ab3028dd84d9a13681b8781cd6f3e639dc12"
     },
     {
       "id": "sony-wah",
@@ -82,9 +102,14 @@
       "logo": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyWAH.png",
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyWAH.png",
       "status": "Live",
-      "streamType": "hls",
-      "streamUrl": "https://allinonereborn2.online/sony-new/playlists/sony_wah.m3u8",
-      "drm": null
+      "streamType": "dash-cookies",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/Sony_Wah_MOB/WDVLive/index.mpd",
+      "drm": {
+        "type": "clearkey",
+        "keyId": "04aa0b80ef9c5040b04ea0887df6063b",
+        "key": "370ea9eb2f1c841441b44cbbe1fc8a38"
+      },
+      "cookie": "__hdnea__=st=1794169811~exp=1794256211~acl=/*~hmac=eae2d157781a0003b42adba312c4ab3028dd84d9a13681b8781cd6f3e639dc12"
     },
     {
       "id": "&-picture",
@@ -124,9 +149,14 @@
       "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfrW1HpVPOqfOfFR0NBWL58job-bMLJK7JlFeubfSfCA&s=10",
       "background": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfrW1HpVPOqfOfFR0NBWL58job-bMLJK7JlFeubfSfCA&s=10",
       "status": "Live",
-      "streamType": "hls",
-      "streamUrl": "https://allinonereborn2.online/sony-new/playlists/sony_hd.m3u8",
-      "drm": null
+      "streamType": "dash-cookies",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/Sony_HD_MOB/WDVLive/index.mpd",
+      "drm": {
+        "type": "clearkey",
+        "keyId": "5db46816174a58ffbd3264c1b9b1897e",
+        "key": "25dfeb34d409d57a2c5a0fe7bc95ca98"
+      },
+      "cookie": "__hdnea__=st=1794169811~exp=1794256211~acl=/*~hmac=eae2d157781a0003b42adba312c4ab3028dd84d9a13681b8781cd6f3e639dc12"
     },
     {
       "id": "sonysabhd",
@@ -135,9 +165,14 @@
       "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_SAB_HD.png",
       "background": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_SAB_HD.png",
       "status": "Live",
-      "streamType": "hls",
-      "streamUrl": "https://allinonereborn2.online/sony-new/playlists/sab_hd.m3u8",
-      "drm": null
+      "streamType": "dash-cookies",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonySAB_MOB/WDVLive/index.mpd",
+      "drm": {
+        "type": "clearkey",
+        "keyId": "f223cf2122d7510da9fcec6e523ffba1",
+        "key": "c55848470f58d3bd934fbfe844522b0e"
+      },
+      "cookie": "__hdnea__=st=1794169811~exp=1794256211~acl=/*~hmac=eae2d157781a0003b42adba312c4ab3028dd84d9a13681b8781cd6f3e639dc12"
     },
     {
       "id": "sonypal",
@@ -146,9 +181,14 @@
       "logo": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyPAL.png",
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyPAL.png",
       "status": "Live",
-      "streamType": "hls",
-      "streamUrl": "https://allinonereborn2.online/sony-new/playlists/sony_pal.m3u8",
-      "drm": null
+      "streamType": "dash-cookies",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/Sony_Pal_MOB/WDVLive/index.mpd",
+      "drm": {
+        "type": "clearkey",
+        "keyId": "b6a5a3a7893b593f8e6530a68d0e7e17",
+        "key": "d10e5362ffadfb1531e847c1fdbfb490"
+      },
+      "cookie": "__hdnea__=st=1794169811~exp=1794256211~acl=/*~hmac=eae2d157781a0003b42adba312c4ab3028dd84d9a13681b8781cd6f3e639dc12"
     },
     {
       "id": "zeetv",
@@ -269,9 +309,14 @@
       "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Yay_Hindi.png",
       "background": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Yay_Hindi.png",
       "status": "Live",
-      "streamType": "hls",
-      "streamUrl": "https://allinonereborn2.online/sony-new/playlists/sony_yay.m3u8",
-      "drm": null
+      "streamType": "dash-cookies",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyYAYHin_MOB/WDVLive/index.mpd",
+      "drm": {
+        "type": "clearkey",
+        "keyId": "16d62886f34551dcaeb971fce0d47225",
+        "key": "f3d4ef32236c9a35e16104bcbe03b414"
+      },
+      "cookie": "__hdnea__=st=1794169811~exp=1794256211~acl=/*~hmac=eae2d157781a0003b42adba312c4ab3028dd84d9a13681b8781cd6f3e639dc12"
     },
     {
       "id": "b4u-music",
@@ -1741,7 +1786,11 @@
       "streamType": "dash-cookies",
       "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/Sony_SAB_MOB/WDVLive/index.mpd",
       "cookie": "__hdnea__=st=1794169811~exp=1794256211~acl=/*~hmac=eae2d157781a0003b42adba312c4ab3028dd84d9a13681b8781cd6f3e639dc12",
-      "drm": null,
+      "drm": {
+        "type": "clearkey",
+        "keyId": "f223cf2122d7510da9fcec6e523ffba1",
+        "key": "c55848470f58d3bd934fbfe844522b0e"
+      },
       "synced": true
     },
     {
