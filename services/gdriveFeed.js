@@ -212,7 +212,7 @@ async function getDriveCategories(forceRefresh = false) {
         slug: "hd-stream",
         icon: "fas fa-tv",
         imageUrl: "https://encryptedic.com/imagNd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s",
-        m3uLink: "https://allinonereborn2.online/jiotv-m3u/jtv25.m3u8"
+        m3uLink: "https://allinonereborn2.online/jiotv-m3u/jtv39.m3u8"
       },
       {
         id: "gcat_3",
