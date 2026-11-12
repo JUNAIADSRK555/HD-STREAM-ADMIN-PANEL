@@ -171,7 +171,14 @@ async function getDriveCategories(forceRefresh = false) {
       .map((c, idx) => {
         const title = (c.title || c.name || `Channel ${idx + 1}`).trim();
         const slug = (c.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-')).replace(/^-+|-+$/g, '');
-        const cleanM3u = (c.m3uLink || c.url || '').trim().replace(/^:\s*/, '');
+        let cleanM3u = (c.m3uLink || c.url || '').trim().replace(/^:\s*/, '');
+        if (cleanM3u.includes('allinonereborn') && cleanM3u.includes('jiotv-m3u')) {
+          cleanM3u = cleanM3u.replace(/jtv\d+\.m3u8/i, 'jtv39.m3u8');
+        }
+        const isJio = /jio|jd/i.test(title) || /jiotv|jtv/i.test(cleanM3u);
+        if (isJio && (!cleanM3u || /jtv38|jtv25|jtv33/i.test(cleanM3u))) {
+          cleanM3u = 'https://allinonereborn2.online/jiotv-m3u/jtv39.m3u8';
+        }
         const img = (c.imageUrl || c.image || c.logo || '').trim();
         return {
           id: c.id || `gcat_${idx + 1}`,
