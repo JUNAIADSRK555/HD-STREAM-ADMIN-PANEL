@@ -1,6 +1,6 @@
 {
   "heading": "MIX TV Channels",
-  "totalChannels": 10,
+  "totalChannels": 12,
   "category": "Mix Entertainment & Music",
   "channels": [
     {
@@ -44,14 +44,34 @@
       "url": "https://cdn4.mjunoon.tv:8087/streamtest/131M/chunks.m3u8"
     },
     {
-      "id": "mix-ary-musik",
-      "name": "ARY Musik",
-      "title": "ARY Musik",
+      "id": "mix-9xm",
+      "name": "9XM Music",
+      "title": "9XM Music",
       "category": "Music",
       "streamType": "M3U8",
-      "logo": "https://upload.wikimedia.org/wikipedia/en/b/bb/ARY_Musik_logo.png",
-      "streamUrl": "https://arymusik.aryzap.com/3fd38b2c62d0c3bbd74aedabb533c03a/6459fa78/v1/01847ac7a4930b8ed5aa6ed04aba/01847ac8f5f70b8ed5aa6ed04abd/main.m3u8",
-      "url": "https://arymusik.aryzap.com/3fd38b2c62d0c3bbd74aedabb533c03a/6459fa78/v1/01847ac7a4930b8ed5aa6ed04aba/01847ac8f5f70b8ed5aa6ed04abd/main.m3u8"
+      "logo": "https://imagesv2.dsp1.ott.kaltura.com/Service.svc/GetImage/p/5093/entry_id/373b5a755dd848ea92a8385da4184ec9/version/0",
+      "streamUrl": "https://d2o8pibksxtln6.cloudfront.net/live/media/9XM/hls_fta/9XM.m3u8",
+      "url": "https://d2o8pibksxtln6.cloudfront.net/live/media/9XM/hls_fta/9XM.m3u8"
+    },
+    {
+      "id": "mix-9x-jalwa",
+      "name": "9X Jalwa",
+      "title": "9X Jalwa",
+      "category": "Music",
+      "streamType": "M3U8",
+      "logo": "https://imagesv2.dsp1.ott.kaltura.com/Service.svc/GetImage/p/5093/entry_id/e4d5fb46162145b2b918f6d2f3dcf68a/version/0",
+      "streamUrl": "https://d2o8pibksxtln6.cloudfront.net/live/media/9X_Jalwa/hls_fta/9X_Jalwa.m3u8",
+      "url": "https://d2o8pibksxtln6.cloudfront.net/live/media/9X_Jalwa/hls_fta/9X_Jalwa.m3u8"
+    },
+    {
+      "id": "mix-music-india",
+      "name": "Music India",
+      "title": "Music India",
+      "category": "Music",
+      "streamType": "M3U8",
+      "logo": "https://imagesv2.dsp1.ott.kaltura.com/Service.svc/GetImage/p/5093/entry_id/6bf56ec7a731420790b4bf94fb11c470/version/0",
+      "streamUrl": "https://d2o8pibksxtln6.cloudfront.net/live/media/Music_India/hls_fta/Music_India.m3u8",
+      "url": "https://d2o8pibksxtln6.cloudfront.net/live/media/Music_India/hls_fta/Music_India.m3u8"
     },
     {
       "id": "mix-republic",
@@ -87,6 +107,7 @@
       "id": "mix-sansad-tv",
       "name": "Sansad TV HD",
       "title": "Sansad TV HD",
+      "category": "News",
       "logo": "https://imagesv2.dsp1.ott.kaltura.com/Service.svc/GetImage/p/5093/entry_id/f6ace40e05bd435184b232ca5d67fc62/version/0",
       "streamType": "M3U8",
       "streamUrl": "https://d2o8pibksxtln6.cloudfront.net/live/media/Sansad_TV_HD/hls_fta/Sansad_TV_HD.m3u8",
