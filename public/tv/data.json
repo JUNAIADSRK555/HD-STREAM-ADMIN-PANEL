@@ -8,7 +8,7 @@
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyMAX.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/SonyMAX1_BTS/WDVLive/index.mpd?__hdnea__=st=1794590723~exp=1794612323~acl=/bpk-tv/SonyMAX1_BTS/WDVLive/*~hmac=be924fc89032d20fc5dc85b97bc863de4c8fde74844822d049d3e9badb3bd654",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyMAX1_MOB/WDVLive/index.mpd",
       "drm": {
         "type": "clearkey",
         "keyId": "13f0ed7aadc1519ab5cf50575ef487ef",
@@ -24,7 +24,7 @@
       "background": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Max_SD.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/SonyMAX1_BTS/WDVLive/index.mpd?__hdnea__=st=1794590723~exp=1794612323~acl=/bpk-tv/SonyMAX1_BTS/WDVLive/*~hmac=be924fc89032d20fc5dc85b97bc863de4c8fde74844822d049d3e9badb3bd654",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyMAX1_MOB/WDVLive/index.mpd",
       "drm": {
         "type": "clearkey",
         "keyId": "13f0ed7aadc1519ab5cf50575ef487ef",
@@ -72,7 +72,7 @@
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyMAX2.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/Sony_MAX2_BTS/WDVLive/index.mpd?__hdnea__=st=1794590717~exp=1794612317~acl=/bpk-tv/Sony_MAX2_BTS/WDVLive/*~hmac=e94256361adbc51866946e6f9c23de8cc4b205f21b944ee9a50cb0e052f35032",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyMAX2_MOB/WDVLive/index.mpd",
       "drm": {
         "type": "clearkey",
         "keyId": "e6747f14bca759f3901f60bb6d21bff9",
@@ -88,7 +88,7 @@
       "background": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Pix_HD.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/SonyPIX_BTS/WDVLive/index.mpd?__hdnea__=st=1794590723~exp=1794612323~acl=/bpk-tv/SonyPIX_BTS/WDVLive/*~hmac=f33a25a4eefc446eadc962c9357943879e117e597cfb0b4071a0d4ca0f9bd568",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyPIX_MOB/WDVLive/index.mpd",
       "drm": {
         "type": "clearkey",
         "keyId": "d01a618715035ef6964cc1279521c621",
@@ -168,11 +168,11 @@
       "background": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_SAB_HD.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/SonySAB_BTS/WDVLive/index.mpd?__hdnea__=st=1794590715~exp=1794612315~acl=/bpk-tv/SonySAB_BTS/WDVLive/*~hmac=d4824eb653e5b7fcaffa4e228cf3382f8ba270abcd39d43156895b6bb31be4c8",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonySAB_MOB/WDVLive/index.mpd",
       "drm": {
         "type": "clearkey",
-        "keyId": "2a19442cb6a65a0d9547b7a887029334",
-        "key": "78f4db938c5873b14dffa721a6b979c5"
+        "keyId": "f223cf2122d7510da9fcec6e523ffba1",
+        "key": "c55848470f58d3bd934fbfe844522b0e"
       },
       "cookie": "__hdnea__=st=1794590887~exp=1794612487~acl=/*~hmac=345c87f18957ebd4f994cc47fdd1ecc9d5d99e5b6100a8a5a131fd68296226b8"
     },
@@ -184,7 +184,7 @@
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyPAL.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/SonyPAL_BTS/WDVLive/index.mpd?__hdnea__=st=1794590715~exp=1794612315~acl=/bpk-tv/SonyPAL_BTS/WDVLive/*~hmac=7df88aceffe8edfc4b3f30a059d5cc05877a1c992f180e155e269c1a3edd1d53",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyPAL_MOB/WDVLive/index.mpd",
       "drm": {
         "type": "clearkey",
         "keyId": "42b169e9d385567491f88420c87be4af",
@@ -247,8 +247,8 @@
       "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Marathi_SD.png",
       "background": "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Marathi_SD.png",
       "status": "Live",
-      "streamType": "hls",
-      "streamUrl": "https://ranapkx.site/RANAPK33k/TVD/play.php?id=373436",
+      "streamType": "dash-cookies",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyMarathi_MOB/WDVLive/index.mpd",
       "drm": null,
       "cookie": "__hdnea__=st=1794590887~exp=1794612487~acl=/*~hmac=345c87f18957ebd4f994cc47fdd1ecc9d5d99e5b6100a8a5a131fd68296226b8"
     },
@@ -1846,12 +1846,12 @@
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonySAB.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/SonySAB_BTS/WDVLive/index.mpd?__hdnea__=st=1794590715~exp=1794612315~acl=/bpk-tv/SonySAB_BTS/WDVLive/*~hmac=d4824eb653e5b7fcaffa4e228cf3382f8ba270abcd39d43156895b6bb31be4c8",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonySAB_MOB/WDVLive/index.mpd",
       "cookie": "__hdnea__=st=1794590887~exp=1794612487~acl=/*~hmac=345c87f18957ebd4f994cc47fdd1ecc9d5d99e5b6100a8a5a131fd68296226b8",
       "drm": {
         "type": "clearkey",
-        "keyId": "2a19442cb6a65a0d9547b7a887029334",
-        "key": "78f4db938c5873b14dffa721a6b979c5"
+        "keyId": "f223cf2122d7510da9fcec6e523ffba1",
+        "key": "c55848470f58d3bd934fbfe844522b0e"
       },
       "synced": true
     },
@@ -1868,7 +1868,7 @@
       "drm": {
         "type": "clearkey",
         "keyId": "ba4d9b38517552de9654d3652d27933b",
-        "key": "ba4d9b38517552de9654d3652d27933b:31e7cbf3d289d3116386457ed8bac3a2,f223cf2122d7510da9fcec6e523ffba1:c55848470f58d3bd934fbfe844522b0e"
+        "key": "31e7cbf3d289d3116386457ed8bac3a2"
       },
       "synced": true
     },
@@ -2781,12 +2781,12 @@
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/Pogo_Hindi.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/Pogo_Hindi_BTS/WDVLive/index.mpd?__hdnea__=st=1794590717~exp=1794612317~acl=/bpk-tv/Pogo_Hindi_BTS/WDVLive/*~hmac=7e2b2279c56c789cf58553c143ffa92ce0267898ded444f3e2859bc9327dd246",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/Pogo_Hindi_MOB/WDVLive/index.mpd",
       "cookie": "__hdnea__=st=1794590887~exp=1794612487~acl=/*~hmac=345c87f18957ebd4f994cc47fdd1ecc9d5d99e5b6100a8a5a131fd68296226b8",
       "drm": {
         "type": "clearkey",
-        "keyId": "bbddeabdd7775d4990ffd45e8fb1233f",
-        "key": "6de1b1a97b8d816252e69e8b723d26ed"
+        "keyId": "d19984624fc15209b3cb5cf3bf99232f",
+        "key": "baca6aa9494ed43cf02975eda742eeab"
       },
       "synced": true
     },
@@ -5263,7 +5263,7 @@
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyPIX.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/SonyPIX_BTS/WDVLive/index.mpd?__hdnea__=st=1794590723~exp=1794612323~acl=/bpk-tv/SonyPIX_BTS/WDVLive/*~hmac=f33a25a4eefc446eadc962c9357943879e117e597cfb0b4071a0d4ca0f9bd568",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyPIX_MOB/WDVLive/index.mpd",
       "cookie": "__hdnea__=st=1794590887~exp=1794612487~acl=/*~hmac=345c87f18957ebd4f994cc47fdd1ecc9d5d99e5b6100a8a5a131fd68296226b8",
       "drm": {
         "type": "clearkey",
@@ -5960,7 +5960,7 @@
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyBBCEarthHin.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/SonyBBCEarthHin_BTS/WDVLive/index.mpd?__hdnea__=st=1794590723~exp=1794612323~acl=/bpk-tv/SonyBBCEarthHin_BTS/WDVLive/*~hmac=8c61c87ae293663b2602d1e74a57a77956b67c7beea2d49d69bc0d95916e5d2f",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyBBCEarthHin_MOB/WDVLive/index.mpd",
       "cookie": "__hdnea__=st=1794590887~exp=1794612487~acl=/*~hmac=345c87f18957ebd4f994cc47fdd1ecc9d5d99e5b6100a8a5a131fd68296226b8",
       "drm": {
         "type": "clearkey",
@@ -8472,7 +8472,7 @@
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyMarathi.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/SonyMarathi_BTS/WDVLive/index.mpd?__hdnea__=st=1794590716~exp=1794612316~acl=/bpk-tv/SonyMarathi_BTS/WDVLive/*~hmac=e46d9671b81651e3cc9f03a1599610b2d6e8a380b91da8b32f5d573eff44e556",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyMarathi_MOB/WDVLive/index.mpd",
       "cookie": "__hdnea__=st=1794590887~exp=1794612487~acl=/*~hmac=345c87f18957ebd4f994cc47fdd1ecc9d5d99e5b6100a8a5a131fd68296226b8",
       "drm": {
         "type": "clearkey",
@@ -18043,7 +18043,7 @@
       "background": "https://jiotv.catchup.cdn.jio.com/dare_images/images/SonyMAX1.png",
       "status": "Live",
       "streamType": "dash-cookies",
-      "streamUrl": "https://jiotvpllive.cdn.jio.com/bpk-tv/SonyMAX1_BTS/WDVLive/index.mpd?__hdnea__=st=1794590723~exp=1794612323~acl=/bpk-tv/SonyMAX1_BTS/WDVLive/*~hmac=be924fc89032d20fc5dc85b97bc863de4c8fde74844822d049d3e9badb3bd654",
+      "streamUrl": "https://jiotvmblive.cdn.jio.com/bpk-tv/SonyMAX1_MOB/WDVLive/index.mpd",
       "cookie": "__hdnea__=st=1794590887~exp=1794612487~acl=/*~hmac=345c87f18957ebd4f994cc47fdd1ecc9d5d99e5b6100a8a5a131fd68296226b8",
       "drm": {
         "type": "clearkey",
