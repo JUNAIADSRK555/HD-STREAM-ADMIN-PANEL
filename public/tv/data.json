@@ -1217,8 +1217,8 @@
                          "background":  "https://jiotv.catchup.cdn.jio.com/dare_images/images/Sony_HD.png",
                          "status":  "Live",
                          "streamType":  "dash-cookies",
-                         "streamUrl":  "https://jiotvpllive.cdn.jio.com/bpk-tv/SETHDSTB_BTS/WDVLive/index.mpd?__hdnea__=st=1794590715~exp=1794612315~acl=/bpk-tv/SETHDSTB_BTS/WDVLive/*~hmac=6be6e015cb90a3b2b6aa7c37545cba9a4a8d53826683526de18168afeca8d69f",
-                         "cookie":  "__hdnea__=st=1794590887~exp=1794612487~acl=/*~hmac=345c87f18957ebd4f994cc47fdd1ecc9d5d99e5b6100a8a5a131fd68296226b8",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/SETHDSTB_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
                          "drm":  {
                                      "type":  "clearkey",
                                      "keyId":  "bcf05cebf2fa54d88c616ec4e0ee9f3f",
@@ -18230,8 +18230,8 @@
                          "background":  "https://jiotv.catchup.cdn.jio.com/dare_images/images/DiscoveryKidsKan.png",
                          "status":  "Live",
                          "streamType":  "dash-cookies",
-                         "streamUrl":  "https://jiotvpllive.cdn.jio.com/bpk-tv/DiscoveryKidsKan_BTS/WDVLive/index.mpd?__hdnea__=st=1794590719~exp=1794612319~acl=/bpk-tv/DiscoveryKidsKan_BTS/WDVLive/*~hmac=2d2a2f2456f3ed4f02426906a1416bdca3f1c9e2edcde55d8d3bcff830c9ad0b",
-                         "cookie":  "__hdnea__=st=1794590887~exp=1794612487~acl=/*~hmac=345c87f18957ebd4f994cc47fdd1ecc9d5d99e5b6100a8a5a131fd68296226b8",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/DiscoveryKidsKan_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
                          "drm":  {
                                      "type":  "clearkey",
                                      "keyId":  "d02018317d6456d6a1c461d2ded462bc",
@@ -19139,6 +19139,646 @@
                                      "key":  "null"
                                  },
                          "synced":  true
+                     },
+                     {
+                         "id":  "204",
+                         "name":  "DD Sports",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/DD_Sports.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/DD_Sports.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/DD_Sports_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "e6bd071206ea552ba32a22496af8f2a5",
+                                     "key":  "962e83890c212fb4fe0fdab30bc2ba0d"
+                                 }
+                     },
+                     {
+                         "id":  "875",
+                         "name":  "Eurosport HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Dsports_HD.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Dsports_HD.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Dsports_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "b3bcfaeae129566f80a3afb2b533f917",
+                                     "key":  "6843545622aa27cab11368ffb3cae72a"
+                                 }
+                     },
+                     {
+                         "id":  "889",
+                         "name":  "Jio Sports HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Jio_Sports.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Jio_Sports.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Jio_Sports_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "efebee7d002b5e519c5df02b191a2709",
+                                     "key":  "30fc4c79935da32b16aea1362e6b4892"
+                                 }
+                     },
+                     {
+                         "id":  "1163",
+                         "name":  "JioGames HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Jio_Esports_HD.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Jio_Esports_HD.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Jio_Esports_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "17df4d1c15ab5fcb88dc46f94e16412c",
+                                     "key":  "f5ff1078996afe0b18841250f3f8cf9a"
+                                 }
+                     },
+                     {
+                         "id":  "1294",
+                         "name":  "Eurosport",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Dsports.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Dsports.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Dsports_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "4197a27f1c445f06a04a3616aa95b575",
+                                     "key":  "0345ef0f4815e7a99418c94c4adfcb52"
+                                 }
+                     },
+                     {
+                         "id":  "1529",
+                         "name":  "MI TV",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/MI_TV.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/MI_TV.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/MI_TV_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "d958cdeb2bf55ab8869fc3e483446ab6",
+                                     "key":  "8b3eaa90d6f76eb35ca312189c398ff9"
+                                 }
+                     },
+                     {
+                         "id":  "460",
+                         "name":  "Star Sports Select 1 HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/96/65/302113_1749664252703_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/96/65/302113_1749664252703_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_Select_HD_1_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "8fc8499852ea5182b2a9307bd921cea1",
+                                     "key":  "c0ff2fbd59e26d6633f98af470c4d7b6"
+                                 }
+                     },
+                     {
+                         "id":  "162",
+                         "name":  "Sony Ten 1 HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Ten_HD.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Ten_HD.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Ten_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "3525c924e54154b39533d86b1c7a428a",
+                                     "key":  "8548b566fc6608a7d3bd601ee5f3d889"
+                                 }
+                     },
+                     {
+                         "id":  "891",
+                         "name":  "Sony Ten 2 HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Ten2_HD.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Ten2_HD.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Ten2_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "91fce77f2f8056f084ed961c7ebe86ed",
+                                     "key":  "8214bd5eb6c21444e8ea644824affd79"
+                                 }
+                     },
+                     {
+                         "id":  "892",
+                         "name":  "Sony Ten 3 Hindi HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Ten3_HD.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Ten3_HD.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Ten3_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "111e6908b965566e97139efddf7ef459",
+                                     "key":  "c87903abbc052e1f21e51ebd928d9cb1"
+                                 }
+                     },
+                     {
+                         "id":  "1123",
+                         "name":  "Star Sports Select 1",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/13/82/301994_1749664069587_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/13/82/301994_1749664069587_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_Select_1_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "df07fac4675a597f92cbe2edbffb7c23",
+                                     "key":  "0d6b8e6559306e043bf26c7c8ffce7ae"
+                                 }
+                     },
+                     {
+                         "id":  "461",
+                         "name":  "Star Sports Select 2 HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/98/79/302114_1749665414817_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/98/79/302114_1749665414817_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_Select_HD_2_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "2c443dffefb256a5b7a1364cc4af3529",
+                                     "key":  "1d78f35200eb5977a95de669788cf128"
+                                 }
+                     },
+                     {
+                         "id":  "1114",
+                         "name":  "Star Sports Select 2",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/98/48/301989_1749664475828_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/98/48/301989_1749664475828_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_Select_2_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "2b307daa57a75698acfac3e85d4ff8c5",
+                                     "key":  "d3c17909d061caa2e0a9c75e195ae3d4"
+                                 }
+                     },
+                     {
+                         "id":  "1106",
+                         "name":  "Star Sports 1 HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/76/32/301981_1749665664018_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/76/32/301981_1749665664018_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_HD1_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "45825561f4ef516691a9e16d1d35dd1d",
+                                     "key":  "3951fe7fbf4b0b33e6246fc401f76797"
+                                 }
+                     },
+                     {
+                         "id":  "1142",
+                         "name":  "Star Sports 1",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/56/92/302115_1749665579801_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/56/92/302115_1749665579801_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_1_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "a415207154a154e59d6259f6c436937c",
+                                     "key":  "56c3bac0e95368220dd75b6312a4458c"
+                                 }
+                     },
+                     {
+                         "id":  "1108",
+                         "name":  "Star Sports 1 Hindi HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/5/6/301982_1749665314605_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/5/6/301982_1749665314605_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_HD1_Hindi_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "a1ce6b9514f35174bda80ddd425bfd88",
+                                     "key":  "5c5e158724eced92f92ca8286fb28fd9"
+                                 }
+                     },
+                     {
+                         "id":  "362",
+                         "name":  "Star Sports 1 Hindi",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/13/81/302112_1749665154709_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/13/81/302112_1749665154709_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_1_Hindi_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "30039b6e2c545c01aa84e649875c4977",
+                                     "key":  "7aa610c68000fe9ed97851d40a52abff"
+                                 }
+                     },
+                     {
+                         "id":  "1109",
+                         "name":  "Star Sports 2 HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/41/51/301983_1749666169105_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/41/51/301983_1749666169105_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_HD2_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "b99144f27b865d6ba1007fead82b2783",
+                                     "key":  "b2f10f09a771327b9bc69484d78e4595"
+                                 }
+                     },
+                     {
+                         "id":  "1141",
+                         "name":  "Star Sports 2",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/11/30/302116_1749666029079_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/11/30/302116_1749666029079_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_2_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "d49703e538a2545fa2d8d57f34a4d0ba",
+                                     "key":  "9ef07c1b359ee137db0493cebd6acdf0"
+                                 }
+                     },
+                     {
+                         "id":  "1984",
+                         "name":  "Star Sports 2 Hindi HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/56/36/301229_1742214332015_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/56/36/301229_1742214332015_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/StarSportsHD2Hin_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "5b50f11a09a15275b5742ef2d6e001e0",
+                                     "key":  "9b9ce35c8d91340939031aba5e433991"
+                                 }
+                     },
+                     {
+                         "id":  "1985",
+                         "name":  "Star Sports 2 Hindi",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/57/17/302124_1749130246443_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/57/17/302124_1749130246443_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/StarSports2Hin_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "f9af22f6d76f5f5d98a35eed7fc35292",
+                                     "key":  "b979fbf840b5c984733d28aaf683762e"
+                                 }
+                     },
+                     {
+                         "id":  "1389",
+                         "name":  "Star Sports 3",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/78/2/302117_1749666092192_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/78/2/302117_1749666092192_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_3_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "2904732c8fb55ebeaa0f59316916997e",
+                                     "key":  "f69101b71872dcfb2cd1987d3773c0f4"
+                                 }
+                     },
+                     {
+                         "id":  "3277",
+                         "name":  "Star Sports 1 Tamil HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/19/19/302122_1749662923298_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/19/19/302122_1749662923298_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_1_Tamil_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "1e9099af7f025ad6b3fd363bb2db8faf",
+                                     "key":  "c45a762695c40f6675b8b56ac50e97a5"
+                                 }
+                     },
+                     {
+                         "id":  "1124",
+                         "name":  "Star Sports 1 Tamil",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/69/73/301995_1749664384503_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/69/73/301995_1749664384503_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_1_Tamil_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "a05f788e6082561fad5565ab7457c995",
+                                     "key":  "5756af02f8923b1e8767ff375bafb4aa"
+                                 }
+                     },
+                     {
+                         "id":  "3278",
+                         "name":  "Star Sports 1 Telugu HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/19/57/302123_1749663029798_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/19/57/302123_1749663029798_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_1_Telugu_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "a56a509011675303900ead16165ba38f",
+                                     "key":  "c4c4c7aec0ff4a3fa0c6d8cb1ae56c30"
+                                 }
+                     },
+                     {
+                         "id":  "1651",
+                         "name":  "Star Sports 1 Telugu",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/26/67/302119_1749662981095_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/26/67/302119_1749662981095_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_1_Telugu_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "8aa7da0842d65285b23e55619ab0f1c6",
+                                     "key":  "fe01e21ac81a19049d3ba82b5bd33dfa"
+                                 }
+                     },
+                     {
+                         "id":  "1650",
+                         "name":  "Star Sports 1 Kannada",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/13/91/302118_1749663894692_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/13/91/302118_1749663894692_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_1_Kannada_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "bab01ce8ab695712a5fe390f1b4ffca2",
+                                     "key":  "5685130a845e217080b84fc170b67f00"
+                                 }
+                     },
+                     {
+                         "id":  "1122",
+                         "name":  "Star Sports 2 Kannada",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/11/37/301993_1749664589518_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/11/37/301993_1749664589518_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_2_Kannada_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "c1ef762b00a35caea7dcafe355b09610",
+                                     "key":  "16538c004d246559a88cba2b57b55857"
+                                 }
+                     },
+                     {
+                         "id":  "3273",
+                         "name":  "Star Sports 2 Tamil HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/50/43/302120_1749664850896_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/50/43/302120_1749664850896_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports2_Tamil_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "bd9dfd385dbc56a99a048f88d3828571",
+                                     "key":  "eecf613dad0b8250ffaddc7ba86be68b"
+                                 }
+                     },
+                     {
+                         "id":  "2853",
+                         "name":  "Star Sports 2 Tamil",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/74/92/301561_1749664725619_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/74/92/301561_1749664725619_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/StarSports2Tamil_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "0a0ad7fdf02955d483496e5d5ad41b64",
+                                     "key":  "cc1d01a4ccfd47da4f5ff62e20686505"
+                                 }
+                     },
+                     {
+                         "id":  "3274",
+                         "name":  "Star Sports 2 Telugu HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/84/67/302121_1749664974599_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/84/67/302121_1749664974599_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports2_Telugu_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "5515e7889d225404939f53765feba2ea",
+                                     "key":  "56fa91e2ee09e5a989c630cb3b2df13d"
+                                 }
+                     },
+                     {
+                         "id":  "2852",
+                         "name":  "Star Sports 2 Telugu",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://img.media.jio.com/tvpimages/41/94/301562_1749665043898_l_medium.jpg",
+                         "background":  "https://img.media.jio.com/tvpimages/41/94/301562_1749665043898_l_medium.jpg",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/StarSports2Telugu_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "e85ffc940cfc5c5790a24b714acef1cd",
+                                     "key":  "fda416daac7608bfd608ab4c5b724a84"
+                                 }
+                     },
+                     {
+                         "id":  "2766",
+                         "name":  "BRAVE TV",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Brave_TV.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Brave_TV.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Brave_TV_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "5b39b43eac995ba58be147d4274b80ad",
+                                     "key":  "7a90a6f3fa4f42ae694436f830f442c2"
+                                 }
+                     },
+                     {
+                         "id":  "2779",
+                         "name":  "Red Bull TV",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Red_Bull_TV.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Red_Bull_TV.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Red_Bull_TV_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "9d8303ed3e0b56078f7ac6d6bd8199c0",
+                                     "key":  "eb60e3e7edc02fbfa3e4c8e841b65b87"
+                                 }
+                     },
+                     {
+                         "id":  "3011",
+                         "name":  "Lancs TV HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Lancs_TV_HD.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Lancs_TV_HD.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Lancs_TV_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "032977e68d9851fcb150f147b89cf9e8",
+                                     "key":  "e1e870afc222d2d2a7f913e3205f4fa5"
+                                 }
+                     },
+                     {
+                         "id":  "3146",
+                         "name":  "All Women\u0027s Sports Network",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/AWSN.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/AWSN.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/AWSN_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "8f7f3239c37f521ba1804aebdcd7404a",
+                                     "key":  "516e21012c50b8e6c51b297b07bb0675"
+                                 }
+                     },
+                     {
+                         "id":  "3204",
+                         "name":  "Penta TV",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Penta_TV.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Penta_TV.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Penta_TV_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "bd38f502b44b5aec8196ac4aebd3ca7c",
+                                     "key":  "b26a13589bc487b06f421a6bb00b2100"
+                                 }
+                     },
+                     {
+                         "id":  "3243",
+                         "name":  "Pickleball Now",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Pickleball_Now.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Pickleball_Now.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Pickleball_Now_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "fc418df9af225e18a8fc6278a6e9cd75",
+                                     "key":  "64cf8bec9b8133a32187241bba87d635"
+                                 }
+                     },
+                     {
+                         "id":  "3530",
+                         "name":  "UIPM Pentathlon World Cup",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/UIPMPentathlonWC.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/UIPMPentathlonWC.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/UIPMPentathlonWC_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "59414fca13b95985ad38ba9074840a81",
+                                     "key":  "16e62faf7f2ef75112ebb98377a2a03e"
+                                 }
+                     },
+                     {
+                         "id":  "155",
+                         "name":  "Sony Ten 5 HD",
+                         "category":  "Sports, Jio-Tv",
+                         "logo":  "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Sports_Ten_5_HD.png",
+                         "background":  "https://jiotvimages.cdn.jio.com/dare_images/images/Sony_Sports_Ten_5_HD.png",
+                         "status":  "Live",
+                         "streamType":  "dash-cookies",
+                         "streamUrl":  "https://jiotvmblive.cdn.jio.com/bpk-tv/Six_HD_MOB/WDVLive/index.mpd",
+                         "cookie":  "__hdnea__=st=1794612611~exp=1794699011~acl=/*~hmac=adb892438951187924fdd2260ad772121593d04857bae666acbdc7b38ac1c96e",
+                         "drm":  {
+                                     "type":  "clearkey",
+                                     "keyId":  "8cb7b40cefe053ea91895e3194bb9912",
+                                     "key":  "467cf6d740b7212fcfc648644fb79943"
+                                 }
                      }
                  ]
 }
