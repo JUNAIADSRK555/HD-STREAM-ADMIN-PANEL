@@ -3,8 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
+const cron = require('node-cron');
 const { connectDB } = require('./config/db');
 const Store = require('./services/store');
+const { syncDrivePlaylist } = require('./sync-drive-playlist');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -92,9 +94,24 @@ if (!process.env.VERCEL) {
   connectDB().then(() => {
     app.listen(PORT, () => {
       console.log(`🚀 HD STREAM Admin Backend Running on port ${PORT}`);
+      
+      // 1. Initial Google Drive Playlist Sync on Server Startup
+      syncDrivePlaylist().catch(err => console.error('[Drive Sync Startup Error]:', err.message));
+
+      // 2. Schedule Auto-Sync every 15 minutes
+      cron.schedule('*/15 * * * *', () => {
+        console.log('[Cron] Running scheduled Google Drive playlist sync (every 15 min)...');
+        syncDrivePlaylist().catch(err => console.error('[Cron Sync Error]:', err.message));
+      });
+      console.log('⏰ Google Drive playlist auto-sync scheduled: Every 15 minutes');
     });
   }).catch(() => {
-    app.listen(PORT);
+    app.listen(PORT, () => {
+      syncDrivePlaylist().catch(err => console.error('[Drive Sync Startup Error]:', err.message));
+      cron.schedule('*/15 * * * *', () => {
+        syncDrivePlaylist().catch(err => console.error('[Cron Sync Error]:', err.message));
+      });
+    });
   });
 }
 
