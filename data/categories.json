@@ -1,13 +1,5 @@
 [
   {
-    "id": "gcat_hdstream",
-    "name": "HD STREAM",
-    "slug": "hd-stream",
-    "icon": "fas fa-play-circle",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/hdstream.png",
-    "m3uLink": "https://premiumplugx.com/VIP/pluglist.php"
-  },
-  {
     "id": "gcat_1",
     "name": "JIO TV+",
     "slug": "jio-tv",
@@ -16,100 +8,179 @@
     "m3uLink": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/tv/data.json"
   },
   {
-    "id": "gcat_2",
-    "name": "SONY LIV",
-    "slug": "sony-liv",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/sonyliv.png",
-    "m3uLink": "https://raw.githubusercontent.com/sportlive18/Sonyliv-Playlist-Autoupdate/main/sony.m3u"
+    "id": "gcat_1",
+    "name": "OPPLEX TV",
+    "slug": "opplex-tv",
+    "icon": "https://images.dwncdn.net/images/t_app-icon-l/p/726e4016-4238-4585-bb28-24dd34caf251/3103446756/opplextv-icon.jpeg",
+    "imageUrl": "https://images.dwncdn.net/images/t_app-icon-l/p/726e4016-4238-4585-bb28-24dd34caf251/3103446756/opplextv-icon.jpeg",
+    "m3uLink": "https://bdix.spidy.online/MAC/SBHGOLD/SBHgold.m3u",
+    "portal_url": "",
+    "mac": ""
   },
   {
-    "id": "gcat_fancode",
-    "name": "FANCODE LIVE",
-    "slug": "fancode-live",
-    "icon": "fas fa-bolt",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/fancode.png",
-    "m3uLink": "https://allinonereborn2.online/fctest/json/fancode_latest.json"
+    "id": "gcat_2",
+    "name": "JD TV 1",
+    "slug": "jd-tv-1",
+    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s",
+    "m3uLink": "https://allinonereborn2.online/jiotv-m3u/jtv39.m3u8",
+    "portal_url": "",
+    "mac": ""
   },
   {
     "id": "gcat_3",
-    "name": "MIX TV",
-    "slug": "mix-tv",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCm7hdWxlS5fbZ3Do-pqzytQVayxUNHFl5oD5E4TWtQfCnRw2pM2UOa8I&s=10",
-    "m3uLink": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/tv/mix.json"
+    "name": "ANIME",
+    "slug": "anime",
+    "icon": "https://png.pngtree.com/png-vector/20260801/ourmid/pngtree-24-7-service-icon-vector-png-image_19653807.webp",
+    "imageUrl": "https://png.pngtree.com/png-vector/20260801/ourmid/pngtree-24-7-service-icon-vector-png-image_19653807.webp",
+    "m3uLink": "https://live.hacks.tools/iptv/categories/animation.m3u",
+    "portal_url": "",
+    "mac": ""
   },
   {
     "id": "gcat_4",
-    "name": "VZY",
-    "slug": "vzy",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIYAVnSjMhpKILSGSOyqeLnackwGjeolKPRVv4Yh0UW8RJI-hYBKQbO319&s=10",
-    "m3uLink": "https://pastyx.pages.dev/api/paste/vzy-playlist-m3u/raw"
+    "name": "JIO TV+ 1",
+    "slug": "jio-tv-1",
+    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKIIUwitJWzKomNurXMsbwVwSjDt3LgjOgWg&s",
+    "m3uLink": "https://jiostbplus.saregojo99.workers.dev/m3u",
+    "portal_url": "",
+    "mac": ""
   },
   {
     "id": "gcat_5",
-    "name": "PAKISTAN TV",
-    "slug": "pakistan-tv",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10",
-    "m3uLink": "https://iptv-org.github.io/iptv/countries/pk.m3u"
+    "name": "TV MIX",
+    "slug": "tv-mix",
+    "icon": "https://play-lh.googleusercontent.com/j6LuUl_tSXzJz27NiYDnTQR-uuiFb6jbpQP5nM9xnOpG1MclgjJys2jGrz5drSYvh0p0f0wsY6jf-oZGf-PKWQ",
+    "imageUrl": "https://play-lh.googleusercontent.com/j6LuUl_tSXzJz27NiYDnTQR-uuiFb6jbpQP5nM9xnOpG1MclgjJys2jGrz5drSYvh0p0f0wsY6jf-oZGf-PKWQ",
+    "m3uLink": "https://premiumplugx.com/VIP/pluglist.php",
+    "portal_url": "",
+    "mac": ""
   },
   {
     "id": "gcat_6",
-    "name": "TOFFEE",
-    "slug": "toffee",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLjYG2Yb4mLqygUe_GDkKu5Rw73jqEQmxeXddimkUpE2NrKsvXfaMf-LMQ&s=10",
-    "m3uLink": "https://iptv-org.github.io/iptv/languages/hin.m3u"
+    "name": "FAST TV",
+    "slug": "fast-tv",
+    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3SWvvTZVwNAqFYKwR1JeRkTaT36ypAj89CQ&s",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3SWvvTZVwNAqFYKwR1JeRkTaT36ypAj89CQ&s",
+    "m3uLink": "https://cinexcricket.com/api/sport/data.json",
+    "portal_url": "",
+    "mac": ""
   },
   {
     "id": "gcat_7",
-    "name": "IRAN TV",
-    "slug": "iran-tv",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/iran.png",
-    "m3uLink": "https://iptv-org.github.io/iptv/countries/ir.m3u"
+    "name": "VZY",
+    "slug": "vzy",
+    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIYAVnSjMhpKILSGSOyqeLnackwGjeolKPRVv4Yh0UW8RJI-hYBKQbO319&s=10",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIYAVnSjMhpKILSGSOyqeLnackwGjeolKPRVv4Yh0UW8RJI-hYBKQbO319&s=10",
+    "m3uLink": "https://pastyx.pages.dev/api/paste/vzy-playlist-m3u/raw",
+    "portal_url": "",
+    "mac": ""
   },
   {
     "id": "gcat_8",
-    "name": "Afghanistan TV",
-    "slug": "afghanistan-tv",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-i-alUhNqSc08Q7HHJO2i7fCxKxZKBJCXfKf7QymkpmqVhEK4G75wQgs&s=10",
-    "m3uLink": "https://iptv-org.github.io/iptv/countries/af.m3u"
+    "name": "PAKISTAN TV",
+    "slug": "pakistan-tv",
+    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10",
+    "m3uLink": "https://iptv-org.github.io/iptv/countries/pk.m3u",
+    "portal_url": "",
+    "mac": ""
   },
   {
     "id": "gcat_9",
-    "name": "CARTOON MOVIE",
-    "slug": "cartoon-movie",
-    "icon": "fas fa-film",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/cartoon.png",
-    "m3uLink": "https://drive.google.com/uc?export=download&id=1UZ1M-R5Lx58Hi7qkbi5Ylnf8UirfRFPH"
+    "name": "TOFFEE",
+    "slug": "toffee",
+    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLjYG2Yb4mLqygUe_GDkKu5Rw73jqEQmxeXddimkUpE2NrKsvXfaMf-LMQ&s=10",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLjYG2Yb4mLqygUe_GDkKu5Rw73jqEQmxeXddimkUpE2NrKsvXfaMf-LMQ&s=10",
+    "m3uLink": "https://iptv-org.github.io/iptv/languages/hin.m3u",
+    "portal_url": "",
+    "mac": ""
   },
   {
     "id": "gcat_10",
-    "name": "MX PLAYER",
-    "slug": "mx-player",
-    "icon": "fas fa-play",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10",
-    "m3uLink": "https://playlist-by-xfireflix.pages.dev/India/mxplayer"
+    "name": "IRAN TV",
+    "slug": "iran-tv",
+    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNjZWyN-Ux1i7Ljm9XH0S88GucnvHSk7O1YyBtU9sIiiGLJm4EWR77ueJ9&s=10",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNjZWyN-Ux1i7Ljm9XH0S88GucnvHSk7O1YyBtU9sIiiGLJm4EWR77ueJ9&s=10",
+    "m3uLink": "https://iptv-org.github.io/iptv/countries/ir.m3u",
+    "portal_url": "",
+    "mac": ""
   },
   {
     "id": "gcat_11",
-    "name": "YUPPY TV",
-    "slug": "yuppy-tv",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s",
-    "m3uLink": "https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u"
+    "name": "Afghanistan TV",
+    "slug": "afghanistan-tv",
+    "icon": "https://static.vecteezy.com/system/resources/thumbnails/011/571/509/small_2x/circle-flag-of-afghanistan-free-png.png",
+    "imageUrl": "https://static.vecteezy.com/system/resources/thumbnails/011/571/509/small_2x/circle-flag-of-afghanistan-free-png.png",
+    "m3uLink": "https://iptv-org.github.io/iptv/countries/af.m3u",
+    "portal_url": "",
+    "mac": ""
   },
   {
     "id": "gcat_12",
-    "name": "STALKER PORTAL LIVE",
-    "slug": "stalker-portal",
-    "icon": "fas fa-server",
-    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJ62IwtiCZ9E8fqeu8hDPhvjHqNrols3GnUddW3VszWA&s=10",
-    "portal_url": "http://134.119.176.239/stalker_portal/c/",
-    "mac": "00:1A:79:78:EE:AD"
+    "name": "CARTOON MOVIE",
+    "slug": "cartoon-movie",
+    "icon": "https://logos-world.net/wp-content/uploads/2022/06/CMovies-Symbol.png",
+    "imageUrl": "https://logos-world.net/wp-content/uploads/2022/06/CMovies-Symbol.png",
+    "m3uLink": "https://drive.google.com/uc?export=download&id=1UZ1M-R5Lx58Hi7qkbi5Ylnf8UirfRFPH",
+    "portal_url": "",
+    "mac": ""
+  },
+  {
+    "id": "gcat_13",
+    "name": "MX PLAYER",
+    "slug": "mx-player",
+    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10",
+    "m3uLink": "https://playlist-by-xfireflix.pages.dev/India/mxplayer",
+    "portal_url": "",
+    "mac": ""
+  },
+  {
+    "id": "gcat_14",
+    "name": "SONY TV",
+    "slug": "sony-tv",
+    "icon": "https://thumbnail.imgbin.com/14/9/0/imgbin-sony-entertainment-television-sony-liv-television-channel-sony-s-networks-india-others-HJcVkNCn3zcaRWUAuRZGMAG2K_t.jpg",
+    "imageUrl": "https://thumbnail.imgbin.com/14/9/0/imgbin-sony-entertainment-television-sony-liv-television-channel-sony-s-networks-india-others-HJcVkNCn3zcaRWUAuRZGMAG2K_t.jpg",
+    "m3uLink": "https://raw.githubusercontent.com/sportlive18/Sonyliv-Playlist-Autoupdate/main/sony.m3u",
+    "portal_url": "",
+    "mac": ""
+  },
+  {
+    "id": "gcat_15",
+    "name": "SONY TV 2",
+    "slug": "sony-tv-2",
+    "icon": "https://thumbnail.imgbin.com/14/9/0/imgbin-sony-entertainment-television-sony-liv-television-channel-sony-s-networks-india-others-HJcVkNCn3zcaRWUAuRZGMAG2K_t.jpg",
+    "imageUrl": "https://thumbnail.imgbin.com/14/9/0/imgbin-sony-entertainment-television-sony-liv-television-channel-sony-s-networks-india-others-HJcVkNCn3zcaRWUAuRZGMAG2K_t.jpg",
+    "m3uLink": "https://sonydismthjgdtarsadfsghdjf.higuifytdrseaw.workers.dev/m3u",
+    "portal_url": "",
+    "mac": ""
+  },
+  {
+    "id": "gcat_16",
+    "name": "YUPPY TV",
+    "slug": "yuppy-tv",
+    "icon": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s",
+    "m3uLink": "https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u",
+    "portal_url": "",
+    "mac": ""
+  },
+  {
+    "id": "gcat_17",
+    "name": "B4U PORTAL",
+    "slug": "b4u-portal",
+    "icon": "https://images.dwncdn.net/images/t_app-icon-l/p/726e4016-4238-4585-bb28-24dd34caf251/3103446756/opplextv-icon.jpeg",
+    "imageUrl": "https://images.dwncdn.net/images/t_app-icon-l/p/726e4016-4238-4585-bb28-24dd34caf251/3103446756/opplextv-icon.jpeg",
+    "m3uLink": "http://play.b4u.live/stalker_portal/c/",
+    "portal_url": "http://play.b4u.live/stalker_portal/c/",
+    "mac": "00:1A:79:82:5F:01",
+    "tariff_plan": "Full TV",
+    "adult_pass": "7070",
+    "max_conn": "100000",
+    "serial_cut": "8B910A07977CD",
+    "device_id_1": "FDDB952641AA2826CE9E6B6159D9D5242B41F93A69288C342C3508764A3E3621",
+    "device_id_2": "FDDB952641AA2826CE9E6B6159D9D5242B41F93A69288C342C3508764A3E3621"
   }
 ]

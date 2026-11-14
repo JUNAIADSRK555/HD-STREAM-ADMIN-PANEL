@@ -117,68 +117,139 @@ function validateRawContent(rawText) {
 }
 
 /**
- * Parses either JSON or M3U/M3U8 playlist into standard channels array
+ * Parses either:
+ * - A Category List (JSON array with category objects containing m3uLink / portal_url / title)
+ * - OR a Channels Playlist (JSON array with streamUrl/drm or M3U/M3U8)
+ * Returns { type: 'categories' | 'channels', data: [...] }
  */
-function parsePlaylist(content) {
+function parseDrivePayload(content) {
   const trimmed = content.trim();
 
   // --- 1. Try JSON Format ---
   if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
     try {
       const parsed = JSON.parse(trimmed);
+
+      // Check if it's a CATEGORY LIST
+      const isArrayOfCategories = Array.isArray(parsed) && parsed.length > 0 &&
+        parsed.some(item => item && (item.m3uLink || item.portal_url || item.mac || (item.title && !item.streamUrl && !item.stream_url)));
+
+      if (isArrayOfCategories) {
+        const cleanCategories = parsed
+          .filter(c => {
+            if (!c || typeof c !== 'object') return false;
+            const title = String(c.title || c.name || '').trim();
+            const slug = String(c.slug || '').trim();
+            const combined = `${title} ${slug}`.toLowerCase();
+            return !/adult|18\+|porn|erotic|nsfw|xxx|brazzers|playboy|sensual/i.test(combined);
+          })
+          .map((c, idx) => {
+            const title = String(c.title || c.name || `Category ${idx + 1}`).trim();
+            const slug = String(c.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-')).replace(/^-+|-+$/g, '');
+            let m3uLink = String(c.m3uLink || c.url || '').trim();
+            let portal_url = String(c.portal_url || '').trim();
+            if (!portal_url && m3uLink.includes('stalker_portal')) {
+              portal_url = m3uLink;
+            }
+            const img = String(c.imageUrl || c.image || c.logo || '').trim();
+
+            const cat = {
+              id: String(c.id || `gcat_${idx + 1}`).trim(),
+              name: title,
+              slug: slug || `cat-${idx + 1}`,
+              icon: String(c.icon || (img ? img : 'fas fa-tv')).trim(),
+              imageUrl: img,
+              m3uLink,
+              portal_url,
+              mac: String(c.mac || '').trim()
+            };
+
+            if (c.tariff_plan) cat.tariff_plan = String(c.tariff_plan);
+            if (c.adult_pass) cat.adult_pass = String(c.adult_pass);
+            if (c.max_conn) cat.max_conn = String(c.max_conn);
+            if (c.serial_cut) cat.serial_cut = String(c.serial_cut);
+            if (c.device_id_1) cat.device_id_1 = String(c.device_id_1);
+            if (c.device_id_2) cat.device_id_2 = String(c.device_id_2);
+
+            return cat;
+          });
+
+        if (cleanCategories.length === 0) {
+          throw new Error('Categories list contains 0 valid items after filtering.');
+        }
+
+        // Ensure JIO TV+ is present so the 1,177 core channels remain accessible
+        const hasJioTv = cleanCategories.some(c => c.slug === 'jio-tv' || c.name === 'JIO TV+');
+        if (!hasJioTv) {
+          cleanCategories.unshift({
+            id: 'gcat_1',
+            name: 'JIO TV+',
+            slug: 'jio-tv',
+            icon: 'fas fa-tv',
+            imageUrl: 'https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/jiotv.png',
+            m3uLink: 'https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/tv/data.json'
+          });
+        }
+
+        return {
+          type: 'categories',
+          data: cleanCategories
+        };
+      }
+
+      // Check if it's a CHANNELS LIST
       const rawChannels = Array.isArray(parsed)
         ? parsed
         : (Array.isArray(parsed.channels) ? parsed.channels : null);
 
-      if (!rawChannels || rawChannels.length === 0) {
-        throw new Error('JSON structure does not contain a non-empty channels array.');
-      }
+      if (rawChannels && rawChannels.length > 0) {
+        const validChannels = rawChannels.map((ch, idx) => {
+          const streamUrl = (ch.streamUrl || ch.url || ch.link || ch.stream_url || '').trim();
+          if (!streamUrl || !streamUrl.startsWith('http')) return null;
 
-      const validChannels = rawChannels.map((ch, idx) => {
-        const streamUrl = (ch.streamUrl || ch.url || ch.link || ch.stream_url || '').trim();
-        if (!streamUrl || !streamUrl.startsWith('http')) return null;
+          const name = String(ch.name || ch.title || `Channel ${idx + 1}`).trim();
+          const id = String(ch.id || `ch_${idx + 1}`).trim();
+          const category = String(ch.category || ch.group || 'Live TV').trim();
+          const logo = String(ch.logo || ch.imageUrl || ch.tvgLogo || ch.icon || '').trim();
+          const cookie = String(ch.cookie || ch.headers?.Cookie || ch.headers?.cookie || '').trim();
 
-        const name = String(ch.name || ch.title || `Channel ${idx + 1}`).trim();
-        const id = String(ch.id || `ch_${idx + 1}`).trim();
-        const category = String(ch.category || ch.group || 'Live TV').trim();
-        const logo = String(ch.logo || ch.imageUrl || ch.tvgLogo || ch.icon || '').trim();
-        const cookie = String(ch.cookie || ch.headers?.Cookie || ch.headers?.cookie || '').trim();
+          let drm = { type: 'none', keyId: '', key: '' };
+          if (ch.drm && typeof ch.drm === 'object') {
+            drm = {
+              type: ch.drm.type || ch.drm.scheme || 'clearkey',
+              keyId: String(ch.drm.keyId || ch.drm.key_id || '').trim(),
+              key: String(ch.drm.key || '').trim()
+            };
+          } else if (ch.license_key && typeof ch.license_key === 'string' && ch.license_key.includes(':')) {
+            const parts = ch.license_key.split(':');
+            drm = {
+              type: 'clearkey',
+              keyId: parts[0].trim(),
+              key: parts[1].trim()
+            };
+          }
 
-        let drm = { type: 'none', keyId: '', key: '' };
-        if (ch.drm && typeof ch.drm === 'object') {
-          drm = {
-            type: ch.drm.type || ch.drm.scheme || 'clearkey',
-            keyId: String(ch.drm.keyId || ch.drm.key_id || '').trim(),
-            key: String(ch.drm.key || '').trim()
+          return {
+            id,
+            name,
+            category,
+            logo,
+            background: logo,
+            status: String(ch.status || 'Live').trim(),
+            streamType: String(ch.streamType || (streamUrl.includes('.mpd') ? 'dash-cookies' : 'hls')).trim(),
+            streamUrl,
+            cookie,
+            drm
           };
-        } else if (ch.license_key && typeof ch.license_key === 'string' && ch.license_key.includes(':')) {
-          const parts = ch.license_key.split(':');
-          drm = {
-            type: 'clearkey',
-            keyId: parts[0].trim(),
-            key: parts[1].trim()
+        }).filter(Boolean);
+
+        if (validChannels.length > 0) {
+          return {
+            type: 'channels',
+            data: validChannels
           };
         }
-
-        return {
-          id,
-          name,
-          category,
-          logo,
-          background: logo,
-          status: String(ch.status || 'Live').trim(),
-          streamType: String(ch.streamType || (streamUrl.includes('.mpd') ? 'dash-cookies' : 'hls')).trim(),
-          streamUrl,
-          cookie,
-          drm
-        };
-      }).filter(Boolean);
-
-      if (validChannels.length === 0) {
-        throw new Error('No valid channel stream URLs found in JSON.');
       }
-
-      return validChannels;
     } catch (e) {
       if (trimmed.startsWith('{')) {
         throw new Error(`JSON parsing failed: ${e.message}`);
@@ -288,20 +359,28 @@ function parsePlaylist(content) {
       throw new Error('M3U playlist found but 0 valid channel stream URLs could be extracted.');
     }
 
-    return channels;
+    return {
+      type: 'channels',
+      data: channels
+    };
   }
 
-  throw new Error('Unsupported playlist format: Content is neither valid JSON nor valid M3U/M3U8.');
+  throw new Error('Unsupported playlist format: Content is neither a valid Categories JSON, Channels JSON, nor M3U/M3U8.');
+}
+
+// Backwards compatibility alias
+function parsePlaylist(content) {
+  const result = parseDrivePayload(content);
+  return result.data;
 }
 
 /**
  * Main auto-sync function.
- * Fetches playlist from Google Drive, validates, parses, and safely updates public/tv/data.json.
- * If validation fails for ANY reason, existing public/tv/data.json is kept untouched.
+ * Fetches playlist/categories from Google Drive, validates, parses, and safely updates either
+ * data/categories.json or public/tv/data.json depending on the payload type.
  */
 async function syncDrivePlaylist(customUrl = null) {
   const driveUrl = customUrl || process.env.GOOGLE_DRIVE_PLAYLIST_URL;
-  const targetPath = path.join(__dirname, 'public', 'tv', 'data.json');
 
   if (!driveUrl || !driveUrl.trim()) {
     console.log('[Drive Sync] GOOGLE_DRIVE_PLAYLIST_URL is not configured in .env. Skipping sync.');
@@ -314,41 +393,59 @@ async function syncDrivePlaylist(customUrl = null) {
     return { success: false, message: 'Placeholder file ID configured' };
   }
 
-  console.log(`[Drive Sync] Starting Google Drive playlist sync...`);
+  console.log(`[Drive Sync] Starting Google Drive sync...`);
   console.log(`[Drive Sync] Configured URL: ${driveUrl.trim()}`);
   console.log(`[Drive Sync] Direct Download URL: ${normalizeGoogleDriveUrl(driveUrl.trim())}`);
 
   try {
     const rawContent = await fetchGoogleDriveContent(driveUrl.trim());
     const validatedContent = validateRawContent(rawContent);
-    const parsedChannels = parsePlaylist(validatedContent);
+    const parsedPayload = parseDrivePayload(validatedContent);
 
-    if (!Array.isArray(parsedChannels) || parsedChannels.length === 0) {
-      throw new Error('Zero valid channels parsed from playlist.');
+    if (parsedPayload.type === 'categories') {
+      const targetPath = path.join(__dirname, 'data', 'categories.json');
+      const backupPath = path.join(__dirname, 'data', 'categories.json.bak');
+
+      if (fs.existsSync(targetPath)) {
+        try {
+          fs.copyFileSync(targetPath, backupPath);
+        } catch (_) {}
+      }
+
+      fs.writeFileSync(targetPath, JSON.stringify(parsedPayload.data, null, 2), 'utf8');
+
+      console.log(`[Drive Sync SUCCESS] Successfully synced ${parsedPayload.data.length} categories to data/categories.json!`);
+      return {
+        success: true,
+        type: 'categories',
+        categoriesCount: parsedPayload.data.length
+      };
+    } else {
+      const targetPath = path.join(__dirname, 'public', 'tv', 'data.json');
+      const backupPath = path.join(__dirname, 'public', 'tv', 'data.json.bak');
+
+      if (fs.existsSync(targetPath)) {
+        try {
+          fs.copyFileSync(targetPath, backupPath);
+        } catch (_) {}
+      }
+
+      const payload = {
+        channels: parsedPayload.data
+      };
+
+      fs.writeFileSync(targetPath, JSON.stringify(payload, null, 2), 'utf8');
+
+      console.log(`[Drive Sync SUCCESS] Successfully updated ${parsedPayload.data.length} channels in public/tv/data.json!`);
+      return {
+        success: true,
+        type: 'channels',
+        channelsCount: parsedPayload.data.length
+      };
     }
-
-    // Prepare backup of existing file if present
-    if (fs.existsSync(targetPath)) {
-      try {
-        const backupPath = path.join(__dirname, 'public', 'tv', 'data.json.bak');
-        fs.copyFileSync(targetPath, backupPath);
-      } catch (_) {}
-    }
-
-    const payload = {
-      channels: parsedChannels
-    };
-
-    fs.writeFileSync(targetPath, JSON.stringify(payload, null, 2), 'utf8');
-
-    console.log(`[Drive Sync SUCCESS] Successfully updated ${parsedChannels.length} channels in public/tv/data.json!`);
-    return {
-      success: true,
-      channelsCount: parsedChannels.length
-    };
   } catch (err) {
     console.error(`[Drive Sync ERROR] Sync rejected: ${err.message}`);
-    console.warn(`[Drive Sync SAFEGUARD] Existing public/tv/data.json was preserved untouched.`);
+    console.warn(`[Drive Sync SAFEGUARD] Target files preserved untouched.`);
     return {
       success: false,
       error: err.message
@@ -373,7 +470,7 @@ module.exports = {
   normalizeGoogleDriveUrl,
   fetchGoogleDriveContent,
   validateRawContent,
+  parseDrivePayload,
   parsePlaylist,
   syncDrivePlaylist
 };
-
