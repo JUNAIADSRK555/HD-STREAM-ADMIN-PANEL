@@ -308,16 +308,23 @@ async function getDriveCategories(forceRefresh = false) {
 
 /**
  * Format a single match from Google Drive format to Android LiveStreamEvent
+ * Fully supports Willow Cricket (JSON 1), Live Event Array (JSON 2), and legacy feeds.
  */
 function formatDriveMatch(m, defaultStatus = 'LIVE', index = 0) {
-  const status = (m.status || defaultStatus || 'LIVE').toUpperCase();
-  const title = (m.match_name || m.title || `Live Match ${index + 1}`).trim();
+  const rawStatus = (m.status || defaultStatus || 'LIVE').trim().toUpperCase();
+  const status = (rawStatus.includes('UPCOMING') || rawStatus.includes('FUTURE')) ? 'UPCOMING'
+    : (rawStatus.includes('FINISH') || rawStatus.includes('ENDED') || rawStatus.includes('COMPLETE')) ? 'FINISHED'
+    : 'LIVE';
 
-  // Extract teams
+  const title = (m.match_name || m.title || m.synopsis || m.heading || `Live Match ${index + 1}`).trim();
+
+  // Extract teams (supports team_a, team_b, team1, team2, or title splitting)
   let team1Name = 'Team 1';
   let team2Name = 'Team 2';
 
-  if (m.team1 && m.team1.name) {
+  if (m.team_a && m.team_a.name) {
+    team1Name = m.team_a.name;
+  } else if (m.team1 && m.team1.name) {
     team1Name = m.team1.name;
   } else if (/ vs /i.test(title)) {
     const parts = title.split(/\s+vs\s+/i);
@@ -331,40 +338,84 @@ function formatDriveMatch(m, defaultStatus = 'LIVE', index = 0) {
     team1Name = title;
   }
 
-  if (m.team2 && m.team2.name) {
+  if (m.team_b && m.team_b.name) {
+    team2Name = m.team_b.name;
+  } else if (m.team2 && m.team2.name) {
     team2Name = m.team2.name;
   }
 
-  // Parse streams
-  const streams = (m.streams || []).map((s, sIdx) => {
-    let url = (s.url || s.streamUrl || '').trim();
+  // Collect stream items (supports nested streams/channels + Willow flat streams)
+  const rawStreamCandidates = [...(m.streams || m.channels || m.servers || m.links || [])];
+
+  if (m.stream_url_alpha && String(m.stream_url_alpha).startsWith('http')) {
+    rawStreamCandidates.push({ title: 'Server 1 (Alpha) HD', url: m.stream_url_alpha, drm_key: m.drm_key });
+  }
+  if (m.stream_url_beta && String(m.stream_url_beta).startsWith('http')) {
+    rawStreamCandidates.push({ title: 'Server 2 (Beta) HD', url: m.stream_url_beta, drm_key: m.drm_key });
+  }
+  if (m.stream_url && String(m.stream_url).startsWith('http')) {
+    rawStreamCandidates.push({ title: 'Server HD', url: m.stream_url, drm_key: m.drm_key });
+  }
+  if (m.match_url && String(m.match_url).startsWith('http') && (m.match_url.includes('.m3u8') || m.match_url.includes('.mpd'))) {
+    rawStreamCandidates.push({ title: 'Official Stream HD', url: m.match_url, drm_key: m.drm_key });
+  }
+
+  const streams = rawStreamCandidates.map((s, sIdx) => {
+    let url = (s.url || s.streamUrl || s.stream_url || s.link || '').trim();
     if (!url || !url.startsWith('http')) {
       return null;
     }
 
-    const isMpd = (s.type || '').toLowerCase() === 'mpd' || url.includes('.mpd');
-    const isHls = (s.type || '').toLowerCase() === 'hls' || url.includes('.m3u8');
+    const rawType = String(s.type || s.streamType || '').trim().toUpperCase();
+    const isMpd = rawType === 'DASH' || rawType === 'MPD' || url.includes('.mpd');
+    const isHls = rawType === 'HLS' || rawType === 'M3U8' || url.includes('.m3u8');
     const streamType = s.streamType || (isMpd ? 'MPD' : isHls ? 'M3U8' : 'DIRECT');
 
     let drm = s.drm || {};
-    if (!drm.keyId && url.includes('drmLicense=')) {
-      const match = url.match(/drmLicense=([0-9a-fA-F]{32}):([0-9a-fA-F]{32})/);
-      if (match) {
+    const rawDrmKey = (s.drm_key || s.drmKey || m.drm_key || '').trim();
+
+    if (!drm.keyId && !drm.key) {
+      if (rawDrmKey) {
+        if (rawDrmKey.includes(':')) {
+          const parts = rawDrmKey.split(':');
+          drm = {
+            enabled: true,
+            scheme: 'clearkey',
+            keyId: parts[0]?.trim() || '',
+            key: parts[1]?.trim() || ''
+          };
+        } else if (rawDrmKey.startsWith('http')) {
+          drm = {
+            enabled: true,
+            scheme: rawType.includes('WIDEVINE') ? 'widevine' : 'clearkey',
+            licenseUrl: rawDrmKey
+          };
+        } else if (rawDrmKey.length === 32) {
+          drm = {
+            enabled: true,
+            scheme: 'clearkey',
+            key: rawDrmKey
+          };
+        }
+      } else if (url.includes('drmLicense=')) {
+        const match = url.match(/drmLicense=([0-9a-fA-F]{32}):([0-9a-fA-F]{32})/);
+        if (match) {
+          drm = {
+            enabled: true,
+            scheme: 'clearkey',
+            keyId: match[1],
+            key: match[2]
+          };
+        }
+      } else if (s.keys && Array.isArray(s.keys) && s.keys.length > 0) {
+        const k = s.keys[0];
         drm = {
           enabled: true,
-          scheme: 'clearkey',
-          keyId: match[1],
-          key: match[2]
+          scheme: s.drm_scheme || s.drmScheme || 'clearkey',
+          keyId: k.key_id || k.keyId,
+          key: k.key
         };
       }
-    } else if (s.keys && Array.isArray(s.keys) && s.keys.length > 0) {
-      const k = s.keys[0];
-      drm = {
-        enabled: true,
-        scheme: s.drm_scheme || s.drmScheme || 'clearkey',
-        keyId: k.key_id || k.keyId,
-        key: k.key
-      };
     }
 
     let clearKeyLicense = null;
@@ -386,50 +437,56 @@ function formatDriveMatch(m, defaultStatus = 'LIVE', index = 0) {
 
     return {
       id: s.id || `stream_${index}_${sIdx}`,
-      title: s.title || `Server ${sIdx + 1} HD`,
+      title: s.title || s.name || s.channel_name || `Server ${sIdx + 1} HD`,
       streamType,
       streamUrl: url,
       quality: s.quality || '1080p HD',
       headers: {
-        'User-Agent': s.headers?.['User-Agent'] || s.headers?.userAgent || 'ExoPlayer-Media3/1.4.0',
-        'Referer': s.headers?.['Referer'] || s.headers?.referer || '',
+        'User-Agent': s.headers?.['User-Agent'] || s.headers?.userAgent || s.user_agent || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/149.0.0.0 Safari/537.36',
+        'Referer': s.headers?.['Referer'] || s.headers?.referer || s.referer || '',
         'Origin': s.headers?.['Origin'] || s.headers?.origin || '',
         'Cookie': s.headers?.['Cookie'] || s.headers?.cookie || ''
       },
       drm: {
-        enabled: Boolean(s.drm?.enabled || s.drm?.keyId || s.drm?.key || s.drm?.licenseUrl),
-        scheme: s.drm?.scheme || (s.drm?.keyId || s.drm?.key ? 'clearkey' : 'none'),
-        keyId: s.drm?.keyId || '',
-        key: s.drm?.key || '',
-        licenseUrl: s.drm?.licenseUrl || (s.drm?.keyId && s.drm?.key ? `${s.drm.keyId}:${s.drm.key}` : ''),
+        enabled: Boolean(drm?.enabled || drm?.keyId || drm?.key || drm?.licenseUrl),
+        scheme: drm?.scheme || (drm?.keyId || drm?.key ? 'clearkey' : 'none'),
+        keyId: drm?.keyId || '',
+        key: drm?.key || '',
+        licenseUrl: drm?.licenseUrl || (drm?.keyId && drm?.key ? `${drm.keyId}:${drm.key}` : ''),
         clearKeyLicense
       }
     };
   });
 
+  const banner = (m.cover_image || m.banner_logo || m.bannerUrl || m.banner || m.image || m.poster || '').trim();
+  const matchTime = (m.time && m.date) ? `${m.time} • ${m.date}` : (m.time || m.date || 'LIVE NOW');
+
+  const team1Logo = (m.team_a && (m.team_a.logo || m.team_a.flag)) || (m.team1 && (m.team1.logo || m.team1.flag)) || m.team1_logo || '';
+  const team2Logo = (m.team_b && (m.team_b.logo || m.team_b.flag)) || (m.team2 && (m.team2.logo || m.team2.flag)) || m.team2_logo || '';
+
   return {
-    id: m.id || `gdrive_m_${index}_${Buffer.from(title).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 10)}`,
+    id: m.id || m.match_id || `gdrive_m_${index}_${Buffer.from(title).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 10)}`,
     title: title,
-    category: m.category || 'Live Cricket',
+    category: m.category || m.sport || 'Live Cricket',
     status: status,
     format: m.format || 'T20',
-    startTime: m.time || m.startTime || 'LIVE NOW',
-    bannerUrl: m.bannerUrl || m.banner || '',
-    description: m.result || m.description || '',
-    isPinned: Boolean(m.isPinned),
+    startTime: matchTime,
+    bannerUrl: banner,
+    description: m.synopsis || m.result || m.description || '',
+    isPinned: Boolean(m.isPinned || status === 'LIVE'),
     team1: {
       name: team1Name,
       shortName: team1Name.slice(0, 4).toUpperCase().trim(),
-      flag: m.team1?.flag || m.team1?.logo || '',
-      logo: m.team1?.logo || m.team1?.flag || '',
-      score: m.team1?.score || ''
+      flag: team1Logo,
+      logo: team1Logo,
+      score: (m.team_a && m.team_a.score) || (m.team1 && m.team1.score) || ''
     },
     team2: {
       name: team2Name,
       shortName: team2Name.slice(0, 4).toUpperCase().trim(),
-      flag: m.team2?.flag || m.team2?.logo || '',
-      logo: m.team2?.logo || m.team2?.flag || '',
-      score: m.team2?.score || ''
+      flag: team2Logo,
+      logo: team2Logo,
+      score: (m.team_b && m.team_b.score) || (m.team2 && m.team2.score) || ''
     },
     totalStreams: streams.filter(Boolean).length,
     streams: streams.filter(Boolean)
@@ -469,11 +526,25 @@ async function getDriveEvents(forceRefresh = false) {
     if (driveRes && driveRes.ok) {
       try {
         const driveData = await driveRes.json();
-        const allRaw = [
-          ...(driveData.live_matches || []).map(m => ({ ...m, _defaultStatus: 'LIVE' })),
-          ...(driveData.upcoming_matches || []).map(m => ({ ...m, _defaultStatus: 'UPCOMING' })),
-          ...(driveData.finished_matches || []).map(m => ({ ...m, _defaultStatus: 'FINISHED' }))
-        ];
+        let allRaw = [];
+
+        if (Array.isArray(driveData)) {
+          // Format 2: Live Event Array
+          allRaw = driveData.map(m => ({ ...m, _defaultStatus: m.status || 'LIVE' }));
+        } else if (driveData && typeof driveData === 'object') {
+          // Check for unified array: Matches (Willow JSON 1), matches, data, items, events, results
+          const matchesList = driveData.Matches || driveData.matches || driveData.data || driveData.items || driveData.events || driveData.results;
+          if (Array.isArray(matchesList)) {
+            allRaw = matchesList.map(m => ({ ...m, _defaultStatus: m.status || 'LIVE' }));
+          } else {
+            // Split arrays: live_matches / upcoming_matches / finished_matches
+            allRaw = [
+              ...(driveData.live_matches || driveData.liveMatches || []).map(m => ({ ...m, _defaultStatus: 'LIVE' })),
+              ...(driveData.upcoming_matches || driveData.upcomingMatches || []).map(m => ({ ...m, _defaultStatus: 'UPCOMING' })),
+              ...(driveData.finished_matches || driveData.finishedMatches || []).map(m => ({ ...m, _defaultStatus: 'FINISHED' }))
+            ];
+          }
+        }
         cricketAll = allRaw.map((m, idx) => formatDriveMatch(m, m._defaultStatus, idx)).filter(Boolean);
       } catch (err) {
         console.error('Error parsing Drive Cricket data:', err.message);
@@ -529,6 +600,7 @@ module.exports = {
   LIVE_EVENTS_DRIVE_URL,
   SPORTS_DATA_URL,
   isCricketMatch,
+  formatDriveMatch,
   getDriveCategories,
   getDriveEvents
 };
