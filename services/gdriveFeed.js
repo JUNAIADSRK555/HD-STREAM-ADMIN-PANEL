@@ -295,12 +295,16 @@ async function getDriveCategories(forceRefresh = false) {
       },
       {
         id: "gcat_12",
-        name: "STALKER PORTAL LIVE",
+        name: "STALKER TATA SKY",
         slug: "stalker-portal",
-        icon: "fas fa-server",
+        type: "stalker",
+        icon: "fas fa-satellite-dish",
         imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJ62IwtiCZ9E8fqeu8hDPhvjHqNrols3GnUddW3VszWA&s=10",
-        portal_url: "http://134.119.176.239/stalker_portal/c/",
-        mac: "00:1A:79:78:EE:AD"
+        portal_url: "http://play.tatasky.xyz/stalker_portal/c/",
+        mac: "00:1A:79:82:5F:01",
+        serial: "8B910A07977CD",
+        device_id_1: "FDDB952641AA2826CE9E6B6159D9D5242B41F93A69288C342C3508764A3E3621",
+        device_id_2: "FDDB952641AA2826CE9E6B6159D9D5242B41F93A69288C342C3508764A3E3621"
       }
     ];
   }
