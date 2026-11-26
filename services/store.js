@@ -854,22 +854,22 @@ const Store = {
 
   // --- SETTINGS ---
   async getSettings() {
-    const defaultApkUrl = 'https://stream-admin-backend.vercel.app/HD-STREAM.apk';
+    const defaultApkUrl = 'https://hd-stream-backend.onrender.com/HD-STREAM.apk';
     if (isMongoConnected()) {
       let settings = await Settings.findOne();
       if (!settings) {
         settings = await Settings.create({
           ...inMemoryState.settings,
-          appVersion: '3.0.6',
-          minVersion: '3.0.6',
+          appVersion: '3.4.45',
+          minVersion: '3.4.40',
           apkDownloadUrl: defaultApkUrl
         });
       }
-      if (!settings.apkDownloadUrl || settings.apkDownloadUrl.includes('example.com') || settings.apkDownloadUrl.includes('10.129') || settings.apkDownloadUrl.endsWith('.app')) {
+      if (!settings.apkDownloadUrl || settings.apkDownloadUrl.includes('example.com') || settings.apkDownloadUrl.includes('10.129') || settings.apkDownloadUrl.includes('vercel.app') || settings.apkDownloadUrl.endsWith('.app')) {
         settings.apkDownloadUrl = defaultApkUrl;
       }
-      settings.appVersion = '3.0.6';
-      settings.minVersion = '3.0.6';
+      settings.appVersion = '3.4.45';
+      settings.minVersion = '3.4.40';
       await settings.save();
       return settings;
     }
@@ -1132,8 +1132,8 @@ const Store = {
       } catch (err) {}
     }
 
-    if (initialSettings) {
-      Object.assign(initialSettings, payload);
+    if (inMemoryState?.settings) {
+      Object.assign(inMemoryState.settings, payload);
     }
 
     return {
