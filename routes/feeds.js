@@ -258,7 +258,7 @@ router.get(['/mobile', '/app-data'], async (req, res) => {
       categories,
       liveEvents,
       upcomingEvents,
-      recentEvents: finishedEvents,
+      recentEvents,
       vodSection: vods.map(v => ({
         id: v._id,
         title: v.title,
