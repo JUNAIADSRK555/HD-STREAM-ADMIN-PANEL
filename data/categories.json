@@ -36,7 +36,7 @@
     "name": "MIX TV",
     "slug": "mix-tv",
     "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/mixtv.png",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCm7hdWxlS5fbZ3Do-pqzytQVayxUNHFl5oD5E4TWtQfCnRw2pM2UOa8I&s=10",
     "m3uLink": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/tv/mix.json"
   },
   {
@@ -44,7 +44,7 @@
     "name": "VZY",
     "slug": "vzy",
     "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/vzy.png",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIYAVnSjMhpKILSGSOyqeLnackwGjeolKPRVv4Yh0UW8RJI-hYBKQbO319&s=10",
     "m3uLink": "https://pastyx.pages.dev/api/paste/vzy-playlist-m3u/raw"
   },
   {
@@ -52,7 +52,7 @@
     "name": "PAKISTAN TV",
     "slug": "pakistan-tv",
     "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/pakistantv.png",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBLV9kgm97df5xLeoC-7i8uhp65boAZKw3__9QNW9WGYA0HHk7hS2MBvDa&s=10",
     "m3uLink": "https://iptv-org.github.io/iptv/countries/pk.m3u"
   },
   {
@@ -60,7 +60,7 @@
     "name": "TOFFEE",
     "slug": "toffee",
     "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/toffee.png",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLjYG2Yb4mLqygUe_GDkKu5Rw73jqEQmxeXddimkUpE2NrKsvXfaMf-LMQ&s=10",
     "m3uLink": "https://iptv-org.github.io/iptv/languages/hin.m3u"
   },
   {
@@ -76,7 +76,7 @@
     "name": "Afghanistan TV",
     "slug": "afghanistan-tv",
     "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/afghanistan.png",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT-i-alUhNqSc08Q7HHJO2i7fCxKxZKBJCXfKf7QymkpmqVhEK4G75wQgs&s=10",
     "m3uLink": "https://iptv-org.github.io/iptv/countries/af.m3u"
   },
   {
@@ -92,7 +92,7 @@
     "name": "MX PLAYER",
     "slug": "mx-player",
     "icon": "fas fa-play",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/mxplayer.png",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1NMH254M3gNL2gmhzuwqdRswejy1avQaUvDjHlgGhRA&s=10",
     "m3uLink": "https://playlist-by-xfireflix.pages.dev/India/mxplayer"
   },
   {
@@ -100,7 +100,7 @@
     "name": "YUPPY TV",
     "slug": "yuppy-tv",
     "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/yupptv.png",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSU9aEfg_OS21ZixLmLgbdJvnf90iTZ4zwVtg&s",
     "m3uLink": "https://raw.githubusercontent.com/abusaeeidx/Yupptv-Playlist/refs/heads/main/playlist.m3u"
   },
   {
@@ -109,72 +109,11 @@
     "slug": "stalker-portal",
     "type": "stalker",
     "icon": "fas fa-satellite-dish",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/tatasky.png",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJ62IwtiCZ9E8fqeu8hDPhvjHqNrols3GnUddW3VszWA&s=10",
     "portal_url": "http://play.tatasky.xyz/stalker_portal/c/",
     "mac": "00:1A:79:82:5F:01",
     "serial": "8B910A07977CD",
     "device_id_1": "FDDB952641AA2826CE9E6B6159D9D5242B41F93A69288C342C3508764A3E3621",
     "device_id_2": "FDDB952641AA2826CE9E6B6159D9D5242B41F93A69288C342C3508764A3E3621"
-  },
-  {
-    "id": "gcat_opplex",
-    "name": "OPPLEX TV",
-    "slug": "opplex-tv",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/opplex.png",
-    "m3uLink": "https://kliv.in/Rsd"
-  },
-  {
-    "id": "gcat_zee5",
-    "name": "ZEE 5",
-    "slug": "zee-5",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/zee5.png",
-    "m3uLink": "https://kashurstb-filter.wasmer.app/filter.php?url=https%3A%2F%2Fjiobkl.ytzinadabaad.workers.dev%2F&hide=all&show=zee"
-  },
-  {
-    "id": "gcat_star",
-    "name": "STAR CHANNEL",
-    "slug": "star-channel",
-    "icon": "fas fa-star",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/star.png",
-    "m3uLink": "https://kashurstb-filter.wasmer.app/filter.php?url=https%3A%2F%2Fjiobkl.ytzinadabaad.workers.dev%2F&hide=all&show=star"
-  },
-  {
-    "id": "gcat_kids",
-    "name": "KIDS TV",
-    "slug": "kids-tv",
-    "icon": "fas fa-child",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/kidstv.png",
-    "m3uLink": "https://kashurstb-filter.wasmer.app/filter.php?url=https%3A%2F%2Fjiobkl.ytzinadabaad.workers.dev%2F&hide=all&show=Kids"
-  },
-  {
-    "id": "gcat_airtel",
-    "name": "AIRTEL XTREAM",
-    "slug": "airtel-xtream",
-    "type": "stalker",
-    "icon": "fas fa-satellite-dish",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/airtel.png",
-    "portal_url": "http://play.tatasky.xyz/stalker_portal/c/",
-    "mac": "00:1A:79:82:5F:01",
-    "serial": "8B910A07977CD",
-    "device_id_1": "FDDB952641AA2826CE9E6B6159D9D5242B41F93A69288C342C3508764A3E3621",
-    "device_id_2": "FDDB952641AA2826CE9E6B6159D9D5242B41F93A69288C342C3508764A3E3621"
-  },
-  {
-    "id": "gcat_biggboss",
-    "name": "BIGG BOSS 24/7",
-    "slug": "bigg-boss",
-    "icon": "fas fa-eye",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/biggboss.png",
-    "m3uLink": "https://kashurstb-filter.wasmer.app/filter.php?url=https%3A%2F%2Fkliv.in%2Fbz2&hide=all&show=BIGG%20BOSS"
-  },
-  {
-    "id": "gcat_jdtv",
-    "name": "JD TV 1",
-    "slug": "jd-tv",
-    "icon": "fas fa-tv",
-    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/jdtv.png",
-    "m3uLink": "https://allinonereborn2.online/jiotv-m3u/jtv3929.m3u8"
   }
 ]

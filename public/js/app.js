@@ -436,6 +436,7 @@ async function fetchDashboardStats() {
   } catch (e) {
     updateStatsUI(defaultSampleData.stats);
   }
+  fetchDailyInstallStats().catch(() => {});
 }
 
 function updateStatsUI(stats) {
@@ -514,6 +515,54 @@ async function fetchDevicesList() {
     }
   } catch (e) {
     if (container) container.innerHTML = '<div class="p-4 text-center text-red-400">Failed to load devices</div>';
+  }
+}
+
+async function fetchDailyInstallStats() {
+  const container = document.getElementById('daily-installs-container');
+  const todaySpan = document.getElementById('daily-installs-today');
+  const yesterdaySpan = document.getElementById('daily-installs-yesterday');
+  if (!container) return;
+
+  try {
+    const res = await apiRequest('/api/analytics/daily-installs?days=14');
+    if (res && res.success && res.data) {
+      const data = res.data;
+      if (todaySpan) todaySpan.textContent = data.todayInstalls || 0;
+      if (yesterdaySpan) yesterdaySpan.textContent = data.yesterdayInstalls || 0;
+
+      const breakdown = data.dailyBreakdown || [];
+      if (breakdown.length === 0) {
+        container.innerHTML = '<div class="text-center py-3 text-xs text-slate-500">No daily install data recorded yet.</div>';
+        return;
+      }
+
+      const maxInstalls = Math.max(...breakdown.map(d => d.installs || 0), 1);
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          ${breakdown.slice(0, 10).map((d) => {
+            const percent = Math.min(100, Math.round((d.installs / maxInstalls) * 100));
+            return `
+              <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 border border-slate-800/80 hover:border-slate-700 transition">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="text-xs font-semibold text-slate-200 w-24 truncate">${d.label}</span>
+                  <div class="w-24 sm:w-32 bg-slate-800 rounded-full h-2 overflow-hidden">
+                    <div class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-2 rounded-full" style="width: ${Math.max(percent, 8)}%"></div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3 text-right shrink-0">
+                  <span class="text-xs font-bold text-emerald-400">${d.installs} <span class="text-[10px] text-slate-400 font-normal">installs</span></span>
+                  <span class="text-[10px] text-slate-400 font-mono">${d.dateStr}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+  } catch (e) {
+    if (container) container.innerHTML = `<div class="text-center py-2 text-xs text-rose-400">Failed to load daily stats: ${e.message}</div>`;
   }
 }
 
@@ -2088,29 +2137,52 @@ async function saveAppSettings() {
   }
 }
 
+function setNotificationPreset(type) {
+  const titleElem = document.getElementById('setting-notification-title');
+  const msgElem = document.getElementById('setting-announcement');
+  if (type === 'cricket') {
+    if (titleElem) titleElem.value = '🏏 Big Cricket Match is LIVE Now!';
+    if (msgElem) msgElem.value = '🔴 Live stream is active in crystal-clear 1080p 60FPS! Open HD STREAM now to watch ball-by-ball action.';
+  } else if (type === 'channels') {
+    if (titleElem) titleElem.value = '📺 New 24/7 Channels Added!';
+    if (msgElem) msgElem.value = '✨ Over 10,500+ live TV channels, sports, and entertainment streams have been updated! Check them out now.';
+  } else if (type === 'server') {
+    if (titleElem) titleElem.value = '⚡ High-Speed Ultra Low Buffer Active';
+    if (msgElem) msgElem.value = '🚀 High speed streaming server upgraded. Enjoy ultra smooth and buffer-free HD streaming!';
+  }
+}
+
 async function broadcastNotification(enable) {
+  const titleElem = document.getElementById('setting-notification-title');
   const annElem = document.getElementById('setting-announcement');
+  const actionElem = document.getElementById('setting-notification-action');
   const annEnabledElem = document.getElementById('setting-announcement-enabled');
   if (annEnabledElem) annEnabledElem.checked = enable;
 
+  const title = titleElem ? titleElem.value.trim() : 'HD STREAM Live Alert';
   const msg = annElem ? annElem.value.trim() : '';
-  if (enable && !msg) {
-    showToast('Please enter a notification message first!', 'error');
+  const actionUrl = actionElem ? actionElem.value.trim() : '';
+
+  if (enable && !msg && !title) {
+    showToast('Please enter a notification title or message first!', 'error');
     if (annElem) annElem.focus();
     return;
   }
 
   const payload = {
+    title: title || 'HD STREAM Live Alert',
+    message: msg,
+    actionUrl,
     announcement: msg,
     announcementEnabled: enable
   };
 
   try {
-    await apiRequest('/api/settings', 'PUT', payload);
+    const res = await apiRequest('/api/notifications/send', 'POST', payload);
     if (!state.settings) state.settings = {};
     Object.assign(state.settings, payload);
     if (enable) {
-      showToast('🚀 Instant Notification Sent to APK! Users will see the alert popup.', 'success');
+      showToast('🚀 Push Notification Sent to all Mobile APK Devices!', 'success');
     } else {
       showToast('In-app alert popup turned off for mobile APK.', 'info');
     }

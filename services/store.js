@@ -6,7 +6,7 @@ const Match = require('../models/Match');
 const Category = require('../models/Category');
 const Vod = require('../models/Vod');
 const Settings = require('../models/Settings');
-const { Device, AnalyticsSummary } = require('../models/Analytics');
+const { Device, AnalyticsSummary, DailyInstall } = require('../models/Analytics');
 
 const inMemoryDevices = new Map();
 let inMemoryApkDownloads = 0; // Real download counter, no fake offset
@@ -960,38 +960,50 @@ const Store = {
   },
 
   // --- DEVICE & APP USAGE ANALYTICS ---
-  async trackDevice(ip, userAgent) {
-    if (!ip && !userAgent) return;
+  async trackDevice(ip, userAgent, customDeviceId = '', modelName = '', osVer = '') {
+    if (!ip && !userAgent && !customDeviceId) return;
     const cleanIp = (ip || '').split(',')[0].trim().replace(/^.*:/, '');
     const cleanUa = (userAgent || '').substring(0, 200);
-    const deviceId = getDeviceId(cleanIp, cleanUa);
+    const deviceId = customDeviceId && customDeviceId.trim().length > 4 ? customDeviceId.trim() : getDeviceId(cleanIp, cleanUa);
     const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const resolvedModel = modelName || parseDeviceModel(cleanUa);
 
     // In-memory track
     const existing = inMemoryDevices.get(deviceId);
-    if (!existing) {
+    const isNew = !existing;
+    if (isNew) {
       inMemoryDevices.set(deviceId, {
         deviceId,
         ip: cleanIp,
         userAgent: cleanUa,
+        deviceModel: resolvedModel,
+        osVersion: osVer,
         firstSeen: now,
         lastSeen: now,
         requestsCount: 1
       });
     } else {
       existing.lastSeen = now;
+      if (modelName) existing.deviceModel = modelName;
+      if (osVer) existing.osVersion = osVer;
       existing.requestsCount = (existing.requestsCount || 1) + 1;
     }
 
     // Persist to MongoDB if connected
     if (isMongoConnected()) {
       try {
+        const doc = await Device.findOne({ deviceId });
+        const isDbNew = !doc;
+
         await Device.findOneAndUpdate(
           { deviceId },
           {
             $set: {
               ip: cleanIp,
               userAgent: cleanUa,
+              deviceModel: resolvedModel,
+              osVersion: osVer,
               lastSeen: now
             },
             $setOnInsert: { firstSeen: now },
@@ -999,10 +1011,138 @@ const Store = {
           },
           { upsert: true, new: true }
         );
+
+        const dailyUpdate = { $set: { updatedAt: now } };
+        if (isDbNew) {
+          dailyUpdate.$inc = { installs: 1, activeUsers: 1 };
+        } else {
+          dailyUpdate.$inc = { activeUsers: 1 };
+        }
+        await DailyInstall.findOneAndUpdate(
+          { dateStr: todayStr },
+          dailyUpdate,
+          { upsert: true, new: true }
+        );
       } catch (err) {
         // non-blocking
       }
     }
+  },
+
+  async getDailyInstallStats(days = 14) {
+    const list = [];
+    const now = new Date();
+
+    if (isMongoConnected()) {
+      try {
+        for (let i = 0; i < days; i++) {
+          const d = new Date(now);
+          d.setDate(d.getDate() - i);
+          const dateStr = d.toISOString().split('T')[0];
+
+          const start = new Date(d);
+          start.setHours(0, 0, 0, 0);
+          const end = new Date(d);
+          end.setHours(23, 59, 59, 999);
+
+          const [installsCount, activeCount] = await Promise.all([
+            Device.countDocuments({ firstSeen: { $gte: start, $lte: end } }),
+            Device.countDocuments({ lastSeen: { $gte: start, $lte: end } })
+          ]);
+
+          const label = i === 0 ? 'Today' : i === 1 ? 'Yesterday' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+          list.push({
+            dateStr,
+            label,
+            installs: installsCount,
+            activeUsers: Math.max(activeCount, installsCount)
+          });
+        }
+      } catch (err) {}
+    }
+
+    if (list.length === 0) {
+      for (let i = 0; i < days; i++) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        const start = new Date(d);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(d);
+        end.setHours(23, 59, 59, 999);
+
+        let installs = 0;
+        let active = 0;
+        for (const dev of inMemoryDevices.values()) {
+          const fsTime = new Date(dev.firstSeen).getTime();
+          const lsTime = new Date(dev.lastSeen).getTime();
+          if (fsTime >= start.getTime() && fsTime <= end.getTime()) installs++;
+          if (lsTime >= start.getTime() && lsTime <= end.getTime()) active++;
+        }
+
+        const label = i === 0 ? 'Today' : i === 1 ? 'Yesterday' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        list.push({
+          dateStr,
+          label,
+          installs,
+          activeUsers: Math.max(active, installs)
+        });
+      }
+    }
+
+    const todayInstalls = list[0]?.installs || 0;
+    const yesterdayInstalls = list[1]?.installs || 0;
+    const weekInstalls = list.slice(0, 7).reduce((acc, cur) => acc + cur.installs, 0);
+    const totalInstalls = list.reduce((acc, cur) => acc + cur.installs, 0);
+
+    return {
+      todayInstalls,
+      yesterdayInstalls,
+      weekInstalls,
+      totalInstalls,
+      dailyBreakdown: list
+    };
+  },
+
+  async sendNotification(title, message, actionUrl = '') {
+    const cleanTitle = (title || 'HD STREAM Live Alert').trim();
+    const cleanMessage = (message || '').trim();
+    const notificationId = `notif_${Date.now()}`;
+    const now = new Date();
+
+    const payload = {
+      notificationTitle: cleanTitle,
+      notificationMessage: cleanMessage,
+      notificationId,
+      notificationTime: now,
+      notificationActionUrl: (actionUrl || '').trim(),
+      announcement: cleanMessage,
+      announcementEnabled: true,
+      updatedAt: now
+    };
+
+    if (isMongoConnected()) {
+      try {
+        await Settings.findOneAndUpdate(
+          {},
+          { $set: payload },
+          { upsert: true, new: true }
+        );
+      } catch (err) {}
+    }
+
+    if (initialSettings) {
+      Object.assign(initialSettings, payload);
+    }
+
+    return {
+      notificationId,
+      notificationTitle: cleanTitle,
+      notificationMessage: cleanMessage,
+      notificationTime: now,
+      notificationActionUrl: actionUrl
+    };
   },
 
   async trackApkDownload() {

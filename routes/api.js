@@ -288,6 +288,63 @@ router.get('/devices', async (req, res) => {
   }
 });
 
+// Day-by-Day App Installs Analytics
+router.get('/analytics/daily-installs', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days || '14', 10);
+    const data = await Store.getDailyInstallStats(days);
+    res.json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Dedicated Device Registration Endpoint from Mobile App Launch
+router.post('/devices/register', async (req, res) => {
+  try {
+    const { deviceId, deviceModel, osVersion } = req.body || {};
+    const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '';
+    const userAgent = req.headers['user-agent'] || '';
+    await Store.trackDevice(ip, userAgent, deviceId, deviceModel, osVersion);
+    res.json({ success: true, message: 'Device registered successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Push Notification to Mobile APK Endpoints
+router.post('/notifications/send', requireAdmin, async (req, res) => {
+  try {
+    const { title, message, actionUrl } = req.body || {};
+    if (!message && !title) {
+      return res.status(400).json({ success: false, message: 'Notification title or message is required' });
+    }
+    const result = await Store.sendNotification(title, message, actionUrl);
+    res.json({ success: true, data: result, message: '🚀 Push notification broadcasted to all mobile APK devices!' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+router.get('/notifications/latest', async (req, res) => {
+  try {
+    const settings = await Store.getSettings();
+    res.json({
+      success: true,
+      data: {
+        notificationId: settings.notificationId || '',
+        notificationTitle: settings.notificationTitle || 'HD STREAM Live Alert',
+        notificationMessage: settings.notificationMessage || settings.announcement || '',
+        notificationTime: settings.notificationTime || settings.updatedAt || new Date(),
+        notificationActionUrl: settings.notificationActionUrl || '',
+        announcementEnabled: settings.announcementEnabled !== false
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // 3. Match / Live Event Endpoints (Directly synced from Google Drive)
 router.get('/matches', async (req, res) => {
   try {
