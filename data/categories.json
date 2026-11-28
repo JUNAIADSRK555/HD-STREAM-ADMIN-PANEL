@@ -115,5 +115,17 @@
     "serial": "8B910A07977CD",
     "device_id_1": "FDDB952641AA2826CE9E6B6159D9D5242B41F93A69288C342C3508764A3E3621",
     "device_id_2": "FDDB952641AA2826CE9E6B6159D9D5242B41F93A69288C342C3508764A3E3621"
+  },
+  {
+    "id": "gcat_13",
+    "name": "TV KING",
+    "slug": "tv-king",
+    "type": "xtream",
+    "icon": "fas fa-crown",
+    "imageUrl": "https://raw.githubusercontent.com/JUNAIADSRK555/HD-STREAM-ADMIN-PANEL/main/public/logos/hdstream.png",
+    "server": "http://livebox.pro",
+    "username": "Hs123",
+    "password": "Hs123",
+    "m3uLink": "http://livebox.pro/player_api.php?username=Hs123&password=Hs123"
   }
 ]

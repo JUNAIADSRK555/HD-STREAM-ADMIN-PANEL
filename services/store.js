@@ -660,6 +660,15 @@ const Store = {
             icon: c.icon || 'fas fa-tv',
             imageUrl: c.imageUrl || '',
             m3uLink: c.m3uLink || '',
+            type: c.type || '',
+            server: c.server || '',
+            username: c.username || '',
+            password: c.password || '',
+            portal_url: c.portal_url || '',
+            mac: c.mac || '',
+            serial: c.serial || '',
+            device_id_1: c.device_id_1 || '',
+            device_id_2: c.device_id_2 || '',
             order: c.order !== undefined ? c.order : (idx + 1),
             isActive: c.isActive !== false
           }));

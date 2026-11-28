@@ -1951,16 +1951,34 @@ function previewStream(url, type) {
 
 // --- CATEGORIES ---
 
+function toggleCatTypeFields() {
+  const type = (document.getElementById('cat-type')?.value || 'm3u');
+  const m3uGrp = document.getElementById('cat-m3u-group');
+  const xtreamGrp = document.getElementById('cat-xtream-group');
+  const stalkerGrp = document.getElementById('cat-stalker-group');
+  if (m3uGrp) m3uGrp.classList.toggle('hidden', type !== 'm3u');
+  if (xtreamGrp) xtreamGrp.classList.toggle('hidden', type !== 'xtream');
+  if (stalkerGrp) stalkerGrp.classList.toggle('hidden', type !== 'stalker');
+}
+
 function openNewCategoryModal() {
   document.getElementById('cat-modal-title').textContent = 'Add New Category';
   document.getElementById('cat-id').value = '';
   document.getElementById('cat-name').value = '';
   document.getElementById('cat-slug').value = '';
+  document.getElementById('cat-type').value = 'm3u';
   document.getElementById('cat-m3u').value = '';
+  document.getElementById('cat-xtream-server').value = '';
+  document.getElementById('cat-xtream-username').value = '';
+  document.getElementById('cat-xtream-password').value = '';
+  document.getElementById('cat-stalker-portal').value = '';
+  document.getElementById('cat-stalker-mac').value = '';
+  document.getElementById('cat-stalker-serial').value = '';
   document.getElementById('cat-image').value = '';
   document.getElementById('cat-icon').value = 'fas fa-tv';
   document.getElementById('cat-order').value = (state.categories.length + 1).toString();
   document.getElementById('cat-submit-btn').textContent = 'Save Category';
+  toggleCatTypeFields();
   openModal('modal-category');
 }
 
@@ -1976,26 +1994,55 @@ function openEditCategoryModal(id) {
   document.getElementById('cat-id').value = cat._id || cat.id || '';
   document.getElementById('cat-name').value = cat.name || '';
   document.getElementById('cat-slug').value = cat.slug || '';
+  
+  const isXtream = cat.type === 'xtream' || (cat.server && cat.username) || (cat.m3uLink && cat.m3uLink.includes('player_api.php'));
+  const isStalker = !isXtream && (cat.type === 'stalker' || cat.portal_url || cat.mac || (cat.m3uLink && cat.m3uLink.includes('stalker_portal')));
+  const catType = isXtream ? 'xtream' : (isStalker ? 'stalker' : 'm3u');
+
+  document.getElementById('cat-type').value = catType;
   document.getElementById('cat-m3u').value = cat.m3uLink || '';
+  document.getElementById('cat-xtream-server').value = cat.server || '';
+  document.getElementById('cat-xtream-username').value = cat.username || '';
+  document.getElementById('cat-xtream-password').value = cat.password || '';
+  document.getElementById('cat-stalker-portal').value = cat.portal_url || '';
+  document.getElementById('cat-stalker-mac').value = cat.mac || '';
+  document.getElementById('cat-stalker-serial').value = cat.serial || '';
   document.getElementById('cat-image').value = cat.imageUrl || '';
   document.getElementById('cat-icon').value = cat.icon || 'fas fa-tv';
   document.getElementById('cat-order').value = (cat.order || 1).toString();
   document.getElementById('cat-submit-btn').textContent = 'Update Category';
+  toggleCatTypeFields();
   openModal('modal-category');
 }
 
 async function handleSaveCategory(e) {
   e.preventDefault();
   const id = document.getElementById('cat-id').value.trim();
+  const catType = document.getElementById('cat-type')?.value || 'm3u';
+  
   const payload = {
     name: document.getElementById('cat-name').value.trim(),
     slug: document.getElementById('cat-slug').value.trim(),
-    m3uLink: document.getElementById('cat-m3u').value.trim(),
+    type: catType,
     imageUrl: document.getElementById('cat-image').value.trim(),
     icon: document.getElementById('cat-icon').value.trim(),
     order: parseInt(document.getElementById('cat-order').value) || 1,
     isActive: true
   };
+
+  if (catType === 'xtream') {
+    payload.server = document.getElementById('cat-xtream-server').value.trim();
+    payload.username = document.getElementById('cat-xtream-username').value.trim();
+    payload.password = document.getElementById('cat-xtream-password').value.trim();
+    payload.m3uLink = `${payload.server.replace(/\/+$/, '')}/player_api.php?username=${payload.username}&password=${payload.password}`;
+  } else if (catType === 'stalker') {
+    payload.portal_url = document.getElementById('cat-stalker-portal').value.trim();
+    payload.mac = document.getElementById('cat-stalker-mac').value.trim();
+    payload.serial = document.getElementById('cat-stalker-serial').value.trim();
+    payload.m3uLink = payload.portal_url;
+  } else {
+    payload.m3uLink = document.getElementById('cat-m3u').value.trim();
+  }
 
   try {
     if (id) {

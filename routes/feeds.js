@@ -199,8 +199,15 @@ router.get(['/mobile', '/app-data'], async (req, res) => {
         icon: c.icon || 'fas fa-tv',
         imageUrl: c.imageUrl || '',
         m3uLink: c.m3uLink || '',
+        type: c.type || '',
+        server: c.server || '',
+        username: c.username || '',
+        password: c.password || '',
         portal_url: c.portal_url || '',
-        mac: c.mac || ''
+        mac: c.mac || '',
+        serial: c.serial || '',
+        device_id_1: c.device_id_1 || c.deviceId1 || '',
+        device_id_2: c.device_id_2 || c.deviceId2 || ''
       });
     }
 
@@ -216,8 +223,15 @@ router.get(['/mobile', '/app-data'], async (req, res) => {
         icon: c.icon || 'fas fa-tv',
         imageUrl: c.imageUrl || '',
         m3uLink: c.m3uLink || '',
+        type: c.type || '',
+        server: c.server || '',
+        username: c.username || '',
+        password: c.password || '',
         portal_url: c.portal_url || '',
-        mac: c.mac || ''
+        mac: c.mac || '',
+        serial: c.serial || '',
+        device_id_1: c.device_id_1 || c.deviceId1 || '',
+        device_id_2: c.device_id_2 || c.deviceId2 || ''
       });
     }
 
@@ -242,7 +256,7 @@ router.get(['/mobile', '/app-data'], async (req, res) => {
         notificationId: settings.notificationId || '',
         notificationTime: settings.notificationTime || settings.updatedAt || new Date().toISOString(),
         notificationActionUrl: settings.notificationActionUrl || '',
-        appVersion: '3.4.47',
+        appVersion: '3.4.48',
         minVersion: settings.minVersion || '1.0.0',
         apkDownloadUrl: settings.apkDownloadUrl || 'https://hd-stream-backend.onrender.com/HD-STREAM.apk',
         maintenanceMode: settings.maintenanceMode,
